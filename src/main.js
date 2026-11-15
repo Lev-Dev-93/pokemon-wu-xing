@@ -1,22 +1,76 @@
+import {startBattle,playTurn,availableMoves} from './battle.js';
+import {grantTestExperience,acceptMove,acceptEvolution,describeMove} from './battle-rewards.js';
+import {createPokemon} from './team.js';
+import {levelProgress,availableLevelEvolutions} from './progression.js';
+import {getMove,getEvolutions,speciesTypes,experienceForLevel} from './moves.js';
+import {STARTERS} from './starter-data.js';
 import {drawScene} from './art.js';
 import {Engine} from './engine.js';
-const engine=new Engine();
-const canvas=document.querySelector('#game');
-const ctx=canvas.getContext('2d');
-const info=document.querySelector('#info');
-const notice=document.querySelector('#notice');
-const details=document.querySelector('#debug');
+const engine=new Engine();const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
+const info=document.querySelector('#info'),notice=document.querySelector('#notice'),details=document.querySelector('#debug');
+const dialogBox=document.querySelector('#dialogue'),speaker=document.querySelector('#speaker'),dialogText=document.querySelector('#dialogue-text');
 const directions={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right'};
-const keys=new Set();let last=0;
-function move(dir){engine.step(dir);draw();}
-function draw(){const m=engine.map;canvas.width=m.w*32;canvas.height=m.h*32;ctx.imageSmoothingEnabled=false;drawScene(ctx,m,engine.state);document.querySelector('#area').textContent=m.name;info.textContent=`${m.name} · Position ${engine.state.x},${engine.state.y} · Höhe ${engine.state.elevation} · Schritte ${engine.state.steps}`;notice.textContent=engine.message||'Pfeiltasten oder WASD zum Bewegen';window.__pokemonWuXing=engine;}
-window.addEventListener('keydown',e=>{const dir=directions[e.key];if(dir){e.preventDefault();keys.add(e.key);if(!e.repeat)move(dir)}if(e.key==='Escape'){keys.clear();details.open=false;}});
+const menu=document.querySelector('#game-menu'),menuContent=document.querySelector('#menu-content');let menuOpen=false;let battle=null;let rewardDone=false;let pendingRewards=[];let battleFlash=0;const battlePanel=document.querySelector('#battle-panel');const keys=new Set();let last=0;const saveKey='pokemon-wu-xing-dev',autoKey='pokemon-wu-xing-autosave',legacyKey='monsterreise-dev1';const starterPanel=document.querySelector('#starter-panel'),starterSearch=document.querySelector('#starter-search'),starterList=document.querySelector('#starter-list'),starterStatus=document.querySelector('#starter-status');
+const journal=document.querySelector('#journal'),journalButton=document.querySelector('#journal-toggle');
+function move(dir){if(menuOpen||!starterPanel.hidden||!battlePanel.hidden)return;engine.step(dir);if(engine.lastEvent==='transition')autoSave();engine.lastEvent=null;draw()}
+function interact(){if(menuOpen||!starterPanel.hidden||!battlePanel.hidden)return;keys.clear();engine.interact();if(engine.lastEvent==='dialogueFinished')autoSave();engine.lastEvent=null;draw()}
+function autoSave(){try{localStorage.setItem(autoKey,engine.save())}catch(e){console.warn('Automatisches Speichern nicht möglich',e)}}
+function renderStarters(){
+ starterList.replaceChildren();const q=starterSearch.value.trim().toLocaleLowerCase('de');
+ const results=STARTERS.filter(p=>p.name.toLocaleLowerCase('de').includes(q)||p.identifier.includes(q)||String(p.id).includes(q));
+ starterStatus.textContent=`${results.length} von ${STARTERS.length} möglichen Arten · Auswahl einmalig`;
+ for(const p of results){const b=document.createElement('button');b.type='button';b.textContent=`#${String(p.id).padStart(3,'0')} · ${p.name}`;b.addEventListener('click',()=>{
+ if(!engine.chooseStarter(p.id)){notice.textContent='Auswahl derzeit nicht möglich.';return}
+ starterPanel.hidden=true;keys.clear();autoSave();draw();});starterList.append(b)}
+}
+function openStarters(){
+ if(engine.state.flags.egg_received){notice.textContent=`Dein Wunsch: ${engine.starterWish?.name||'unbekannt'} – das Ei ist bereits erhalten.`;return}
+ if(engine.state.mapId!=='ground'||!engine.state.flags.spokenToBreederA||!engine.state.flags.spokenToBreederB){notice.textContent='Sprich zuerst im Erdgeschoss mit beiden Züchtern.';return}
+ toggleMenu(false);keys.clear();starterPanel.hidden=false;starterSearch.value='';renderStarters();starterSearch.focus();draw();
+}
+function renderJournal(){const data=engine.journal;document.querySelector('#journal-title').textContent=data.heading;document.querySelector('#journal-description').textContent=data.description;const ul=document.querySelector('#journal-tasks');ul.replaceChildren();for(const task of data.tasks){const li=document.createElement('li');li.className=task.done?'done':'pending';li.textContent=`${task.done?'✓':'○'} ${task.label}`;ul.append(li)}}
+function toggleJournal(){journal.hidden=!journal.hidden;journalButton.setAttribute('aria-expanded',String(!journal.hidden));renderJournal()}
+function draw(){const m=engine.map;canvas.width=m.w*32;canvas.height=m.h*32;ctx.imageSmoothingEnabled=false;drawScene(ctx,m,engine.state);
+ document.querySelector('#area').textContent=m.name;info.textContent=`${m.name} · Position ${engine.state.x},${engine.state.y} · Höhe ${engine.state.elevation} · Schritte ${engine.state.steps}`;
+ dialogBox.hidden=engine.mode!=='dialogue';if(engine.dialogue){speaker.textContent=engine.dialogue.name;dialogText.textContent=engine.dialogue.pages[engine.dialogue.index]}
+ renderJournal();notice.textContent=engine.message|| (engine.mode==='dialogue'?'':'WASD / Pfeiltasten · E / Leertaste: Untersuchen');window.__pokemonWuXing=engine;}
+function toggleMenu(force){if(!starterPanel.hidden||!battlePanel.hidden)return;menuOpen=typeof force==='boolean'?force:!menuOpen;menu.hidden=!menuOpen;document.querySelector('#menu-toggle').setAttribute('aria-expanded',String(menuOpen));keys.clear();if(!menuOpen)menuContent.replaceChildren();}
+function menuPanel(which){menuContent.replaceChildren();const heading=document.createElement('h3');const list=document.createElement('ul');if(which==='team'){heading.textContent='Pokémon-Team';const members=engine.team;if(!members.length){const li=document.createElement('li');li.textContent='Noch keine Pokémon im Team. Dein Starter-Ei gehört nicht zum Team.';list.append(li)}else for(const [index,p] of members.entries()){const li=document.createElement('li');li.textContent=`${index+1}. #${String(p.speciesId).padStart(3,'0')} · Lv. ${p.level} · KP ${p.currentHp}/${p.stats.hp}`;list.append(li);const ml=document.createElement('li');ml.textContent='Attacken: '+(p.moves.length?p.moves.map(id=>getMove(id)?.de||getMove(id)?.name||'#'+id).join(', '):'Keine');list.append(ml);const xp=levelProgress(p);const xpLi=document.createElement('li');xpLi.textContent='EP: '+xp.experience+(xp.nextLevelExperience===null?' · Maximallevel':' / '+xp.nextLevelExperience);list.append(xpLi);const available=availableLevelEvolutions(p);if(available.length){const al=document.createElement('li');al.textContent='Levelentwicklung möglich: '+available.map(e=>'#'+e.to).join(', ')+' (Bestätigung folgt in Kampfsystem)';list.append(al)}const evo=getEvolutions(p.speciesId);if(evo.length){const el=document.createElement('li');el.textContent='Entwicklungsziele: '+evo.map(x=>'#'+x.to).join(', ')+' (Sonderentwicklungen noch gesperrt)';list.append(el)}}if(engine.state.starterEgg&&!engine.state.starterEgg.hatched){const li=document.createElement('li');li.textContent='Starter-Ei: im Besitz, schlüpft erst auf Route 1.';list.append(li)}}else if(which==='inventory'){heading.textContent='Beutel';const items=engine.inventory;if(!items.length){const li=document.createElement('li');li.textContent='Noch keine Gegenstände vorhanden.';list.append(li)}else for(const item of items){const li=document.createElement('li');li.textContent=`${item.id} × ${item.quantity}`;list.append(li)}}else if(which==='settings'){heading.textContent='Einstellungen';for(const [label,cls] of [['Große Schrift','large-text'],['Hoher Kontrast','high-contrast']]){const button=document.createElement('button');button.textContent=label;button.setAttribute('aria-pressed',String(document.body.classList.contains(cls)));button.addEventListener('click',()=>{document.body.classList.toggle(cls);button.setAttribute('aria-pressed',String(document.body.classList.contains(cls)))});list.append(button)}}else if(which==='journal'){heading.textContent=engine.journal.heading;for(const task of engine.journal.tasks){const li=document.createElement('li');li.textContent=`${task.done?'✓':'○'} ${task.label}`;list.append(li)}}menuContent.append(heading,list)}
+document.querySelector('#starter-open').addEventListener('click',openStarters);document.querySelector('#starter-close').addEventListener('click',()=>{starterPanel.hidden=true;keys.clear();draw()});starterSearch.addEventListener('input',renderStarters);
+document.querySelector('#birthday-preview').addEventListener('click',()=>{if(menuOpen)toggleMenu(false);keys.clear();engine.beginBirthdayPreview();if(engine.mode==='dialogue')autoSave();draw()});
+document.querySelector('#menu-toggle').addEventListener('click',()=>toggleMenu());document.querySelector('#menu-close').addEventListener('click',()=>toggleMenu(false));document.querySelector('#menu-team').addEventListener('click',()=>menuPanel('team'));document.querySelector('#menu-inventory').addEventListener('click',()=>menuPanel('inventory'));document.querySelector('#menu-settings').addEventListener('click',()=>menuPanel('settings'));document.querySelector('#menu-journal').addEventListener('click',()=>menuPanel('journal'));document.querySelector('#menu-save').addEventListener('click',()=>document.querySelector('#save').click());
+window.addEventListener('keydown',e=>{if(e.target instanceof HTMLElement&&['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;
+ if(!battlePanel.hidden){if(e.key==='Escape')closeBattle();return}
+ if(!starterPanel.hidden){if(e.key==='Escape'){starterPanel.hidden=true;keys.clear();draw()}return}
+ if(e.key==='e'||e.key==='E'||e.code==='Space'){e.preventDefault();if(!e.repeat)interact();return}
+ if(e.key==='m'||e.key==='M'){e.preventDefault();if(!e.repeat)toggleMenu();return}if(e.key==='Escape'){if(menuOpen){toggleMenu(false);return}keys.clear();details.open=false;if(!journal.hidden)toggleJournal();return}
+ if(menuOpen)return;if(e.key==='j'||e.key==='J'){e.preventDefault();if(!e.repeat)toggleJournal();return}
+ const dir=directions[e.key];if(dir){e.preventDefault();if(engine.mode==='dialogue')return;keys.add(e.key);if(!e.repeat)move(dir)}});
 window.addEventListener('keyup',e=>keys.delete(e.key));window.addEventListener('blur',()=>keys.clear());
 for(const b of document.querySelectorAll('[data-dir]'))b.addEventListener('click',()=>move(b.dataset.dir));
-const saveKey='pokemon-wu-xing-dev';const legacyKey='monsterreise-dev1';
-document.querySelector('#save').addEventListener('click',()=>{try{localStorage.setItem(saveKey,engine.save());notice.textContent='Spielstand gespeichert';}catch(e){notice.textContent=`Speichern fehlgeschlagen: ${e.message}`}});
-document.querySelector('#load').addEventListener('click',()=>{try{const raw=localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');engine.load(raw);draw();notice.textContent='Spielstand geladen';}catch(e){notice.textContent=`Laden fehlgeschlagen: ${e.message}`}});
-document.querySelector('#reset').addEventListener('click',()=>{engine.reset();draw();notice.textContent='Neues Spiel gestartet';});
-function frame(t){if(t-last>=125){const key=[...keys].at(-1);if(key)move(directions[key]);last=t;}requestAnimationFrame(frame)}
+document.querySelector('#interact').addEventListener('click',interact);dialogBox.addEventListener('click',interact);
+journalButton.addEventListener('click',toggleJournal);document.querySelector('#continue').addEventListener('click',()=>{try{const raw=localStorage.getItem(autoKey)||localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');engine.load(raw);keys.clear();draw();notice.textContent='Letzten Stand fortgesetzt'}catch(e){notice.textContent=`Fortsetzen fehlgeschlagen: ${e.message}`}});
+document.querySelector('#save').addEventListener('click',()=>{try{localStorage.setItem(saveKey,engine.save());notice.textContent='Spielstand gespeichert'}catch(e){notice.textContent=`Speichern fehlgeschlagen: ${e.message}`}});
+document.querySelector('#load').addEventListener('click',()=>{try{const raw=localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');engine.load(raw);keys.clear();draw();notice.textContent='Spielstand geladen'}catch(e){notice.textContent=`Laden fehlgeschlagen: ${e.message}`}});
+document.querySelector('#reset').addEventListener('click',()=>{keys.clear();starterPanel.hidden=true;engine.reset();try{localStorage.removeItem(autoKey)}catch(e){}draw();notice.textContent='Neues Spiel gestartet'});
+function frame(t){if(t-last>=125){if(engine.mode==='exploration'&&!menuOpen&&starterPanel.hidden&&battlePanel.hidden){const key=[...keys].at(-1);if(key)move(directions[key])}last=t}requestAnimationFrame(frame)}
+
+// Abgeschlossene technische Testarena: keine Änderung an Engine-Team oder Story.
+function rewardNotice(text){const el=document.querySelector('#battle-reward');const p=document.createElement('p');p.textContent=text;el.append(p)}
+function nextReward(){const el=document.querySelector('#battle-choices');el.replaceChildren();const task=pendingRewards.shift();if(!task)return;
+ const prompt=document.createElement('p');prompt.textContent=task.kind==='move'?`Neue Attacke: ${describeMove(task.id)}. Lernen?`:`Entwicklung zu Pokémon #${task.id} durchführen?`;el.append(prompt);
+ function option(label,fn){const b=document.createElement('button');b.textContent=label;b.addEventListener('click',()=>{try{fn();}catch(err){rewardNotice(err.message)}nextReward()});el.append(b)}
+ if(task.kind==='move'){const p=battle.player.pokemon;if(p.moves.length<4)option('Attacke lernen',()=>{acceptMove(p,task.id);rewardNotice(`${describeMove(task.id)} gelernt.`)});else p.moves.forEach((id,index)=>option(`${describeMove(id)} ersetzen`,()=>{acceptMove(p,task.id,index);rewardNotice(`${describeMove(task.id)} gelernt.`)}));option('Nicht lernen',()=>rewardNotice('Attacke nicht gelernt.'))}
+ else{option('Entwickeln',()=>{acceptEvolution(battle.player.pokemon,task.id);rewardNotice(`Entwicklung zu #${task.id} abgeschlossen.`)});option('Nicht entwickeln',()=>rewardNotice('Entwicklung abgebrochen.'))}}
+function settleTestBattle(){if(!battle?.finished||rewardDone)return;rewardDone=true;if(battle.winner!=='player'){rewardNotice('Keine Test-EP vergeben.');return}
+ const result=grantTestExperience(battle.player.pokemon,battle.opponent.pokemon);rewardNotice(`Testbelohnung: ${result.amount} EP · Level ${result.oldLevel} → ${result.newLevel}.`);
+ pendingRewards=[...result.learnableMoves.map(id=>({kind:'move',id})),...result.evolutionOptions.map(e=>({kind:'evolution',id:e.to}))];nextReward()}
+function renderBattle(){if(!battle)return;for(const [id,f] of [['player-hp',battle.player],['enemy-hp',battle.opponent]]){const p=f.pokemon;const el=document.querySelector('#'+id);el.replaceChildren();const label=document.createElement('div');label.textContent=`#${String(p.speciesId).padStart(3,'0')} · Lv. ${p.level} · KP ${p.currentHp}/${p.stats.hp}`;const bar=document.createElement('progress');bar.max=p.stats.hp;bar.value=p.currentHp;el.append(label,bar)}
+ const log=document.querySelector('#battle-log');log.replaceChildren();for(const line of battle.log){const p=document.createElement('p');p.textContent=line;log.append(p)}
+ const moves=document.querySelector('#battle-moves');moves.replaceChildren();for(const move of availableMoves(battle.player)){const b=document.createElement('button');b.textContent=`${move.name} · AP ${move.pp}/${move.maxPp}`;b.disabled=battle.finished||move.pp<=0;b.addEventListener('click',()=>{if(battle.finished)return;const enemy=availableMoves(battle.opponent).filter(m=>m.pp>0);if(!enemy.length){battle.log=['Der Gegner hat keine AP mehr. Testkampf kann neu gestartet werden.'];battle.finished=true;renderBattle();return}try{playTurn(battle,move.index,enemy[Math.floor(Math.random()*enemy.length)].index);battleFlash=Date.now();document.querySelector('.battle-field').classList.remove('battle-hit');void document.querySelector('.battle-field').offsetWidth;document.querySelector('.battle-field').classList.add('battle-hit');renderBattle()}catch(error){battle.log=[error.message];renderBattle()}});moves.append(b)}if(battle.finished){settleTestBattle();const p=document.createElement('p');p.textContent=battle.winner==='player'?'Testsieg!':battle.winner==='opponent'?'Testniederlage.':'Unentschieden.';log.append(p)}}
+function startTestBattle(){if(engine.mode!=='exploration'||!starterPanel.hidden)return;toggleMenu(false);keys.clear();battle=startBattle(createPokemon(4,{level:8}),createPokemon(1,{level:7}));rewardDone=false;pendingRewards=[];document.querySelector('#battle-reward').replaceChildren();document.querySelector('#battle-choices').replaceChildren();battlePanel.hidden=false;renderBattle();document.querySelector('#battle-close').focus()}
+function closeBattle(){battlePanel.hidden=true;battle=null;keys.clear();draw()}
+document.querySelector('#battle-open').addEventListener('click',startTestBattle);document.querySelector('#battle-restart').addEventListener('click',startTestBattle);document.querySelector('#battle-close').addEventListener('click',closeBattle);
+
 draw();requestAnimationFrame(frame);
-if(new URLSearchParams(location.search).has('selftest')){const e=new Engine();let ok=true;try{e.step('down');e.step('down');if(e.state.mapId!=='upper')throw Error('Portal');const s=e.save();e.load(s);}catch(err){ok=false;console.error(err)}document.body.dataset.selftest=ok?'pass':'fail'}
+if(new URLSearchParams(location.search).has('selftest')){const e=new Engine();let ok=true;try{e.state.y=6;e.step('down');if(e.state.mapId!=='ground')throw Error('Treppe');e.load(e.save())}catch(err){ok=false;console.error(err)}document.body.dataset.selftest=ok?'pass':'fail'}

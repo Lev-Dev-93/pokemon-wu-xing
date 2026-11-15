@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {getMove,getLearnset,movesAtLevel,getEvolutions,getLevelEvolutionCandidates,typeEffectiveness,speciesTypes,experienceForLevel} from '../src/moves.js';
+import {createPokemon,validatePokemon} from '../src/team.js';
+test('Gen 5 move data',()=>{assert.equal(getMove(33).name,'tackle');assert.equal(getMove(99999),null);assert.ok(getLearnset(1).length>0)});
+test('Level-up moves are capped and unique',()=>{const a=movesAtLevel(1,5);assert.ok(a.length<=4);assert.equal(new Set(a).size,a.length);assert.ok(a.every(x=>getMove(x)))});
+test('New Pokémon have valid moves',()=>{const p=createPokemon(1);assert.ok(validatePokemon(p));assert.deepEqual(p.moves,movesAtLevel(1,5))});
+test('Evolution chain includes Bulbasaur to Ivysaur',()=>{assert.ok(getEvolutions(1).some(e=>e.to===2&&e.level===16));assert.ok(getLevelEvolutionCandidates(1,16).some(e=>e.to===2));assert.equal(getLevelEvolutionCandidates(1,5).length,0)});
+test('Type chart supports immunity',()=>{assert.equal(typeEffectiveness(1,[8]),0);assert.equal(typeEffectiveness(10,[12]),2);assert.deepEqual(speciesTypes(1),[12,4])});
+test('Growth curve is available',()=>{assert.equal(experienceForLevel(1,1),0);assert.ok(experienceForLevel(1,5)>0)});
+test('Invalid move IDs are rejected in saved team',()=>{const p=createPokemon(1);p.moves=[9999];assert.equal(validatePokemon(p),false)});

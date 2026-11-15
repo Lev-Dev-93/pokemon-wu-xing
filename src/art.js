@@ -45,10 +45,11 @@ stairs(c,7*32,8*32);stairs(c,7*32,9*32);
 for(let y=3;y<11;y++){fence(c,0,y*32);fence(c,W-32,y*32)}
 }
 export function drawScene(c,map,state){c.imageSmoothingEnabled=false;for(let y=0;y<map.h;y++)for(let x=0;x<map.w;x++){const px=x*T,py=y*T,n=x+y*map.w;if(map.id==='yard'){if(x===7&&y>=2||y===10&&x>=4&&x<=10)path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='ground')stone(c,px,py,n);else wood(c,px,py,n);if(map.id!=='yard'&&y===0)wallpaper(c,px,py,n)}
-if(map.id==='bedroom')drawBedroom(c);if(map.id==='upper')drawUpper(c);if(map.id==='ground')drawGround(c);if(map.id==='yard')drawYard(c,map);
+if(map.id==='bedroom')drawBedroom(c);if(map.id==='ground')drawGround(c);if(map.id==='yard')drawYard(c,map);
 // Collision layer is always visually indicated, without changing the engine's walls.
-for(const cell of map.walls){const [x,y]=cell.split(',').map(Number);if(map.id==='bedroom')continue;if(map.id==='upper'&&((x===1||x===2)&&y===1||(x===9||x===10)&&y===1))continue;if(map.id==='ground'&&((x===1||x===2)&&y===1||(x===8||x===9)&&y===1||(x===2||x===3)&&y===5))continue;if(map.id==='yard')continue;wallBlock(c,x*32,y*32)}
+for(const cell of map.walls){const [x,y]=cell.split(',').map(Number);if(map.id==='bedroom')continue;if(map.id==='ground'&&((x===1||x===2)&&y===1||(x===8||x===9)&&y===1||(x===2||x===3)&&y===5))continue;if(map.id==='yard')continue;wallBlock(c,x*32,y*32)}
 if(map.id==='yard'){// raised garden tiles must stay visible above the ground
 R(c,8*32,8*32,3*32,2,'#e7c99b')}
+if(map.id==='ground'){hero(c,6*32,2*32,'down',0);hero(c,3*32,3*32,'left',0)}
 hero(c,state.x*32,state.y*32,state.facing,state.steps);
 }
