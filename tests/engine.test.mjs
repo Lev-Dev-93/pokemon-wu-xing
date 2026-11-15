@@ -1,0 +1,7 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {Engine} from '../src/engine.js';import {maps,canMove} from '../src/maps.js';
+test('Start und Kollision',()=>{const e=new Engine();assert.equal(e.state.mapId,'bedroom');assert.equal(canMove(maps.bedroom,0,1,-1,1),false);assert.equal(canMove(maps.bedroom,1,0,1,1),false);});
+test('Schlafzimmer zu Obergeschoss und zurück',()=>{const e=new Engine();e.step('down');e.step('down');assert.equal(e.state.mapId,'upper');assert.deepEqual([e.state.x,e.state.y],[5,2]);e.step('up');assert.equal(e.state.mapId,'bedroom');assert.deepEqual([e.state.x,e.state.y],[5,6]);});
+test('Treppe beide Richtungen',()=>{const e=new Engine();e.state={...e.state,mapId:'upper',x:10,y:6};e.step('down');assert.equal(e.state.mapId,'ground');e.step('up');assert.equal(e.state.mapId,'upper');});
+test('Hofausgang und Rückweg',()=>{const e=new Engine();e.state={...e.state,mapId:'ground',x:5,y:7};e.step('down');assert.equal(e.state.mapId,'yard');e.step('up');assert.equal(e.state.mapId,'ground');assert.deepEqual([e.state.x,e.state.y],[5,7]);});
+test('Höhenkollision nur über markierte Treppe',()=>{assert.equal(canMove(maps.yard,8,7,8,8),false);assert.equal(canMove(maps.yard,7,8,8,8),true);});
+test('Speichern und Laden',()=>{const e=new Engine();e.step('left');const s=e.save();const n=new Engine();n.load(s);assert.deepEqual(n.state,e.state);assert.throws(()=>n.load('{"schema":1,"state":{"mapId":"yard","x":-1,"y":0}}'));});

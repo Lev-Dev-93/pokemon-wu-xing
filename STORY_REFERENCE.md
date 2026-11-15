@@ -1,0 +1,2 @@
+# Story-Schutz
+Verbindlich: `Monsterreise_Story_Masterfassung_2026-11-14.pdf` (17 Seiten); technische Regeln: `Monsterreise_Technisches_Projekthandbuch_Neustart_2026-11-15.md`. Diese Dateien sind nicht im öffentlichen Paket enthalten. Erste technische Räume sind nur Platzhalter. Es werden keine Dialoge, Namen, Ereignisse oder Pokémon-Entscheidungen erfunden. Geburtstagswunsch und Route-1-Eischlüpfen folgen erst in späteren Meilensteinen. Ältere Story und Zentralstand 034 sind nicht autoritativ.
