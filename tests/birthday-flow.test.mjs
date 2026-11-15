@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {Engine} from '../src/engine.js';
+test('Geburtstagsvorschau liefert nach Dialogabschluss ein eindeutiges Folgeereignis',()=>{const e=new Engine();e.state.mapId='ground';e.state.flags.spokenToBreederA=true;e.state.flags.spokenToBreederB=true;assert.equal(e.beginBirthdayPreview(),true);while(e.mode==='dialogue')e.advanceDialogue();assert.equal(e.lastEvent,'birthdayPreviewFinished');assert.equal(e.state.flags.birthday_wish_pending,true);assert.equal(e.state.flags.egg_received,false)});

@@ -19,8 +19,8 @@ export class Engine{
  const target=[...this.characters,...this.items].find(n=>n.x===x&&n.y===y);if(!target){this.message='Hier gibt es nichts zu untersuchen.';return false;}
  const pages=this.dialogueFor(target);this.dialogue={id:target.id,name:target.name,pages,index:0};if(this.characters.includes(target))target.facing=({up:'down',down:'up',left:'right',right:'left'})[this.state.facing];this.mode='dialogue';this.message='';return true;}
  advanceDialogue(){if(!this.dialogue)return false;if(++this.dialogue.index<this.dialogue.pages.length)return true;
- const id=this.dialogue.id;if(id==='breeder_a')this.setFlag('spokenToBreederA',true);if(id==='breeder_b')this.setFlag('spokenToBreederB',true);
- this.dialogue=null;this.mode='exploration';this.lastEvent='dialogueFinished';return true;}
+ const id=this.dialogue.id;if(id==='birthday_preview')this.lastEvent='birthdayPreviewFinished';if(id==='breeder_a')this.setFlag('spokenToBreederA',true);if(id==='breeder_b')this.setFlag('spokenToBreederB',true);
+ this.dialogue=null;this.mode='exploration';if(this.lastEvent!=='birthdayPreviewFinished')this.lastEvent='dialogueFinished';return true;}
  dialogueFor(target){if(target.id==='breeder_a'&&this.state.flags.spokenToBreederA)return ['Wir haben vorhin schon gesprochen.','Du kannst dich jederzeit im Haus umsehen.'];if(target.id==='breeder_b'&&this.state.flags.visitedYard)return ['Du hast den Hof bereits erkundet.','Es gibt immer etwas Neues zu entdecken.'];return [...target.dialogue];}
  setFlag(key,value){if(!Object.hasOwn(start.flags,key))throw Error('Unbekanntes Ereignis-Flag');if(this.state.flags[key]===value)return false;this.state.flags[key]=value;this.state.eventLog??=[];this.state.eventLog.push({type:'flag',key,value});return true;}
  addItem(id,quantity=1){if(typeof id!=='string'||!id||!Number.isSafeInteger(quantity)||quantity<=0)throw Error('Ungültiger Gegenstand');this.state.inventory??=[];const found=this.state.inventory.find(i=>i.id===id);if(found)found.quantity+=quantity;else this.state.inventory.push({id,quantity});return true;}
