@@ -1,11 +1,8 @@
-# Testbericht – dev.18
+## dev.29 – Dorfladen (technischer Zwischenstand)
 
-- Automatisierte Tests: siehe `npm test` (Node.js).
-- JavaScript-Syntax: `node --check` für alle Module.
-- Browsertest: **nicht durchgeführt**; bestehender dev.15-Browsertest bestätigt nur die frühere Version.
-- Visuelle Prüfung: **nicht durchgeführt**.
-- Neue Tests: Reihenfolge, Idempotenz, gesperrte Vorwegnahme, Save-Validierung und Starterintegration.
+Ein Händler im Startdorf verkauft Pokébälle (40 Pokédollar) und Tränke (60 Pokédollar) zu ausdrücklich vorläufigen Testpreisen. Der Laden ist nach dem Schlüpfen des Starters zugänglich. Käufe aktualisieren Guthaben, Inventar, Ereignisprotokoll und Autosave.
 
+dev.28: 127/127 Node-Tests bestanden. JavaScript-Syntaxprüfung bestanden. Browsertest ausstehend.
 
-## dev.22 – Route 1 und Starter-Schlüpfen
-Route 1 südlich des Startdorfs, Zugang nach Professor-Demonstration, einmaliges Schlüpfen beim ersten Betreten; Level 5, 31 IV, volle KP und versteckte Fähigkeit falls verfügbar; Speicherung und volle-Team-Fallback.
+### dev.31
+Automatisierte Tests: siehe `node --test`. Praktischer Browsertest weiterhin ausstehend.

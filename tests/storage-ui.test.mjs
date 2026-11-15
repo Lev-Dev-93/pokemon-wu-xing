@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {Engine} from '../src/engine.js';
+import {createPokemon} from '../src/team.js';
+const setup=()=>{const e=new Engine();e.state.mapId='village_home';e.state.flags.route1_hatched=true;e.state.team=[createPokemon(1),createPokemon(10)];return e};
+test('Lager nur im Dorfhaus nach Schlüpfen verfügbar',()=>{const e=setup();assert.equal(e.canAccessStorage(),true);e.state.mapId='route1';assert.equal(e.depositPokemon(0),false);assert.equal(e.withdrawPokemon(0),false)});
+test('Pokémon ablegen und zurückholen erhält Daten',()=>{const e=setup();const p=structuredClone(e.state.team[1]);assert.equal(e.depositPokemon(1),true);assert.equal(e.state.team.length,1);assert.deepEqual(e.state.storage[0],p);assert.equal(e.withdrawPokemon(0),true);assert.deepEqual(e.state.team[1],p);assert.equal(e.state.storage.length,0)});
+test('letztes Pokémon darf nicht abgelegt werden',()=>{const e=setup();assert.equal(e.depositPokemon(0),true);assert.equal(e.depositPokemon(0),false)});
+test('Teamspitze wechseln und ungültige Indizes ablehnen',()=>{const e=setup();assert.equal(e.movePokemon(1,0),true);assert.equal(e.state.team[0].speciesId,10);assert.equal(e.movePokemon(7,0),false)});
+test('Lager verhindert Entnahme bei vollem Team',()=>{const e=setup();e.state.storage.push(createPokemon(13));for(let i=0;i<4;i++)e.state.team.push(createPokemon(16));assert.equal(e.withdrawPokemon(0),false);assert.equal(e.state.storage.length,1)});

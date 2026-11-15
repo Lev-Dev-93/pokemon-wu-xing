@@ -25,3 +25,13 @@ export function playTurn(battle,playerMoveIndex,enemyMoveIndex,{rng=Math.random}
  if(battle.log.length>(battle.turnEvents.at(-1)?.log.length||0))battle.turnEvents.push({actor:'status',playerHp:p.pokemon.currentHp,opponentHp:e.pokemon.currentHp,playerPp:[...p.pp],opponentPp:[...e.pp],log:[...battle.log]});
  if(p.pokemon.currentHp===0||e.pokemon.currentHp===0){battle.finished=true;battle.winner=p.pokemon.currentHp>0?'player':e.pokemon.currentHp>0?'opponent':'draw';battle.log.push('Kampf beendet.')}else battle.turn++;return battle;
 }
+
+// Der gegnerische Zug nach einem fehlgeschlagenen Fangversuch (ohne Spielerattacke).
+export function playEnemyOnlyTurn(battle,enemyMoveIndex,{rng=Math.random}={}){
+ if(!battle||battle.finished)throw Error('Kampf bereits beendet oder ungültig');
+ const e=battle.opponent,p=battle.player;if(!Number.isInteger(enemyMoveIndex)||!e.pokemon.moves[enemyMoveIndex]||e.pp[enemyMoveIndex]<=0)throw Error('Attacke nicht verfügbar');
+ battle.log=[];battle.turnEvents=[];perform(battle,e,p,enemyMoveIndex,rng,'Gegner');
+ battle.turnEvents.push({actor:'opponent',playerHp:p.pokemon.currentHp,opponentHp:e.pokemon.currentHp,playerPp:[...p.pp],opponentPp:[...e.pp],log:[...battle.log]});
+ if(p.pokemon.currentHp===0){battle.finished=true;battle.winner='opponent';battle.log.push('Kampf beendet.')}else battle.turn++;
+ return battle;
+}

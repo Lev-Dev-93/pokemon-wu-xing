@@ -1,3 +1,40 @@
+## dev.30 – Teamverwaltung und Lager
+
+- Pokémon im Team an die erste Position setzen.
+- Lagerzugriff im Dorfhaus nach dem Schlüpfen des Starters.
+- Pokémon ablegen und entnehmen; mindestens ein Pokémon verbleibt im Team.
+- Änderungen werden automatisch gespeichert.
+
+## dev.29 – Dorfladen (technischer Zwischenstand)
+
+Ein Händler im Startdorf verkauft Pokébälle (40 Pokédollar) und Tränke (60 Pokédollar) zu ausdrücklich vorläufigen Testpreisen. Der Laden ist nach dem Schlüpfen des Starters zugänglich. Käufe aktualisieren Guthaben, Inventar, Ereignisprotokoll und Autosave.
+
+## dev.28 – Pokémon-Wechsel im Kampf
+
+- Pokémon-Wechsel in Wild- und Trainerkämpfen, sofern ein weiteres kampffähiges Teammitglied vorhanden ist.
+- Ein freiwilliger Wechsel verbraucht den Zug und erlaubt dem Gegner eine Attacke.
+- Nach einem K. o. kann ein weiteres Pokémon ohne zusätzlichen Gegnerzug eingewechselt werden.
+- KP und Angriffs-AP der eingesetzten Pokémon bleiben beim Wechsel erhalten.
+- Trainerkämpfe: Fang und Flucht bleiben gesperrt.
+- Oberfläche weiterhin vorläufig; Browsertest ausstehend.
+
+## dev.26 – Reiseversorgung
+
+- Dorfhausbewohner heilt nach dem Schlüpfen das gesamte Team (KP und Status).
+- Reisevorräte: einmalig drei Tränke im Dorfhaus.
+- Tränke im Beutel auf ein verletztes, nicht besiegtes Team-Pokémon anwenden (maximal 20 KP).
+- Änderungen werden automatisch gespeichert; ältere Speicherstände bleiben ladbar.
+- Browserprüfung steht aus.
+
+## dev.24 – Fangsystem (technischer Zwischenstand)
+
+- Fünf Pokébälle beim ersten Schlüpfen auf Route 1.
+- Pokéball im Wildkampf werfen, KP- und statusabhängige Fangchance.
+- Fehlversuch kostet einen Ball und ermöglicht einen gegnerischen Zug.
+- Gefangene Pokémon werden ins Team (bis 6) oder Lager (bis 500) aufgenommen.
+- Inventar und Team bleiben im bestehenden Speicherformat erhalten.
+- Fangraten sind vorläufig und werden beim regionalen Balancing überprüft.
+
 ## dev.21 – Professor-Ausflug und schillerndes Raupy
 
 - Freiwilliges Gespräch mit dem Professor nach Absol startet eine einmalige, mehrteilige Forschungsexkursion.
@@ -37,3 +74,16 @@ Nach dem Dimensionsereignis den Kindheitsfreund im Startdorf ansprechen, um die 
 
 ## dev.22 – Route 1 und Starter-Schlüpfen
 Route 1 südlich des Startdorfs, Zugang nach Professor-Demonstration, einmaliges Schlüpfen beim ersten Betreten; Level 5, 31 IV, volle KP und versteckte Fähigkeit falls verfügbar; Speicherung und volle-Team-Fallback.
+
+### dev.23: Wildbegegnungen
+Nach Abschluss des Prologs und dem Schlüpfen auf Route 1 kann im hohen Gras ein wildes Pokémon erscheinen. Die Begegnungstabelle ist vorläufig, nicht endgültiger Story-Kanon. Wildkämpfe verwenden das erste kampffähige Team-Pokémon; KP und gewonnene EP bleiben nach dem Kampf erhalten. Flucht ist möglich, Fangen noch nicht. Das bisherige Testkampfsystem bleibt verfügbar. Während eines Wildkampfes wird nicht gespeichert; speichere nach dem Kampf.
+
+
+### Trainerkampf (dev.26)
+Auf Route 1 steht bei (10,8) ein optionaler junger Trainer. Sprich ihn nach dem Schlüpfen deines Starters an. Sein Raupy (Level 4) ist eine vorläufige Testbesetzung. Der Sieg wird gespeichert, nach einer Niederlage ist eine Wiederholung möglich. Trainerkämpfe erlauben weder Flucht noch Fangversuche.
+
+### dev.27
+Der erste Trainer auf Route 1 zahlt nach einem Sieg einmalig 80 Pokédollar. Das Guthaben steht im Beutel und wird gespeichert. Einkaufen ist noch nicht möglich.
+
+### dev.31
+Im Wild- und Trainerkampf können Tränke über „Trank verwenden“ eingesetzt werden. Der Gegner greift anschließend an.
