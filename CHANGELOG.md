@@ -1,7 +1,12 @@
-# Änderungsprotokoll
-## 1.0.0-dev.1 – 15.11.2026
-- Neues, unabhängiges HTML5-Canvas-Projekt erstellt.
-- Fünf technische Testkarten, drei bidirektionale Übergänge und Höhen-Testfläche.
-- Rasterbewegung, Kollision, Treppen, Türübergänge, lokaler Spielstand und Steuerung.
-- Unit-/Integrationstests und Browser-Smoke-Test vorbereitet.
-- Keine alte Engine, keine ungeprüften Pokémon-Daten übernommen.
+# Changelog
+
+## 1.0.0-dev.3 – Das Zuhause
+
+- Vier Karten grafisch ausgebaut: Schlafzimmer, Obergeschoss, Erdgeschoss, Züchterhof.
+- Eigene 32px-Tiles für Holz/Stein/Gras/Weg, Wände, Bett, Schrank, Tisch, Sofa, Anrichte, Pflanzen, Zäune, Dach, Türen, Treppen und Figur.
+- Titel und UI einheitlich auf **Pokémon Wu Xing** gesetzt; Technikdaten eingeklappt.
+- Responsives Layout und Touch-Pfeiltasten erhalten.
+- Speichern unter neuem Schlüssel; Laden liest bei Bedarf auch den alten dev.1/dev.2-Schlüssel.
+- Karten- und Engine-Logik gegenüber dev.2 bewusst nicht verändert.
+
+Keine neuen Storyinhalte oder Pokémon-Daten.

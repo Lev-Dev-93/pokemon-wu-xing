@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {maps} from '../src/maps.js';
+import {drawScene} from '../src/art.js';
+import {Engine} from '../src/engine.js';
+const art=readFileSync(new URL('../src/art.js',import.meta.url),'utf8');
+test('Jede Spielkarte besitzt eine eigene Grafikszene',()=>{for(const id of Object.keys(maps))assert.match(art,new RegExp(`map.id==='${id}'`));});
+test('Rendern verändert den Engine-Spielstand nicht',()=>{const e=new Engine();const before=e.save();const c={fillStyle:'',fillRect(){},imageSmoothingEnabled:true};for(const m of Object.values(maps))drawScene(c,m,{...e.state,mapId:m.id});assert.equal(e.save(),before);});
+test('Alle Portale und Kollisionsfelder bleiben gültig',()=>{for(const m of Object.values(maps)){for(const p of m.portals){assert.ok(maps[p.target]);assert.ok(p.x>=0&&p.x<m.w&&p.y>=0&&p.y<m.h);const t=maps[p.target];assert.ok(p.tx>=0&&p.tx<t.w&&p.ty>=0&&p.ty<t.h);assert.ok(!t.walls.has(`${p.tx},${p.ty}`));}}});

@@ -1,2 +1,5 @@
-# Story-Schutz
-Verbindlich: `Monsterreise_Story_Masterfassung_2026-11-14.pdf` (17 Seiten); technische Regeln: `Monsterreise_Technisches_Projekthandbuch_Neustart_2026-11-15.md`. Diese Dateien sind nicht im öffentlichen Paket enthalten. Erste technische Räume sind nur Platzhalter. Es werden keine Dialoge, Namen, Ereignisse oder Pokémon-Entscheidungen erfunden. Geburtstagswunsch und Route-1-Eischlüpfen folgen erst in späteren Meilensteinen. Ältere Story und Zentralstand 034 sind nicht autoritativ.
+# Story-Referenz
+
+Verbindlich: **Monsterreise – Story-Masterfassung vom 14.11.2026** (17 Seiten). Der spätere Spieltitel wurde vom Nutzer auf **Pokémon Wu Xing** geändert. Technische Leitlinien: Projekthandbuch vom 15.11.2026.
+
+Dieses Grafikpaket stellt ausschließlich das Zuhause der beiden älteren Pokémon-Züchter in Mu als **vorläufige technische Raumdarstellung** dar. Die gezeigte Möbelaufteilung ist ein visueller Entwurf, keine neu festgelegte Story-Tatsache. Es werden keine Dialoge, NPC-Namen oder Ereignisse hinzugefügt. Die kanonische Prologabfolge bleibt unverändert.

@@ -1,12 +1,22 @@
+import {drawScene} from './art.js';
 import {Engine} from './engine.js';
-import {tileHeight} from './maps.js';
-const engine=new Engine();const canvas=document.querySelector('canvas'),ctx=canvas.getContext('2d'),info=document.querySelector('#info'),notice=document.querySelector('#notice');const size=32;let keys=new Set(),last=0,acc=0;
-const directions={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right'};
-window.addEventListener('keydown',e=>{if(directions[e.key]){e.preventDefault();keys.add(e.key);if(!e.repeat)move(directions[e.key]);}if(e.key==='Escape'){keys.clear();notice.textContent='Steuerung: Pfeile / WASD · Speichern/Laden unten';}});
-window.addEventListener('keyup',e=>keys.delete(e.key));window.addEventListener('blur',()=>keys.clear());
+const engine=new Engine();
+const canvas=document.querySelector('#game');
+const ctx=canvas.getContext('2d');
+const info=document.querySelector('#info');
+const notice=document.querySelector('#notice');
+const details=document.querySelector('#debug');
+const directions={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right'};
+const keys=new Set();let last=0;
 function move(dir){engine.step(dir);draw();}
-function draw(){const m=engine.map;canvas.width=m.w*size;canvas.height=m.h*size;ctx.imageSmoothingEnabled=false;for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++){let h=tileHeight(m,x,y),blocked=m.walls.has(`${x},${y}`);ctx.fillStyle=blocked?'#4c5860':h?'#bca36e':m.id==='yard'?'#6d9f65':'#d7c9a9';ctx.fillRect(x*size,y*size,size,size);ctx.strokeStyle='rgba(0,0,0,.12)';ctx.strokeRect(x*size,y*size,size,size);if(h){ctx.fillStyle='#725c38';ctx.fillRect(x*size,y*size+size-5,size,5);}}for(const q of m.portals){ctx.fillStyle=q.kind==='stairs'?'#e0a23e':'#5b91ba';ctx.fillRect(q.x*size+5,q.y*size+5,22,22);}for(const [x,y] of m.stairs){ctx.fillStyle='#d8b875';ctx.fillRect(x*size+4,y*size+12,24,7);}const {x,y,facing}=engine.state;ctx.fillStyle='#253c58';ctx.fillRect(x*size+9,y*size+11,14,17);ctx.fillStyle='#f3c29b';ctx.fillRect(x*size+9,y*size+4,14,12);ctx.fillStyle='#5c392a';ctx.fillRect(x*size+8,y*size+3,16,5);ctx.fillStyle='#f9e9b2';ctx.fillRect(x*size+(facing==='left'?8:facing==='right'?21:14),y*size+13,4,4);info.textContent=`${m.name} · Position ${x},${y} · Höhe ${engine.state.elevation} · Schritte ${engine.state.steps}`;notice.textContent=engine.message||'Blaue Felder: Türen · Goldene Felder: Treppen';window.__monsterreise=engine;}
-document.querySelector('#save').onclick=()=>{localStorage.setItem('monsterreise-dev1',engine.save());notice.textContent='Spielstand gespeichert';};document.querySelector('#load').onclick=()=>{try{engine.load(localStorage.getItem('monsterreise-dev1'));draw();notice.textContent='Spielstand geladen';}catch(e){notice.textContent=e.message;}};document.querySelector('#reset').onclick=()=>{engine.reset();draw();};
-for(const b of document.querySelectorAll('[data-dir]'))b.onclick=()=>move(b.dataset.dir);
-function frame(t){if(t-last>120){const key=[...keys].at(-1);if(key)move(directions[key]);last=t;}requestAnimationFrame(frame);}draw();requestAnimationFrame(frame);
-if(new URLSearchParams(location.search).has('selftest')){const e=new Engine();let pass=true;try{for(const [mapId,dir,steps,expected] of [['bedroom','down',2,'upper'],['upper','right',5,'upper']]){if(e.state.mapId!==mapId)continue;for(let i=0;i<steps;i++)e.step(dir);if(e.state.mapId!==expected)throw Error(mapId);}const raw=e.save();e.load(raw);}catch(err){pass=false;console.error(err);}document.body.dataset.selftest=pass?'pass':'fail';}
+function draw(){const m=engine.map;canvas.width=m.w*32;canvas.height=m.h*32;ctx.imageSmoothingEnabled=false;drawScene(ctx,m,engine.state);document.querySelector('#area').textContent=m.name;info.textContent=`${m.name} · Position ${engine.state.x},${engine.state.y} · Höhe ${engine.state.elevation} · Schritte ${engine.state.steps}`;notice.textContent=engine.message||'Pfeiltasten oder WASD zum Bewegen';window.__pokemonWuXing=engine;}
+window.addEventListener('keydown',e=>{const dir=directions[e.key];if(dir){e.preventDefault();keys.add(e.key);if(!e.repeat)move(dir)}if(e.key==='Escape'){keys.clear();details.open=false;}});
+window.addEventListener('keyup',e=>keys.delete(e.key));window.addEventListener('blur',()=>keys.clear());
+for(const b of document.querySelectorAll('[data-dir]'))b.addEventListener('click',()=>move(b.dataset.dir));
+const saveKey='pokemon-wu-xing-dev';const legacyKey='monsterreise-dev1';
+document.querySelector('#save').addEventListener('click',()=>{try{localStorage.setItem(saveKey,engine.save());notice.textContent='Spielstand gespeichert';}catch(e){notice.textContent=`Speichern fehlgeschlagen: ${e.message}`}});
+document.querySelector('#load').addEventListener('click',()=>{try{const raw=localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');engine.load(raw);draw();notice.textContent='Spielstand geladen';}catch(e){notice.textContent=`Laden fehlgeschlagen: ${e.message}`}});
+document.querySelector('#reset').addEventListener('click',()=>{engine.reset();draw();notice.textContent='Neues Spiel gestartet';});
+function frame(t){if(t-last>=125){const key=[...keys].at(-1);if(key)move(directions[key]);last=t;}requestAnimationFrame(frame)}
+draw();requestAnimationFrame(frame);
+if(new URLSearchParams(location.search).has('selftest')){const e=new Engine();let ok=true;try{e.step('down');e.step('down');if(e.state.mapId!=='upper')throw Error('Portal');const s=e.save();e.load(s);}catch(err){ok=false;console.error(err)}document.body.dataset.selftest=ok?'pass':'fail'}
