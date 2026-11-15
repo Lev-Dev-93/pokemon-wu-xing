@@ -22,3 +22,7 @@
 
 ## Kampf-Testarena dev.13
 Die HTML-Kampfoberfläche in `index.html` und die UI-Anbindung in `src/main.js` verwenden die bestehende reine Kampflogik `src/battle.js`. Die Arena erzeugt temporäre Pokémon und schreibt keine Kampfergebnisse in den Spielstand.
+
+## dev.16: Startdorf Mu
+
+`src/maps.js`: Dorfgeometrie, NPC- und Objektdefinitionen, bidirektionale Portale. `src/art.js`: datenunabhängige 32px-Pixelgrafiken. `src/engine.js`: Besuchs- und Gesprächsflags. Keine neue Render-Engine, keine neuen globalen Eingabehandler. Speicherformat unverändert.

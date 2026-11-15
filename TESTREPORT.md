@@ -1,7 +1,11 @@
-# Testbericht 1.0.0-dev.15
+# Testbericht – dev.18
 
-- Node.js-Tests: **69/69 bestanden** (`npm test`).
-- JavaScript-Syntaxprüfung: **bestanden** (`node --check src/main.js`, `node --check src/battle.js`).
-- Chromium-Headless-Smoke-Test: **nicht abgeschlossen** (Zeitüberschreitung in der Testumgebung); kein bestätigter Browser-E2E-Test.
-- Nutzertest auf GitHub Pages: **ausstehend**.
-- Zu prüfen: Reihenfolge und Animation beider Angriffe, keine Mehrfachklicks, automatischer Geburtstagsdialog und Starterwahl, bestehende Speicherstände.
+- Automatisierte Tests: siehe `npm test` (Node.js).
+- JavaScript-Syntax: `node --check` für alle Module.
+- Browsertest: **nicht durchgeführt**; bestehender dev.15-Browsertest bestätigt nur die frühere Version.
+- Visuelle Prüfung: **nicht durchgeführt**.
+- Neue Tests: Reihenfolge, Idempotenz, gesperrte Vorwegnahme, Save-Validierung und Starterintegration.
+
+
+## dev.22 – Route 1 und Starter-Schlüpfen
+Route 1 südlich des Startdorfs, Zugang nach Professor-Demonstration, einmaliges Schlüpfen beim ersten Betreten; Level 5, 31 IV, volle KP und versteckte Fähigkeit falls verfügbar; Speicherung und volle-Team-Fallback.

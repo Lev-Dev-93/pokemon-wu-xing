@@ -1,6 +1,7 @@
-# Kanonreferenz
-Verbindlich: `Monsterreise_Story_Masterfassung_2026-11-14.pdf`, Abschnitt 02, und `Monsterreise_Technisches_Projekthandbuch_Neustart_2026-11-15.md`, Abschnitt 4.
-[F] Wunsch bestimmt Ei; Ei schlüpft beim ersten Betreten von Route 1. [F] Starterkandidaten strukturell 212, Arten #001–493, keine zusätzlichen Ausschlüsse.
-In dev.8 umgesetzt: Wunsch und Ei mit identischer speciesId, kein Teammitglied. Nicht umgesetzt: vollständiger Geburtstag, Dimensionsereignis, Route-1-Schlüpfen, Level-5-Instanz, IV-/Fähigkeitszuweisung. Diese Punkte dürfen nicht als fertig gelten.
+# Storyreferenz – dev.16
 
-Dev.9: Ei ist kein Teammitglied. Die Route-1-Schlüpfsequenz wird nicht vorgezogen.
+Verbindlich: `Monsterreise_Story_Masterfassung_2026-11-14.pdf`, Abschnitt **02 Prolog, Spieler und Rivale**, sowie `Monsterreise_Technisches_Projekthandbuch_Neustart_2026-11-15.md`.
+
+[F] Heimat der Adoptiveltern: Nation Mu. Nach dem Geburtstagswunsch und dem Ei erschüttert ein unabhängiges Dimensionsereignis das Dorf; Giratina schließt Risse. Der Kindheitsfreund erhält Absol durch einen kurzlebigen Riss. Erst später folgt der Professor-Ausflug mit schillerndem Raupy, und das Ei schlüpft erst beim Betreten von Route 1.
+
+[O/Technische Platzhalter] Das genaue Dorflayout, die Gebäude, die Positionen und die Worte der drei Dorf-NPCs sind **nicht** kanonisch festgelegt. Die neue Dorfkarte ist ein austauschbarer technischer Entwurf. Das Spiel löst in dev.16 keine der genannten späteren Storyereignisse aus.

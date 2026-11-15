@@ -5,3 +5,5 @@ Datenquelle: vom Nutzer bereitgestelltes Archiv `01_Pokeapi_Full_Data.zip`, CSV-
 
 ## Datenimport dev.10
 Attacken, Lernlisten, Entwicklungsbedingungen, Typentabelle und Erfahrungskurven stammen aus der vom Nutzer hochgeladenen `01_Pokeapi_Full_Data.zip` (`data/v2/csv`). Das Datenmaterial basiert auf PokeAPI-Daten; Herkunft, Markenrechte und Weiterverwendung sind vor öffentlicher Distribution gesondert zu klären. Es werden keine Pokémon-Sprites aus diesem Archiv veröffentlicht.
+
+- dev.16: Dorfhäuser, Dorfwege, Gärten und NPC-Platzhalter aus bestehenden selbst programmierten Pixel-Primitiven; keine externen Pokémon- oder Nintendo-Sprites.

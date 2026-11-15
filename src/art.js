@@ -44,12 +44,33 @@ stairs(c,7*32,8*32);stairs(c,7*32,9*32);
 // original fence on outer sides, not collision-bearing: visual boundary only
 for(let y=3;y<11;y++){fence(c,0,y*32);fence(c,W-32,y*32)}
 }
-export function drawScene(c,map,state){c.imageSmoothingEnabled=false;for(let y=0;y<map.h;y++)for(let x=0;x<map.w;x++){const px=x*T,py=y*T,n=x+y*map.w;if(map.id==='yard'){if(x===7&&y>=2||y===10&&x>=4&&x<=10)path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='ground')stone(c,px,py,n);else wood(c,px,py,n);if(map.id!=='yard'&&y===0)wallpaper(c,px,py,n)}
-if(map.id==='bedroom')drawBedroom(c);if(map.id==='ground')drawGround(c);if(map.id==='yard')drawYard(c,map);
+function drawVillage(c,map){
+ const W=map.w,H=map.h;
+ // Original hand-drawn pixel architecture. All walls match the data map.
+ for(const [x,y,w,h,col] of [[2,2,4,2,'#aa7154'],[15,2,4,2,'#667d90'],[3,10,3,2,'#a78d5b'],[16,10,3,2,'#8a6b8f']]){
+  for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++){wallBlock(c,xx*T,yy*T);if(yy===y)roof(c,xx*T,yy*T)}
+  R(c,(x+1)*T,(y+h-1)*T+8,20,20,col);R(c,(x+1)*T+4,(y+h-1)*T+11,12,15,'#3b3e44');
+ }
+ for(const [x,y] of [[1,5],[5,7],[19,7],[2,13],[20,13],[12,12],[7,13]])pot(c,x*T,y*T);
+ for(const [x,y] of [[6,3],[7,4],[14,4],[20,5],[6,12],[13,13],[20,11]])flower(c,x*T,y*T);
+ for(let x=0;x<W;x++){if(x!==10)fence(c,x*T,0);if(x<8||x>13)fence(c,x*T,(H-1)*T)}
+ // Doorways at (6,3) and (19,3) are traversable, with collision walls beside them.
+ for(const [x,y] of [[6,3],[19,3]]){door(c,x*T,y*T);R(c,x*T+7,y*T+26,18,4,'#e4c88f')}
+ // Route 1 opens at the southern edge.
+R(c,10*T+4,(H-1)*T+8,24,18,'#cbb58a');
+// Mark the northern portal clearly; this tile stays traversable.
+ R(c,10*T+4,0,24,9,'#b5a07c');R(c,10*T+7,0,18,4,'#e9d6a7');
+}
+function drawRoute1(c,map){for(let y=2;y<map.h;y++){for(let x=6;x<=9;x++)path(c,x*T,y*T,x+y*map.w)}for(const [x,y] of [[1,2],[3,8],[12,3],[14,10],[2,15],[13,16]]){pot(c,x*T,y*T);flower(c,(x+1)*T,y*T)}for(const [x,y] of [[2,4],[3,4],[12,6],[13,6],[4,12],[5,12],[11,14],[12,14]]){R(c,x*T,y*T,32,32,'#3c704a');R(c,x*T+6,y*T+3,20,25,'#5e985a')}R(c,7*T,0,32,9,'#e2c99c')}
+function drawInterior(c,id){carpet(c,3*T,3*T,5*T,3*T,id==='study'?'#607d87':'#9b775b');window(c,5*T,0);shelf(c,2*T,4*T);shelf(c,3*T,4*T);desk(c,7*T,2*T);pot(c,9*T,5*T);door(c,5*T,7*T);if(id==='village_home'){sofa(c,T,T);table(c,4*T,4*T)}else{desk(c,T,T);shelf(c,8*T,T)}}
+function drawNpc(c,x,y,kind){const colors={villager:'#c17f69',rival:'#6c7cb1',professor:'#e9e8db'};hero(c,x*T,y*T,'down',0);R(c,x*T+9,y*T+17,18,11,colors[kind]||'#8aa58c');if(kind==='professor')R(c,x*T+11,y*T+17,14,9,'#f5f3df')}
+export function drawScene(c,map,state){c.imageSmoothingEnabled=false;for(let y=0;y<map.h;y++)for(let x=0;x<map.w;x++){const px=x*T,py=y*T,n=x+y*map.w;if(map.id==='yard'){if(x===7&&y>=2||y===10&&x>=4&&x<=10)path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='route1'){if(x>=6&&x<=9)path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='village'){if((x>=9&&x<=11)||(y===7&&x>=5&&x<=18)||(y>=4&&y<=11&&x>=12&&x<=13))path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='ground')stone(c,px,py,n);else wood(c,px,py,n);if(!['yard','village','route1'].includes(map.id)&&y===0)wallpaper(c,px,py,n)}
+if(map.id==='bedroom')drawBedroom(c);if(map.id==='ground')drawGround(c);if(map.id==='yard')drawYard(c,map);if(map.id==='village')drawVillage(c,map);if(map.id==='route1')drawRoute1(c,map);if(map.id==='village_home'||map.id==='study')drawInterior(c,map.id);
 // Collision layer is always visually indicated, without changing the engine's walls.
-for(const cell of map.walls){const [x,y]=cell.split(',').map(Number);if(map.id==='bedroom')continue;if(map.id==='ground'&&((x===1||x===2)&&y===1||(x===8||x===9)&&y===1||(x===2||x===3)&&y===5))continue;if(map.id==='yard')continue;wallBlock(c,x*32,y*32)}
+for(const cell of map.walls){const [x,y]=cell.split(',').map(Number);if(map.id==='bedroom')continue;if(map.id==='ground'&&((x===1||x===2)&&y===1||(x===8||x===9)&&y===1||(x===2||x===3)&&y===5))continue;if(map.id==='yard'||map.id==='village'||map.id==='route1')continue;wallBlock(c,x*32,y*32)}
 if(map.id==='yard'){// raised garden tiles must stay visible above the ground
 R(c,8*32,8*32,3*32,2,'#e7c99b')}
 if(map.id==='ground'){hero(c,6*32,2*32,'down',0);hero(c,3*32,3*32,'left',0)}
+if(map.id==='village_home')drawNpc(c,7,3,'resident');if(map.id==='village'){for(const [id,x,y] of [['villager',8,6],['rival',14,7],['professor',17,5]])drawNpc(c,x,y,id)}
 hero(c,state.x*32,state.y*32,state.facing,state.steps);
 }

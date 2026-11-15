@@ -6,6 +6,12 @@ import {getMove,getEvolutions,speciesTypes,experienceForLevel} from './moves.js'
 import {STARTERS} from './starter-data.js';
 import {drawScene} from './art.js';
 import {Engine} from './engine.js';
+import {riftVisualPhase} from './rift-scene.js';
+import {drawRiftOverlay} from './rift-art.js';
+import {absolVisualPhase} from './absol-scene.js';
+import {drawAbsolOverlay} from './absol-art.js';
+import {professorVisualPhase} from './professor-scene.js';
+import {drawProfessorOverlay} from './professor-art.js';
 const engine=new Engine();const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
 const info=document.querySelector('#info'),notice=document.querySelector('#notice'),details=document.querySelector('#debug');
 const dialogBox=document.querySelector('#dialogue'),speaker=document.querySelector('#speaker'),dialogText=document.querySelector('#dialogue-text');
@@ -13,9 +19,10 @@ const directions={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'rig
 const menu=document.querySelector('#game-menu'),menuContent=document.querySelector('#menu-content');let menuOpen=false;let battle=null;let rewardDone=false;let pendingRewards=[];let battleFlash=0;let battleBusy=false;let battleGeneration=0;let battleView=null;const battlePanel=document.querySelector('#battle-panel');const keys=new Set();let last=0;const saveKey='pokemon-wu-xing-dev',autoKey='pokemon-wu-xing-autosave',legacyKey='monsterreise-dev1';const starterPanel=document.querySelector('#starter-panel'),starterSearch=document.querySelector('#starter-search'),starterList=document.querySelector('#starter-list'),starterStatus=document.querySelector('#starter-status');
 const journal=document.querySelector('#journal'),journalButton=document.querySelector('#journal-toggle');
 function move(dir){if(menuOpen||!starterPanel.hidden||!battlePanel.hidden)return;engine.step(dir);if(engine.lastEvent==='transition')autoSave();engine.lastEvent=null;draw()}
-function interact(){if(menuOpen||!starterPanel.hidden||!battlePanel.hidden)return;keys.clear();const before=engine.mode;engine.interact();const event=engine.lastEvent;if(event==='dialogueFinished'||event==='birthdayPreviewFinished')autoSave();engine.lastEvent=null;
+function interact(){if(menuOpen||!starterPanel.hidden||!battlePanel.hidden)return;keys.clear();const before=engine.mode;engine.interact();const event=engine.lastEvent;if(['dialogueFinished','birthdayPreviewFinished','riftSceneFinished','absolSceneFinished','professorDemoFinished','route1Hatched'].includes(event))autoSave();engine.lastEvent=null;
  if(before==='dialogue'&&engine.mode==='exploration'){
   if(event==='birthdayPreviewFinished'&&!engine.state.flags.egg_received){draw();openStarters();return}
+  if(event==='dialogueFinished'&&engine.state.flags.egg_received&&!engine.state.flags.rift_closed){engine.beginRiftScene();autoSave();draw();return}
   if(!engine.state.flags.birthday_wish_pending&&!engine.state.flags.egg_received&&engine.state.mapId==='ground'&&engine.state.flags.spokenToBreederA&&engine.state.flags.spokenToBreederB){engine.beginBirthdayPreview();autoSave()}
  }
  draw()}
@@ -35,7 +42,7 @@ function openStarters(){
 }
 function renderJournal(){const data=engine.journal;document.querySelector('#journal-title').textContent=data.heading;document.querySelector('#journal-description').textContent=data.description;const ul=document.querySelector('#journal-tasks');ul.replaceChildren();for(const task of data.tasks){const li=document.createElement('li');li.className=task.done?'done':'pending';li.textContent=`${task.done?'✓':'○'} ${task.label}`;ul.append(li)}}
 function toggleJournal(){journal.hidden=!journal.hidden;journalButton.setAttribute('aria-expanded',String(!journal.hidden));renderJournal()}
-function draw(){const m=engine.map;canvas.width=m.w*32;canvas.height=m.h*32;ctx.imageSmoothingEnabled=false;drawScene(ctx,m,engine.state);
+function draw(){const m=engine.map;canvas.width=m.w*32;canvas.height=m.h*32;ctx.imageSmoothingEnabled=false;drawScene(ctx,m,engine.state);if(engine.dialogue?.id==='rift_scene')drawRiftOverlay(ctx,canvas.width,canvas.height,riftVisualPhase(engine.dialogue.index));if(engine.dialogue?.id==='absol_scene')drawAbsolOverlay(ctx,canvas.width,canvas.height,absolVisualPhase(engine.dialogue.index));if(engine.dialogue?.id==='professor_demo_scene')drawProfessorOverlay(ctx,canvas.width,canvas.height,professorVisualPhase(engine.dialogue.index));
  document.querySelector('#area').textContent=m.name;info.textContent=`${m.name} · Position ${engine.state.x},${engine.state.y} · Höhe ${engine.state.elevation} · Schritte ${engine.state.steps}`;
  dialogBox.hidden=engine.mode!=='dialogue';if(engine.dialogue){speaker.textContent=engine.dialogue.name;dialogText.textContent=engine.dialogue.pages[engine.dialogue.index]}
  renderJournal();notice.textContent=engine.message|| (engine.mode==='dialogue'?'':'WASD / Pfeiltasten · E / Leertaste: Untersuchen');window.__pokemonWuXing=engine;}
@@ -54,9 +61,9 @@ window.addEventListener('keydown',e=>{if(e.target instanceof HTMLElement&&['INPU
 window.addEventListener('keyup',e=>keys.delete(e.key));window.addEventListener('blur',()=>keys.clear());
 for(const b of document.querySelectorAll('[data-dir]'))b.addEventListener('click',()=>move(b.dataset.dir));
 document.querySelector('#interact').addEventListener('click',interact);dialogBox.addEventListener('click',interact);
-journalButton.addEventListener('click',toggleJournal);document.querySelector('#continue').addEventListener('click',()=>{try{const raw=localStorage.getItem(autoKey)||localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');engine.load(raw);keys.clear();draw();notice.textContent='Letzten Stand fortgesetzt'}catch(e){notice.textContent=`Fortsetzen fehlgeschlagen: ${e.message}`}});
+journalButton.addEventListener('click',toggleJournal);document.querySelector('#continue').addEventListener('click',()=>{try{const raw=localStorage.getItem(autoKey)||localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');engine.load(raw);if(engine.state.flags.egg_received&&!engine.state.flags.rift_closed)engine.beginRiftScene();keys.clear();draw();notice.textContent='Letzten Stand fortgesetzt'}catch(e){notice.textContent=`Fortsetzen fehlgeschlagen: ${e.message}`}});
 document.querySelector('#save').addEventListener('click',()=>{try{localStorage.setItem(saveKey,engine.save());notice.textContent='Spielstand gespeichert'}catch(e){notice.textContent=`Speichern fehlgeschlagen: ${e.message}`}});
-document.querySelector('#load').addEventListener('click',()=>{try{const raw=localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');engine.load(raw);keys.clear();draw();notice.textContent='Spielstand geladen'}catch(e){notice.textContent=`Laden fehlgeschlagen: ${e.message}`}});
+document.querySelector('#load').addEventListener('click',()=>{try{const raw=localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');engine.load(raw);if(engine.state.flags.egg_received&&!engine.state.flags.rift_closed)engine.beginRiftScene();keys.clear();draw();notice.textContent='Spielstand geladen'}catch(e){notice.textContent=`Laden fehlgeschlagen: ${e.message}`}});
 document.querySelector('#reset').addEventListener('click',()=>{keys.clear();starterPanel.hidden=true;engine.reset();try{localStorage.removeItem(autoKey)}catch(e){}draw();notice.textContent='Neues Spiel gestartet'});
 function frame(t){if(t-last>=125){if(engine.mode==='exploration'&&!menuOpen&&starterPanel.hidden&&battlePanel.hidden){const key=[...keys].at(-1);if(key)move(directions[key])}last=t}requestAnimationFrame(frame)}
 
