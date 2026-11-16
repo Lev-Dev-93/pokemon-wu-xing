@@ -438,10 +438,13 @@ document.addEventListener('fullscreenchange',()=>{
  const panel=document.createElement('details');panel.id='layout-editor';panel.style.cssText='max-width:760px;margin:12px auto;padding:12px;border:2px solid #5d846a;border-radius:8px;background:#e5efdf;color:#243c2c';
  const summary=document.createElement('summary');summary.textContent='Karteneditor (Entwicklermodus)';panel.append(summary);panel.hidden=true;
  const editorButton=document.querySelector('#open-layout-editor');
+ const closeEditor=()=>{panel.open=false;panel.hidden=true;editorButton.setAttribute('aria-expanded','false');editorButton.focus();};
+ const closeButton=document.createElement('button');closeButton.type='button';closeButton.textContent='✕ Karteneditor schließen';closeButton.addEventListener('click',closeEditor);panel.append(closeButton);
+ panel.addEventListener('keydown',e=>{if(e.key==='Escape'&&e.target!==gridCanvas){e.preventDefault();closeEditor();}});
  editorButton.addEventListener('click',()=>{panel.hidden=false;panel.open=true;editorButton.setAttribute('aria-expanded','true');panel.scrollIntoView({behavior:'smooth',block:'start'});});
  const controls=document.createElement('div');controls.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:8px';panel.append(controls);
  const field=(label,value)=>{const wrap=document.createElement('label');wrap.textContent=label+' ';const input=document.createElement('input');input.value=value;input.style.width='95px';wrap.append(input);controls.append(wrap);return input};
- const mapField=field('Karte','village'),idField=field('Objekt-ID','village-west-home'),xField=field('X','3'),yField=field('Y','3'),artField=field('Grafik','mu-home');
+ const mapField=document.createElement('select');const mapWrap=document.createElement('label');mapWrap.textContent='Karte ';for(const mapId of layoutInfo().supported){const option=document.createElement('option');option.value=mapId;option.textContent=mapId;mapField.append(option)}mapWrap.append(mapField);controls.append(mapWrap);const idField=field('Objekt-ID','village-west-home'),xField=field('X','3'),yField=field('Y','3'),artField=field('Grafik','mu-home');
  const status=document.createElement('p');status.setAttribute('role','status');panel.append(status);
  const preview=document.createElement('pre');preview.style.cssText='max-height:180px;overflow:auto;font-size:11px';panel.append(preview);
  const refresh=()=>{preview.textContent=JSON.stringify(currentLayout()[mapField.value]||[],null,2)+'\nHistorie: '+JSON.stringify(historyInfo())};
@@ -482,7 +485,7 @@ document.addEventListener('fullscreenchange',()=>{
   refresh();draw();paintGrid();
  });
  const observer=new MutationObserver(()=>paintGrid());observer.observe(preview,{childList:true,characterData:true,subtree:true});
- mapField.addEventListener('change',paintGrid);panel.addEventListener('toggle',()=>{if(panel.open)paintGrid()});
+ mapField.addEventListener('change',()=>{const first=(currentLayout()[mapField.value]||[])[0];idField.value=first?.id||'';xField.value=first?.x??0;yField.value=first?.y??0;artField.value=first?.art||'pot';paintGrid()});panel.addEventListener('toggle',()=>{if(panel.open)paintGrid()});
  mapField.addEventListener('change',refresh);refresh();paintGrid();document.querySelector('main').append(panel);
  if(!layoutLoadResult.ok)status.textContent='Gespeichertes Layout konnte nicht geladen werden: '+layoutLoadResult.errors.join(', ');
 }
