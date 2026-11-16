@@ -1,3 +1,13 @@
+## 1.0.0-dev.61
+- Entwicklung und Attackenlernen mit Regressionstests; AP-Synchronisierung zwischen Kampf und Team korrigiert.
+
+## dev.58 – Prolog-Fehlerbehebung
+
+- Automatischer Lauf zum Dorfplatz startet erst nach Abschluss des Starter-Ei-Dialogs.
+- Normale Dialogabschlüsse lösen die Giratina-Sequenz nicht mehr aus.
+- Veraltete Dialogereignisse beim Abschluss zurückgesetzt.
+- Drei Regressionstests für den Prolog ergänzt.
+
 ## dev.57 – Stabilisierung
 
 Regression: Beim Pokémon-Wechsel werden temporäre Kampfwertstufen und flüchtige Effekte (einschließlich Feuerfänger-Bonus) zurückgesetzt; KP, AP und dauerhafte Statusprobleme bleiben erhalten. Vier gezielte Integrationstests ergänzt. Browsertest ausstehend.
@@ -230,3 +240,21 @@ Route 1 südlich des Startdorfs, Zugang nach Professor-Demonstration, einmaliges
 - Eishaut (Fähigkeit 115) heilt bei Hagel am Rundenende 1/16 maximale KP.
 - Solarkraft (Fähigkeit 94) verstärkt Spezial-Angriff bei Sonne um 50 %, verursacht am Rundenende 1/8 maximale KP Schaden.
 - Effekte gelten auch in der letzten Wetterrunde und enden bei Wetterwechsel.
+
+
+## dev.62
+Route 1: Wegweiser, Wegmarkierung und zwei zusätzliche optionale NPCs.
+
+
+## dev.63
+Vorläufiger Waldpfad Mu (Route 2 als technische Erkundungskarte) mit Rückweg, Zugangssperre bis zum Schlüpfen, NPC und Speicherung. Keine neuen kanonischen Storyereignisse.
+
+
+## dev.64
+Waldpfad: weitere NPCs, eigene Begegnungstabelle, Level 4–6, Journal-Eintrag. Pokémon-Spezies weiterhin #001–493.
+
+## dev.65 – Stabilisierung
+- Speicherdaten: Rückkehrpositionen werden validiert und manipulierte Einträge entfernt.
+- Routenpositionen werden gegen Storyfreigaben geprüft.
+- Fortsetzen/Laden im Dorf startet die Giratina-Szene direkt, statt den Lauf erneut abzuspielen.
+- Regressionstests für fehlerhafte Speicherstände und Kartenpositionen.

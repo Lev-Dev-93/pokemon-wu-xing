@@ -1,3 +1,7 @@
+## dev.58 – Korrektur der Giratina-Sequenz
+
+Der Starter-Ei-Dialog wird vollständig gezeigt, bevor der einmalige automatische Lauf zum Dorfplatz beginnt. Der praktische Browsertest steht noch aus.
+
 ## dev.57 – Stabilisierung
 
 Regression: Beim Pokémon-Wechsel werden temporäre Kampfwertstufen und flüchtige Effekte (einschließlich Feuerfänger-Bonus) zurückgesetzt; KP, AP und dauerhafte Statusprobleme bleiben erhalten. Vier gezielte Integrationstests ergänzt. Browsertest ausstehend.
@@ -166,3 +170,23 @@ Mehrfachtreffer-Attacken treffen 2 bis 5 Mal (Doppelkick und Duonadel stets zwei
 
 ### dev.56
 Typabsorption: H2O-Absorber, Voltabsorber und Feuerfänger bei treffenden gegnerischen Schadensattacken. Feuerfänger verstärkt nach Aktivierung eigene Feuerattacken.
+
+### dev.61: Fortschrittssystem
+Levelentwicklungen und Speicherung der AP nach Kampfbelohnungen stabilisiert.
+
+Designvorgabe: Nur Pokémon #001–493 (Generation 1–4); Attacken und Fähigkeiten aus **allen** Generationen sind langfristig vorgesehen. Die vollständige generationenübergreifende Abdeckung ist noch nicht implementiert.
+
+
+### dev.62 – Testgebiet
+Route 1 besitzt zusätzliche optionale Gespräche und Schilder.
+
+
+### dev.63 – Testgebiet
+Der Waldpfad ist eine austauschbare technische Testkarte; Storyinhalt bleibt unverändert.
+
+
+### dev.64 – Testgebiet
+Auf dem Waldpfad gibt es eine eigene vorläufige Begegnungstabelle und weitere Dialoge.
+
+### dev.65 – Stabilisierung
+Speicherstand-Validierung und Wiederaufnahme der Giratina-Szene im Dorf verbessert.

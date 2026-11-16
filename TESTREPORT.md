@@ -1,20 +1,7 @@
-## dev.57 – Stabilisierung
+# dev.65 – Testbericht
 
-- 304/304 automatisierte Node-Tests bestanden.
-- Vier neue Regressionstests: Kampfwertstufen, flüchtige Effekte, KP/AP/Status-Persistenz und Cache-Normalisierung beim Wechsel.
-- JavaScript-Syntaxprüfung aller src/*.js bestanden.
-- ZIP-Integrität geprüft.
-- Praktischer Browsertest ausstehend; keine Behauptung über Browserfunktionalität.
-
-## dev.56
-
-300/300 automatisierte Tests bestanden (`node --test tests/*.test.mjs`).
-JavaScript-Syntaxprüfung (`node --check src/*.js`) erfolgreich.
-Praktischer Browsertest ausstehend.
-
-## dev.56 – Automatisierte Prüfungen
-
-- `npm test`: 294 Tests bestanden, 0 fehlgeschlagen.
-- 8 neue Tests für Trockenheit, Wolke Sieben, Klimaschutz und Wetterablauf.
-- `node --check src/*.js`: alle JavaScript-Dateien syntaktisch gültig.
-- Praktischer Browsertest weiterhin ausstehend.
+- Node.js-Testlauf: 326 Tests bestanden, 0 fehlgeschlagen.
+- Sechs neue Regressionstests für Speicherdaten und Routenfreigaben.
+- JavaScript-Syntaxprüfung aller src/*.js: bestanden.
+- Browser-Integrationstest: ausstehend.
+- Giratina-Wiederaufnahme im Dorf wurde im Code korrigiert, jedoch noch nicht im Browser verifiziert.
