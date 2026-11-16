@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {auditVisibleObstacles} from '../src/maps.js';test('Häuser Bäume Büsche stimmen mit Kollision überein',()=>assert.deepEqual(auditVisibleObstacles(),[]));

@@ -1,3 +1,58 @@
+
+## dev.290
+- Gemeinsamer Reise-Audit für Beerendorf, Alten Wald, Häuser und Portale.
+
+## dev.289
+- Beerendorfer Dekorationen werden von den Hauptwegen und Zugängen ferngehalten.
+
+## dev.288
+- Kollisions-Audit für sichtbare Häuser, Waldbäume und Büsche eingeführt.
+
+## dev.287
+- Alter Wald: mehrkachelige Baumgruppen ausschließlich auf tatsächlich blockierten Feldern; Weg bleibt sichtbar.
+
+## dev.286
+- Beerendorf: Ost-West-Ausgänge sichtbar markiert; veraltete Nord-Süd-Markierungen und doppelte Büsche entfernt.
+## dev.285
+
+- Regressionstests für Weganschlüsse, unpassierbare Büsche und Hindernisse auf den drei Reisekarten.
+
+## dev.284
+
+- Gelände- und Wegekanten verwenden dieselben Wegkoordinaten wie die Kartenzeichnung.
+
+## dev.283
+
+- Waldrand: Weg vom nördlichen Eingang zur östlichen Ausfahrt als Kurve dargestellt.
+
+## dev.282
+
+- Bachübergang: Weg vom westlichen Eingang zur Brücke und südlichen Ausfahrt optisch verbunden.
+
+## dev.281
+
+- Route 1: Ost-West-Weg mit Anschluss an beide Kartenportale statt irreführendem Nord-Süd-Hauptweg.
+
+## dev.280
+
+- Gemeinsame Karten-Dekorationsprüfung für freie Zugänge, Kollisionen und Weganschlüsse.
+
+## dev.279
+
+- Züchterhof: sichere Weide- und Gartendetails abseits der Laufwege.
+
+## dev.278
+
+- Forschungsplatz: Wege und Eingangsbereiche von Labor und Professorenhaus deutlich markiert.
+
+## dev.277
+
+- Mu: freier Platz und Wege mit dezenten Pflasterdetails, keine Dekoration auf Hausgrundrissen.
+
+## dev.276
+
+- Hofwege auf kollisionsfreie Zellen beschränkt; Durchgänge und Hausvorplatz hervorgehoben.
+
 ## dev.257 – Stabilisierung des Spielverlaufs
 - Browser-Wiederaufnahme auf gemeinsamen Phasenresolver umgestellt; Tests ergänzt.
 
@@ -791,3 +846,35 @@ Migration älterer Spielstände auf Schema 8.
 
 ### dev.267 – Kartengestaltung
 - Beerendorf mit Kisten, Fässern und Beerenkörben belebt; zusätzliche Dekorations- und Kollisionsprüfungen.
+
+### dev.268 – Büsche als Hindernisse
+- Beerenbüsche in Beerendorf blockieren nun wie Bäume die Bewegung; Portale und Ankunftsfelder bleiben frei.
+- Visuelle Buschfelder und Kollisionsfelder werden gemeinsam berechnet.
+
+## dev.269 – Logische Wegführung und Kollisionsabgleich
+- Kollisionsbewusste Wegverbindungen zwischen allen Außenportalen; Wegzeichnung umgeht Gebäude, Bäume und Büsche.
+- Zusätzliche Prüfungen für alle Außenportale, Hindernisse und Himmelsrichtungen.
+
+## dev.270 – Sichtbare Gebäudezugänge
+- Weganschlüsse zu den Außentüren in Mu und Beerendorf vervollständigt.
+- Neues Audit für freie, sichtbare Türvorplätze und Regressionstests.
+
+## dev.271 – Weltzugang und Wegführung
+- Portale per tatsächlicher Bewegungslogik auf Erreichbarkeit prüfen.
+- Automatisierter Regressionstest für die neue Prüfung.
+
+## dev.272 – Weltzugang und Wegführung
+- Ankunftspositionen und Rückwege der Kartenübergänge absichern.
+- Automatisierter Regressionstest für die neue Prüfung.
+
+## dev.273 – Weltzugang und Wegführung
+- Erreichbarkeit der NPC-Gesprächsfelder absichern.
+- Automatisierter Regressionstest für die neue Prüfung.
+
+## dev.274 – Weltzugang und Wegführung
+- Gebäudegrundrisse und Portalpositionen abgleichen.
+- Automatisierter Regressionstest für die neue Prüfung.
+
+## dev.275 – Weltzugang und Wegführung
+- Globale Reiseverbindungen und kombinierte Weltprüfung.
+- Automatisierter Regressionstest für die neue Prüfung.

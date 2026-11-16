@@ -1,7 +1,5 @@
-# Testbericht dev.267
+# Testbericht dev.290
 
-- Automatisierte Tests: 557 bestanden, 0 fehlgeschlagen (`npm test`).
-- JavaScript-Syntax: alle `src/*.js` mit `node --check` geprüft.
-- ZIP-Integrität: alle fünf Archive geprüft.
-- Browserdurchlauf: nicht durchgeführt.
-- Neue Dekorationen ändern keine Kollisionsfelder.
+Automatisierte Tests: 591/591 bestanden.
+
+Interaktiver Browsertest nicht durchgeführt.

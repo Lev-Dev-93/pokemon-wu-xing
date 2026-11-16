@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {auditBerryForestJourney,auditCardinalWorld} from '../src/maps.js';test('Beerendorf und Alter Wald ohne blockierte Reiseziele',()=>assert.deepEqual(auditBerryForestJourney(),[]));test('Kanonische Himmelsrichtungen erhalten',()=>assert.deepEqual(auditCardinalWorld(),[]));

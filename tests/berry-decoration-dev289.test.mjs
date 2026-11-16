@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {maps} from '../src/maps.js';import {berryVillageDecorations,terrainKind} from '../src/landscape.js';test('Beerendorfer Requisiten stehen nicht auf Hauptweg',()=>{for(const [x,y] of berryVillageDecorations(maps.beerendorf))assert.notEqual(terrainKind('beerendorf',x,y),'path');});

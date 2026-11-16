@@ -1,3 +1,4 @@
+import {landscapeObstacleCells,auditSafeVillageDecorations} from './landscape.js';
 // Gemeinsame Weltgrundrisse: Darstellung und Kollision verwenden dieselben Rechtecke.
 export const outdoorBuildings={
  village:[{x:2,y:6,w:3,h:2,color:'#9c705c',label:'HAUS'},{x:17,y:6,w:3,h:2,color:'#a67b64',label:'HAUS'},{x:2,y:10,w:3,h:2,color:'#8b89a3',label:'KAPELLE'},{x:16,y:10,w:3,h:2,color:'#9a6e55',label:'RIVALE'}],
@@ -5,9 +6,9 @@ export const outdoorBuildings={
  beerendorf:[{x:2,y:3,w:2,h:2},{x:12,y:3,w:2,h:2},{x:2,y:11,w:2,h:2},{x:12,y:11,w:2,h:2}]
 };
 // Wege werden nur auf begehbaren Feldern gezeichnet; Gebäude bleiben frei.
-export function isVillagePath(x,y){return ((x>=8&&x<=14&&y>=1&&y<=11)||(y===7&&x>=0&&x<=21)||(y===11&&x>=4&&x<=19)||(y===4&&x>=6&&x<=19));}
+export function isVillagePath(x,y){return ((x>=8&&x<=14&&y>=1&&y<=11)||(y===7&&x>=0&&x<=21)||(y===11&&x>=4&&x<=19)||(y===4&&x>=6&&x<=19)||(x===5&&y>=7&&y<=12)||(x===19&&y>=7&&y<=12)||(x===20&&y>=7&&y<=8));}
 export function isProfessorClearingPath(x,y){return (y===7&&x>=0&&x<=15)||(x>=5&&x<=11&&y>=4&&y<=7);}
-export function isBerryVillagePath(x,y){return (x>=7&&x<=8&&y>=1&&y<=13)||(y===7&&x>=0&&x<=15)||(y>=5&&y<=13&&x===4)||(y>=5&&y<=13&&x===14)||(y===13&&x>=3&&x<=13);}
+export function isBerryVillagePath(x,y){return (x>=7&&x<=8&&y>=1&&y<=13)||(y===7&&x>=0&&x<=15)||(y>=5&&y<=13&&x===4)||(y>=5&&y<=13&&x===14)||(y===13&&x>=3&&x<=13)||(x===3&&y>=13&&y<=14)||(x===13&&y>=13&&y<=14)||(x===4&&y>=5&&y<=7)||(x===14&&y>=5&&y<=7);}
 export const buildingCells=id=>(outdoorBuildings[id]||[]).flatMap(({x,y,w,h})=>Array.from({length:w*h},(_,i)=>[x+i%w,y+Math.floor(i/w)]));
 const room=(id,name,w,h,walls=[],portals=[],heights={},stairs=[])=>({id,name,w,h,walls:new Set(walls.map(p=>p.join(','))),portals,heights,stairs});
 const p=(x,y,target,tx,ty,kind='door')=>({x,y,target,tx,ty,kind});
@@ -47,6 +48,15 @@ export const maps={
  forest_elder_house:room('forest_elder_house','Waldhütte der alten Dame',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'route2',11,11)]),
  study:room('study','Forschungslabor des Professors',11,8,[[1,1],[2,1],[7,1],[8,1],[2,4],[3,4]],[p(5,7,'professor_clearing',6,5)])
 };
+// Busch-Kollision: sichtbare Beerenbüsche blockieren wie Bäume, Portale und Ankunftsfelder bleiben frei.
+const arrivalCells=new Map();
+for(const source of Object.values(maps))for(const p of source.portals){const cells=arrivalCells.get(p.target)||new Set();cells.add(`${p.tx},${p.ty}`);arrivalCells.set(p.target,cells);}
+for(const map of Object.values(maps)){
+ map.landscapeArrivalCells=arrivalCells.get(map.id)||new Set();
+ const entranceAprons=new Set(map.portals.filter(p=>p.kind==='door').map(p=>`${p.x},${p.y+1}`));
+ map.landscapeBushes=new Set(landscapeObstacleCells(map).map(([x,y])=>`${x},${y}`).filter(k=>!arrivalCells.get(map.id)?.has(k)&&!entranceAprons.has(k)));
+ for(const k of map.landscapeBushes)map.walls.add(k);
+}
 export const npcs={route2:[],beerendorf:[],beerendorf_haus:[{id:'herbal_witch',x:6,y:3,name:'Kräuterhexe',dialogue:['Willkommen in meiner Kräuterstube. Ich kann deine Pokémon versorgen.']}],beerendorf_haus2:[],beerendorf_wohnhaus:[],beerendorf_werkstatt:[],brook:[],waldrand:[],yard:[],bedroom:[],village_home:[],village_house_east:[],professor_house:[],chapel:[],rival_house:[],
  forest_elder_house:[{id:'forest_elder',x:6,y:3,name:'Alte Dame',dialogue:['Der Alte Wald bewahrt Geschichten, die älter sind als unsere Dörfer.','Ich erinnere mich an Celebi. Doch nicht jede Erinnerung erzählt die ganze Wahrheit.','Tiefer im Wald liegen alte Ruinen. Dort findest du vielleicht weitere Spuren.','Bevor du weitergehst, solltest du dich gut auf den Weg vorbereiten.']}],
  route1:[{id:'route1_trainer',x:10,y:8,name:'Junger Trainer',dialogue:['Hallo! Lass uns unsere Pokémon in einem Übungskampf messen.']}],
@@ -103,5 +113,53 @@ export function auditCardinalWorld(){
   if(!b.portals.some(q=>q.target===from&&q.kind==='path'))issues.push(`${to} -> ${from}: Rückweg fehlt`);
  }
  if(maps.village.portals.some(p=>p.y===maps.village.h-1))issues.push('Mu besitzt unerwünschten Südausgang');
+ return issues;
+}
+
+// Außenhaustüren müssen frei bleiben und über eine sichtbare Wegkachel erreichbar sein.
+export function auditBuildingApproaches(){
+ const issues=[];
+ const paths={village:isVillagePath,professor_clearing:isProfessorClearingPath,beerendorf:isBerryVillagePath};
+ for(const id of Object.keys(paths)){
+  const map=maps[id];
+  for(const portal of map.portals.filter(p=>p.kind==='door')){
+   const k=`${portal.x},${portal.y}`;
+   if(map.walls.has(k))issues.push(`${id}: Tür ${k} blockiert`);
+   if(!paths[id](portal.x,portal.y))issues.push(`${id}: Tür ${k} ohne sichtbaren Weg`);
+   const below=`${portal.x},${portal.y+1}`;
+   if(!inside(map,portal.x,portal.y+1)||map.walls.has(below)||!paths[id](portal.x,portal.y+1))issues.push(`${id}: Tür ${k} ohne freien Vorplatz`);
+  }
+ }
+ return issues;
+}
+
+export function auditStartingAreaVisualSafety(){
+ return ['yard','village','professor_clearing'].flatMap(id=>auditSafeVillageDecorations(maps[id]));
+}
+
+// Prüft die Deckung zwischen sichtbaren massiven Objekten und der Kollision.
+export function auditVisibleObstacles(){
+ const issues=[];
+ for(const [id,buildings] of Object.entries(outdoorBuildings)){
+  const map=maps[id];
+  for(const {x,y,w,h} of buildings)for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)
+   if(!map.walls.has(`${xx},${yy}`))issues.push(`${id}: Haus ohne Kollision ${xx},${yy}`);
+ }
+ for(const id of ['waldrand','route2'])for(const [x,y] of forestTreeCells(id))
+  if(!maps[id].walls.has(`${x},${y}`))issues.push(`${id}: Baum ohne Kollision ${x},${y}`);
+ for(const map of Object.values(maps))for(const k of map.landscapeBushes||[])
+  if(!map.walls.has(k))issues.push(`${map.id}: Busch ohne Kollision ${k}`);
+ return issues;
+}
+
+export function auditBerryForestJourney(){
+ const issues=[...auditVisibleObstacles(),...auditBuildingApproaches()];
+ const berry=maps.beerendorf,forest=maps.route2;
+ for(const [id,map] of [['beerendorf',berry],['route2',forest]]){
+  for(const p of map.portals){
+   if(map.walls.has(`${p.x},${p.y}`))issues.push(`${id}: Portal blockiert ${p.x},${p.y}`);
+   if(maps[p.target]?.walls.has(`${p.tx},${p.ty}`))issues.push(`${id}: Ankunft blockiert ${p.target}`);
+  }
+ }
  return issues;
 }
