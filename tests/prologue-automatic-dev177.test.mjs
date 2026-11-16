@@ -4,9 +4,9 @@ import {Engine} from '../src/engine.js';
 import {maps,npcs,outdoorBuildings,isVillagePath} from '../src/maps.js';
 import {findStoryWalk,STORY_WALK_TARGETS as T} from '../src/story-autowalk.js';
 test('Professorenhaus liegt nicht auf Wegen, Eingang frei',()=>{
- const house=outdoorBuildings.village.find(b=>b.label==='PROF.');assert.ok(house);
- for(let y=house.y;y<house.y+house.h;y++)for(let x=house.x;x<house.x+house.w;x++)assert.equal(isVillagePath(x,y),false);
- const door=maps.village.portals.find(p=>p.target==='professor_house');assert.deepEqual([door.x,door.y],[13,4]);assert.equal(maps.village.walls.has('13,4'),false);
+ const house=outdoorBuildings.professor_clearing.find(b=>b.label==='PROF.');assert.ok(house);
+ for(let y=house.y;y<house.y+house.h;y++)for(let x=house.x;x<house.x+house.w;x++)assert.equal(maps.professor_clearing.walls.has(`${x},${y}`),true);
+ const door=maps.professor_clearing.portals.find(p=>p.target==='professor_house');assert.deepEqual([door.x,door.y],[11,4]);assert.equal(maps.professor_clearing.walls.has('11,4'),false);
 });
 test('Marktstand verdeckt kein Wohnhaus und Händler ist erreichbar',()=>{
  const home=outdoorBuildings.village.find(b=>b.x===17&&b.y===6);

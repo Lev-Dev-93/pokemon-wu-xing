@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
-const s=readFileSync(new URL('../src/battle.js',import.meta.url),'utf8');
-test('Tempomacher',()=>assert.match(s,/abilityId===20/));
-test('Magmapanzer',()=>assert.match(s,/abilityId===40/));
-test('Insomnia',()=>assert.match(s,/15,72/));
-test('Hydration',()=>assert.match(s,/ability===93/));
-test('Expidermis',()=>assert.match(s,/ability===61/));
+import {preventsStatus,preventsConfusion,statusCureAbility} from '../src/ability-effects.js';
+const f=(id,status=null)=>({pokemon:{abilityId:id,status}});
+test('Tempomacher verhindert Verwirrung',()=>assert.equal(preventsConfusion(f(20)),true));
+test('Magmapanzer verhindert Einfrieren',()=>assert.equal(preventsStatus(f(40),'freeze'),true));
+test('Insomnia und Munterkeit verhindern Schlaf',()=>{assert.equal(preventsStatus(f(15),'sleep'),true);assert.equal(preventsStatus(f(72),'sleep'),true)});
+test('Hydration heilt im Regen',()=>assert.equal(statusCureAbility(f(93,'burn'),'rain',()=>0.9),'Hydration'));
+test('Expidermis heilt mit kontrollierter Zufallszahl',()=>assert.equal(statusCureAbility(f(61,'burn'),null,()=>0),'Expidermis'));

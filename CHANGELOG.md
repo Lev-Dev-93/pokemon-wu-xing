@@ -1,3 +1,33 @@
+## dev.257 – Stabilisierung des Spielverlaufs
+- Browser-Wiederaufnahme auf gemeinsamen Phasenresolver umgestellt; Tests ergänzt.
+
+## dev.256 – Stabilisierung des Spielverlaufs
+- Einheitliche, separat testbare Wiederaufnahmeentscheidung für Prolog-Spielstände.
+
+## dev.255 – Stabilisierung des Spielverlaufs
+- Laufzeitprüfung der automatischen Storywege vor Bewegung eingebaut.
+
+## dev.254 – Stabilisierung des Spielverlaufs
+- Wegkontinuität für automatische Storybewegungen prüfbar gemacht.
+
+## dev.253 – Stabilisierung des Spielverlaufs
+- Automatische Storywege: gültiger Startpunkt und Grenzfälle abgesichert.
+
+## dev.242
+- Deterministische Regressionstests für zentrale Fähigkeitsfunktionen.
+
+## dev.241
+- Wetter-Schadensimmunität und Statusheilung zentralisiert.
+
+## dev.240
+- Wetterabhängige Initiative und Ausweichwerte zentralisiert.
+
+## dev.239
+- Status- und Verwirrungsschutz zentralisiert.
+
+## dev.238
+- Zentrale Wetterunterdrückung in ability-effects.js.
+
 
 ## dev.207 – Regressionstests und Abschluss
 
@@ -706,3 +736,58 @@ Eigene Status-/Heilattacken lösen keine gegnerischen Absorptionsfähigkeiten au
 
 ## dev.237 – Fähigkeitsinventur
 Phasenweiser Implementierungsplan und Audit-Regressionstest.
+
+## dev.243
+Einwechsel-Fähigkeitsmetadaten zentralisiert.
+
+## dev.244
+Absorptionsfähigkeiten als gemeinsame Abfragen definiert.
+
+## dev.245
+Kampfablauf auf zentrale Absorptionslogik umgestellt.
+
+## dev.246
+Doppelten Wechselzustand bereinigt und Regressionstests ergänzt.
+
+## dev.247
+Zusätzlicher Regressionstest und technischer Statusbericht.
+
+- dev.248: Schadensfähigkeiten in gemeinsame Modifikatorabfragen überführt (Solarkraft, Adrenalin, Feuerfänger, Sandgewalt, Hitzeschutz, Speckschicht).
+
+- dev.249: Wetterabhängige Heilung und KP-Verlust über gemeinsame Abfrage vereinheitlicht.
+
+- dev.250: Magieschild-Schutz vor indirektem Schaden über einheitliche Abfrage.
+
+- dev.251: Fünf Regressionstests für zentrale Schadens- und Wetterfähigkeiten.
+
+- dev.252: Dokumentierter Grundlagenstatus und offene Abdeckungsziele.
+
+## dev.258 – Kardinale Weltgeografie
+Forschungsplatz westlich von Mu; Labor und Professorenhaus umgezogen. Neue Ost-West-Verbindungen.
+
+## dev.259 – Kardinale Weltgeografie
+Südrand von Mu vollständig geschlossen.
+
+## dev.260 – Kardinale Weltgeografie
+Wegedarstellung an Himmelsrichtungen angepasst.
+
+## dev.261 – Kardinale Weltgeografie
+Kardinaler Routen-Audit ergänzt.
+
+## dev.262 – Kardinale Weltgeografie
+Migration älterer Spielstände auf Schema 8.
+
+### dev.263 – Kartengestaltung
+- Sanfte, deterministische Wegkanten an Grasland- und Waldpfaden ohne Kollisionsänderung.
+
+### dev.264 – Kartengestaltung
+- Mu, Forschungsplatz und Hof um nicht-blockierende Blumenbeete, Bänke und Forschungspflanzungen ergänzt.
+
+### dev.265 – Kartengestaltung
+- Bachufer mit durchgehenden Uferstreifen und Schilf gestaltet, Brückenfelder freigehalten.
+
+### dev.266 – Kartengestaltung
+- Waldrand und Alter Wald mit Laubstreu und Flechten akzentuiert, ohne neue Hindernisse.
+
+### dev.267 – Kartengestaltung
+- Beerendorf mit Kisten, Fässern und Beerenkörben belebt; zusätzliche Dekorations- und Kollisionsprüfungen.

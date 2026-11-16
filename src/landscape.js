@@ -23,3 +23,47 @@ export function landscapeDetails(map){
  }
  return result;
 }
+
+// Surface edging is decorative only and is never used for collision.
+export function terrainEdgeMask(map,x,y){
+ const here=terrainKind(map.id,x,y);
+ if(here!=='path')return 0;
+ let mask=0;for(const [dx,dy,bit] of [[0,-1,1],[1,0,2],[0,1,4],[-1,0,8]]){
+  const nx=x+dx,ny=y+dy;
+  if(nx<0||ny<0||nx>=map.w||ny>=map.h||terrainKind(map.id,nx,ny)!=='path')mask|=bit;
+ }return mask;
+}
+
+export const villageDecorationPlan=Object.freeze({
+ village:[[7,2,'flowerbed'],[15,2,'flowerbed'],[7,13,'bench'],[14,13,'bench']],
+ professor_clearing:[[2,8,'researchPlot'],[12,9,'researchPlot'],[7,9,'flowerbed']],
+ yard:[[1,5,'flowerbed'],[12,9,'flowerbed']]
+});
+export function safeVillageDecorations(map){
+ return (villageDecorationPlan[map.id]||[]).filter(([x,y])=>
+ x>=0&&y>=0&&x<map.w&&y<map.h&&!map.walls.has(`${x},${y}`)&&
+ !map.portals.some(p=>p.x===x&&p.y===y));
+}
+
+export function brookBankCells(map){
+ if(map.id!=='brook')return [];
+ const cells=[];for(const y of [6,10])for(let x=0;x<map.w;x++){
+  if(x>=6&&x<=9||map.walls.has(`${x},${y}`))continue;
+  cells.push({x,y,side:y===6?'north':'south'});
+ }return cells;
+}
+
+export function woodlandAccentCells(map){
+ if(!['waldrand','route2'].includes(map.id))return [];
+ const result=[];for(let y=2;y<map.h-2;y++)for(let x=1;x<map.w-1;x++){
+  if(map.walls.has(`${x},${y}`)||map.portals.some(p=>p.x===x&&p.y===y)||terrainKind(map.id,x,y)==='path')continue;
+  const seed=(x*31+y*47+x*y*7)%29;
+  if(seed===0||seed===7)result.push({x,y,kind:seed===0?'leafLitter':'lichen'});
+ }return result;
+}
+
+export function berryVillageDecorations(map){
+ if(map.id!=='beerendorf')return [];
+ return [[5,2,'crate'],[10,2,'barrel'],[5,11,'basket'],[10,11,'basket']].filter(([x,y])=>
+ !map.walls.has(`${x},${y}`)&&!map.portals.some(p=>p.x===x&&p.y===y));
+}

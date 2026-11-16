@@ -16,7 +16,7 @@ export function switchTeamPokemon(battle,team,activeIndex,nextIndex,fighters=new
  const selected=fighters.get(nextIndex);
  battle.player=selected?structuredClone(selected):{pokemon:structuredClone(next),pp:currentPp(next),stages:{attack:0,defense:0,specialAttack:0,specialDefense:0,speed:0},volatile:{sleepTurns:0,confusionTurns:0,flinched:false,protected:false,enduring:false,protectStreak:0,seeded:false,aquaRing:false,ingrained:false,solarChargeIndex:null,flashFireBoost:false}};
  battle.player.stages={attack:0,defense:0,specialAttack:0,specialDefense:0,speed:0,accuracy:0,evasion:0};
- battle.player.volatile={...battle.player.volatile,seeded:false,aquaRing:false,ingrained:false,protected:false,enduring:false,flinched:false,confusionTurns:0,protectStreak:0,solarChargeIndex:null,actedThisTurn:false,flashFireBoost:false,flashFireBoost:false};
+ battle.player.volatile={...battle.player.volatile,seeded:false,aquaRing:false,ingrained:false,protected:false,enduring:false,flinched:false,confusionTurns:0,protectStreak:0,solarChargeIndex:null,actedThisTurn:false,flashFireBoost:false};
  battle.finished=false;battle.winner=null;battle.turnEvents=[];
  battle.log=[`Pokémon #${battle.player.pokemon.speciesId} wird eingewechselt!`];applyEntryAbility(battle,'player');
  return nextIndex;

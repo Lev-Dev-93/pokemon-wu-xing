@@ -1,14 +1,14 @@
+import {entryWeather,intimidates,curesOnSwitchOut} from './ability-effects.js';
 // Entry abilities are applied once per actual entry, never during a normal turn.
-const WEATHER_ABILITIES = {2:['rain','Regen'],70:['sun','Sonnenschein'],45:['sand','Sandsturm'],117:['hail','Hagel']};
 export function applyEntryAbility(battle, side){
  const entrant=battle?.[side], opponent=battle?.[side==='player'?'opponent':'player'];
  if(!entrant||!opponent||entrant.pokemon.currentHp<=0)return battle;
  const ability=entrant.pokemon.abilityId;
- if(WEATHER_ABILITIES[ability]){
-  const [weather,label]=WEATHER_ABILITIES[ability];battle.weather=weather;battle.weatherTurns=5;
+ if(entryWeather(ability)){
+  const [weather,label]=entryWeather(ability);battle.weather=weather;battle.weatherTurns=5;
   battle.log.push(`${label} beginnt durch die Fähigkeit des eingewechselten Pokémon!`);
  }
- if(ability===22&&opponent.pokemon.currentHp>0){
+ if(intimidates(ability)&&opponent.pokemon.currentHp>0){
   const old=opponent.stages.attack??0;opponent.stages.attack=Math.max(-6,old-1);
   if(old!==opponent.stages.attack)battle.log.push('Bedroher senkt den Angriff des Gegners!');
  }
@@ -16,6 +16,6 @@ export function applyEntryAbility(battle, side){
  return battle;
 }
 export function cureOnSwitchOut(pokemon){
- if(pokemon?.abilityId===30&&pokemon.status&&pokemon.status!=='healthy')pokemon.status='healthy';
+ if(curesOnSwitchOut(pokemon?.abilityId)&&pokemon.status&&pokemon.status!=='healthy')pokemon.status='healthy';
  return pokemon;
 }

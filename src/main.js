@@ -1,5 +1,5 @@
-import {prologuePhase} from './story-sequence.js';
-import {findStoryWalk,STORY_WALK_TARGETS} from './story-autowalk.js';
+import {prologuePhase,prologueRecoveryAction} from './story-sequence.js';
+import {findStoryWalk,storyWalkIsAdjacent,STORY_WALK_TARGETS} from './story-autowalk.js';
 import {pendingRiftRecovery} from './story-guards.js';
 import {BAG_CATEGORIES,bagEntries,bagTargets,applyBagItem} from './bag.js';
 import {battleOutcome} from './battle-flow.js';
@@ -65,7 +65,7 @@ function runToVillageSquare(){
 // Automatischer Prolog: Giratina → Rivale/Absol → Eltern → Professor.
 function walkStoryTo(mapId,target,done){
  const route=findStoryWalk(mapId,[engine.state.x,engine.state.y],target);
- if(!route){scriptedRun=false;engine.message='Der automatische Storyweg ist blockiert.';draw();return}
+ if(!route||!storyWalkIsAdjacent([engine.state.x,engine.state.y],route)){scriptedRun=false;engine.message='Der automatische Storyweg ist blockiert.';draw();return}
  let index=0;const generation=storyGeneration;
  function advance(){if(generation!==storyGeneration)return;if(index===route.length){done();return}
   const [x,y]=route[index++],oldX=engine.state.x,oldY=engine.state.y;engine.state.x=x;engine.state.y=y;engine.state.steps++;

@@ -4,10 +4,10 @@ import {maps,npcs,objects,canMove} from '../src/maps.js';
 import {Engine} from '../src/engine.js';
 import {createPokemon} from '../src/team.js';
 
-const interiors=['study','professor_house','chapel','rival_house','village_home','village_house_east'];
-test('Startdorf hat sechs Gebäude nach Marktstand-Umbau mit jeweils einem Rückweg',()=>{
+const interiors=['chapel','rival_house','village_home','village_house_east'];
+test('Startdorf hat vier Gebäude nach Marktstand-Umbau mit jeweils einem Rückweg',()=>{
  const doors=maps.village.portals.filter(p=>interiors.includes(p.target));
- assert.equal(doors.length,6);
+ assert.equal(doors.length,4);
  assert.deepEqual(new Set(doors.map(p=>p.target)),new Set(interiors));
  for(const door of doors){
   assert.equal(maps.village.walls.has(`${door.x},${door.y}`),false);
