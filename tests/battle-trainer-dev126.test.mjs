@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {battleOutcome} from '../src/battle-flow.js';test('Trainerbelohnung erst nach letztem Gegner',()=>{assert.equal(battleOutcome('trainer','player',0,1),'next-opponent');assert.equal(battleOutcome('trainer','player',0,0),'complete');});

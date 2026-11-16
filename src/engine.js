@@ -62,6 +62,14 @@ export class Engine{
  canAccessStorage(){return this.mode==='exploration'&&this.state.mapId==='ground'&&this.state.flags.route1_hatched}
  depositPokemon(index){if(!this.canAccessStorage()||!validateTeam(this.state.team)||!Number.isInteger(index)||index<0||index>=this.state.team.length||this.state.team.length<=1||this.state.storage.length>=500)return false;this.state.storage.push(this.state.team.splice(index,1)[0]);this.message='Pokémon im Lager abgelegt.';this.lastEvent='pokemonDeposited';return true}
  withdrawPokemon(index){if(!this.canAccessStorage()||!Number.isInteger(index)||index<0||index>=this.state.storage.length||this.state.team.length>=6)return false;const pokemon=this.state.storage[index];if(!addToTeam(this.state.team,pokemon))return false;this.state.storage.splice(index,1);this.message='Pokémon ins Team aufgenommen.';this.lastEvent='pokemonWithdrawn';return true}
+ recoverFromBlackout(){
+  if(!this.state.flags.route1_hatched||!Array.isArray(this.state.team)||this.state.team.some(p=>p.currentHp>0))return false;
+  healPartyAtStation(this.state.team);
+  this.state.mapId='ground';this.state.x=5;this.state.y=6;this.state.elevation=0;this.state.facing='down';
+  this.state.eventLog.push({type:'blackout',destination:'ground'});
+  this.message='Deine Pokémon wurden von deiner Adoptivmutter versorgt.';
+  this.lastEvent='blackoutRecovered';return true;
+ }
  healPokemon(){return healTeam(this.state.team)}
  healAtStation(){if(this.mode!=='exploration'||this.state.mapId!=='ground'||!this.state.flags.route1_hatched)return false;const changed=healPartyAtStation(this.state.team);this.message=changed?'Dein Pokémon-Team wurde vollständig versorgt.':'Dein Pokémon-Team ist bereits gesund.';this.lastEvent='stationHealed';return true;}
  collectSupplies(){if(this.mode!=='exploration'||this.state.mapId!=='ground'||!this.state.flags.route1_hatched){this.message='Die Vorräte werden erst nach dem Schlüpfen deines Starters ausgegeben.';return false;}if(this.state.flags.suppliesCollected){this.message='Du hast die Vorräte bereits abgeholt.';return false;}this.addItem(POTION_ITEM,3);this.setFlag('suppliesCollected',true);this.message='Du erhältst 3 Tränke für deine Reise.';this.lastEvent='suppliesCollected';return true;}

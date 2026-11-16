@@ -1,3 +1,47 @@
+# dev.137
+
+- Belohnungsdialog bleibt bei fehlgeschlagener Auswahl offen; Identitätstest für Entwicklungen.
+
+# dev.136
+
+- Einheitliche, deduplizierte Belohnungswarteschlange im Kampf.
+
+# dev.135
+
+- Levelaufstiege mit deduplizierten Entwicklungsoptionen und Vorschau.
+
+# dev.134
+
+- Vorschau von Entwicklungswerten ohne Änderung des Teams.
+
+# dev.133
+
+- Lernbare Attacken für übersprungene Level ermitteln.
+
+## dev.127 – Kampfsystem-Integration
+
+Integrationsprüfungen und manueller Browsertestplan.
+
+## dev.126 – Kampfsystem-Integration
+
+Trainerbelohnung nur nach vollständigem Sieg.
+
+## dev.125 – Kampfsystem-Integration
+
+Team-Niederlage führt zur Adoptivmutter und heilt das Team.
+
+## dev.124 – Kampfsystem-Integration
+
+Gegner ohne verbleibende AP beendet Kampf ohne Sackgasse.
+
+## dev.123 – Kampfsystem-Integration
+
+Kampfausgänge und Teamwechsel zentral klassifiziert.
+
+## dev.122 – Dialoge im Spielfenster
+
+Die Dialogbox liegt nun als responsives Overlay am unteren Rand der Weltansicht, auch im Vollbildmodus. Keine Änderungen an Story, NPCs oder Karten.
+
 ## dev.121 – Beerendorf, Waldhütte und Baumkollisionen
 
 Vier Gebäude in Beerendorf: Werkstatt, Kräuterladen, Kräuterhexe (Heilung), Wohnhaus. Zusätzliche dekorative Beerensträucher. Alte Dame in eigener Waldhütte. Sichtbare Baumgruppen sind unpassierbar. Keine Sammelitems oder Nebenaufgaben.
@@ -417,3 +461,33 @@ Questzustand beim Neustart initialisiert, weitere Regressionstests.
 
 ## dev.91
 - Tag/Nacht-Anzeige direkt neben dem Gebietsnamen; Regressionstests für Tageszeitgrenzen.
+
+## dev.128
+Spielmenü vollständig innerhalb des Spielfensters, auch Vollbild.
+
+## dev.129
+Pokémon-Teamkarten und individuelle Detailansichten.
+
+## dev.130
+Erweiterte Detailwerte (IV/EV, AP, Freundschaft, Erfahrung), Freundschaftsentwicklung.
+
+## dev.131
+PC-Lager übersichtlicher mit KP und Team-/Box-Belegung.
+
+## dev.132
+Menü startet in Teamübersicht, Tastaturfokus und Dialogschutz.
+
+## dev.138
+- Beutel im Spielfenster: Kategorien, verständliche Gegenstandsnamen und Zielauswahl.
+
+## dev.139
+- Gegenstände werden anhand ihrer Wirkung in Medizin, AP, Steine, Pokébälle und Sonstiges gruppiert.
+
+## dev.140
+- Gegenstände nur auf gültige Pokémon-Ziele anwendbar; Erfolg speichert automatisch.
+
+## dev.141
+- Marktstand: zusätzlich Einkauf von fünf Exemplaren in einem Schritt.
+
+## dev.142
+- Bedienbarkeit und Tests für Inventar, Itemziele, AP und Entwicklungssteine.

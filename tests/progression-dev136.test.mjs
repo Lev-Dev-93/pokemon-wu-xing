@@ -1,0 +1,1 @@
+import {test} from 'node:test';import {strict as assert} from 'node:assert';import {createRewardQueue} from '../src/battle-rewards.js';test('Belohnungen ohne Duplikate',()=>assert.deepEqual(createRewardQueue({learnableMoves:[1,1],evolutionOptions:[{to:2},{to:2}]}),[{kind:'move',id:1},{kind:'evolution',id:2}]));

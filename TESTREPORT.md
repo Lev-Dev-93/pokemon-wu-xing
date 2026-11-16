@@ -1,3 +1,3 @@
-# dev.121 Testbericht
+# Testbericht dev.142
 
-421 von 421 automatisierten Tests bestanden. JavaScript-Syntax aller src-Dateien geprüft. ZIP-Integrität geprüft. Browsertest noch ausstehend.
+446/446 automatisierte Node-Tests bestanden. JavaScript-Syntax sämtlicher src/*.js erfolgreich geprüft. Kein interaktiver Browsertest durchgeführt.

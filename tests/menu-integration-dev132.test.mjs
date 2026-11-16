@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';const s=fs.readFileSync(new URL('../src/main.js',import.meta.url),'utf8');test('Menü startet mit Teamübersicht und sperrt Dialog',()=>{assert.match(s,/menuPanel\('team'\);menu.querySelector/);assert.match(s,/engine.mode==='dialogue'&&force!==false/)});

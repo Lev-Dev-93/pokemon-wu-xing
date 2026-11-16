@@ -264,3 +264,26 @@ Questbeschreibungen und alle Questgruppen im Menü und Reisetagebuch sichtbar.
 
 ### dev.91
 Tag/Nacht-Anzeige direkt neben dem Gebietsnamen; Regressionstests für Tageszeitgrenzen.
+
+## dev.137 – Pokémon-Menü
+Das Spielmenü erscheint als Overlay direkt innerhalb des Spielfensters. Öffnen mit M; schließen mit Escape. Team und PC werden im Menü verwaltet.
+
+
+### dev.138
+Beutel im Spielfenster: Kategorien, verständliche Gegenstandsnamen und Zielauswahl.
+
+
+### dev.139
+Gegenstände werden anhand ihrer Wirkung in Medizin, AP, Steine, Pokébälle und Sonstiges gruppiert.
+
+
+### dev.140
+Gegenstände nur auf gültige Pokémon-Ziele anwendbar; Erfolg speichert automatisch.
+
+
+### dev.141
+Marktstand: zusätzlich Einkauf von fünf Exemplaren in einem Schritt.
+
+
+### dev.142
+Bedienbarkeit und Tests für Inventar, Itemziele, AP und Entwicklungssteine.

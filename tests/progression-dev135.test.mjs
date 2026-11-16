@@ -1,0 +1,1 @@
+import {test} from 'node:test';import {strict as assert} from 'node:assert';import {createPokemon} from '../src/team.js';import {levelUpSummary} from '../src/progression.js';test('Levelvorschau ist rein',()=>{const p=createPokemon(1,{level:5});const original=structuredClone(p);assert.ok(levelUpSummary(p,100).newLevel>=5);assert.deepEqual(p,original);});

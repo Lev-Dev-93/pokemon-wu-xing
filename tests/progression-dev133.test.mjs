@@ -1,0 +1,1 @@
+import {test} from 'node:test';import {strict as assert} from 'node:assert';import {createPokemon} from '../src/team.js';import {pendingLevelMoves} from '../src/progression.js';test('Lernliste validiert Levelbereich',()=>{const p=createPokemon(1,{level:10});assert.ok(Array.isArray(pendingLevelMoves(p,1,10)));assert.throws(()=>pendingLevelMoves(p,11,12));});

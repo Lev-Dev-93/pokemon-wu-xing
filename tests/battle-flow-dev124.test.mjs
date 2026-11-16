@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {battleOutcome} from '../src/battle-flow.js';test('Kampfflucht und Unentschieden sind abschließbar',()=>{assert.equal(battleOutcome('trainer','escape'),'complete');assert.equal(battleOutcome('test',null),'ongoing');});

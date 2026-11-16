@@ -11,7 +11,7 @@ export function awardExperience(p,amount){requirePokemon(p);if(!integer(amount,0
   for(const x of getLearnset(p.speciesId).filter(x=>x.level===p.level))if(!p.moves.includes(x.moveId)&&!learned.includes(x.moveId))learned.push(x.moveId);
   evolutionOptions.push(...getLevelEvolutionCandidates(p.speciesId,p.level).map(e=>({...e,atLevel:p.level})));
  }
- return {oldLevel:start,newLevel:p.level,levelsGained:p.level-start,learnableMoves:learned,evolutionOptions};
+ return {oldLevel:start,newLevel:p.level,levelsGained:p.level-start,learnableMoves:learned,evolutionOptions:[...new Map(evolutionOptions.map(e=>[e.to,e])).values()]};
 }
 export function learnMove(p,moveId,replaceIndex=null){requirePokemon(p);if(!integer(moveId,1,10000)||!getMove(moveId))throw Error('Unbekannte Attacke');if(p.moves.includes(moveId))return false;
  // Only level-up moves already reached may be learned here; item/tutor moves need a separate system.
@@ -65,4 +65,26 @@ export function friendshipEvolutionOptions(p,timeOfDay='day'){
 export function evolveWithFriendship(p,target,timeOfDay='day'){
  if(!friendshipEvolutionOptions(p,timeOfDay).some(e=>e.to===target))throw Error('Freundschaftsentwicklung nicht möglich');
  return applyEvolution(p,target);
+}
+
+// Level-up candidates are computed across the entire level range, including skipped levels.
+export function pendingLevelMoves(p,fromLevel,toLevel=p.level){
+ requirePokemon(p);if(!integer(fromLevel,1,MAX_LEVEL)||!integer(toLevel,fromLevel,MAX_LEVEL)||toLevel>p.level)throw Error('Ungültiger Levelbereich');
+ return [...new Set(getLearnset(p.speciesId).filter(x=>x.level>fromLevel&&x.level<=toLevel).map(x=>x.moveId))].filter(id=>!p.moves.includes(id));
+}
+
+// A pure preview lets the UI show the result without mutating the team.
+export function previewEvolution(p,target){
+ requirePokemon(p);if(!integer(target,1,493)||!POKEMON_DATA[target])throw Error('Ungültige Entwicklungsart');
+ const copy=structuredClone(p);applyEvolution(copy,target);return {speciesId:copy.speciesId,stats:{...copy.stats},abilityId:copy.abilityId,hiddenAbility:copy.hiddenAbility,currentHp:copy.currentHp};
+}
+
+export function levelUpSummary(p,amount){
+ requirePokemon(p);const copy=structuredClone(p);const result=awardExperience(copy,amount);return {...result,experience:copy.experience,hp:copy.currentHp,stats:{...copy.stats}};
+}
+
+// Evolution never changes the unique individual attributes of a Pokémon.
+export function evolutionPreservesIdentity(before,after){
+ if(!validatePokemon(before)||!validatePokemon(after))return false;
+ return before.level===after.level&&before.experience===after.experience&&before.shiny===after.shiny&&before.friendship===after.friendship&&JSON.stringify(before.ivs)===JSON.stringify(after.ivs)&&JSON.stringify(before.evs)===JSON.stringify(after.evs)&&JSON.stringify(before.moves)===JSON.stringify(after.moves);
 }

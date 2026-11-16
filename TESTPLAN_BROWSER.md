@@ -1,8 +1,9 @@
-# Großer Browsertest – dev.117
-1. Prolog: Züchter, Ei, Giratina, Absol, Professor.
-2. Startdorf, Züchterhof und Wohnhaus auf Kollisionen und Grafik prüfen.
-3. Route 1: Schlüpfen, Trainer, Wildbegegnungen.
-4. Bach → Waldrand → Beerendorf → Alter Wald und zurück.
-5. Beerendorf: Werkstatt, Wohnhaus und Gästehaus betreten und verlassen.
-6. Team, Heilung, Händler, Pokémon-PC sowie Speichern und Laden prüfen.
-7. Keine Sammelobjekte, Nebenaufgaben oder zusätzlichen NPC-Interaktionen erwarten.
+# Browser-Checkliste
+1. M öffnen, Beutel anklicken: Anzeige im Spielfenster.
+2. Zwischen Kategorien wechseln; Mengen und Namen prüfen.
+3. Verletztes Pokémon mit Trank heilen, Menge verringert sich um eins.
+4. Unverletztes Pokémon kann keinen Trank verbrauchen.
+5. AP-Heilmittel, Statusmittel, Entwicklungssteine nur bei passenden Zielen.
+6. Pokéball nur im Wildkampf verwenden.
+7. Marktstand: Kauf von 1 und 5 Gegenständen, Guthaben prüfen.
+8. Speichern und Laden; Mengen und Teamzustand prüfen.

@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';const s=fs.readFileSync(new URL('../src/main.js',import.meta.url),'utf8');test('PC zeigt Team und Lager sowie KP',()=>{assert.match(s,/Pokémon-Lager · Team/);assert.match(s,/→ Ablegen/);assert.match(s,/→ Ins Team/)});
