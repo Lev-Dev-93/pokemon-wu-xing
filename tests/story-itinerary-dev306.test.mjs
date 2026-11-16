@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {buildRiftItinerary} from '../src/story-itinerary.js';
+test('Erdbebenlauf besitzt gültige Fußwege und explizite Kartenwechsel',()=>{const steps=buildRiftItinerary('ground',[5,7]);assert.ok(steps);assert.equal(steps.filter(x=>x.kind==='portal').length,2);assert.deepEqual(steps.at(-1),{kind:'step',mapId:'village',x:11,y:7});});

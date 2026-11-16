@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {maps} from '../src/maps.js';import {terrainEdgeMask} from '../src/landscape.js';import {walkwayCells} from '../src/route-layout.js';
+test('Kantenberechnung verarbeitet alle freien Portalverbindungswege',()=>{for(const id of ['village','professor_clearing','route1','brook','waldrand','beerendorf','route2'])for(const cell of walkwayCells(maps[id]).cells){const [x,y]=cell.split(',').map(Number);assert.ok(Number.isInteger(terrainEdgeMask(maps[id],x,y)));assert.equal(maps[id].walls.has(cell),false)}});

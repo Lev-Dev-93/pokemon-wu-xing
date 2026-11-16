@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {maps} from '../src/maps.js';import {auditRoadSurface} from '../src/landscape.js';import {auditWalkwayNetwork} from '../src/route-layout.js';
+test('Gesamte Außenwelt: Wege und Kollisionsflächen bleiben konsistent',()=>{assert.deepEqual(auditWalkwayNetwork(maps),[]);for(const id of ['village','professor_clearing','route1','brook','waldrand','beerendorf','route2'])assert.deepEqual(auditRoadSurface(maps[id]),[])});

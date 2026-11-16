@@ -6,6 +6,7 @@ export function validatePrologueMilestones(flags){
  if(!flags||typeof flags!=='object')return false;
  const order=['birthday_wish_pending','egg_received','rift_closed','rival_absol','professor_demo','route1_hatched'];
  for(let i=1;i<order.length;i++)if(flags[order[i]]&&!flags[order[i-1]])return false;
+ if(flags.parents_briefed&&(!flags.rift_closed||!flags.rival_absol))return false;
  return true;
 }
 

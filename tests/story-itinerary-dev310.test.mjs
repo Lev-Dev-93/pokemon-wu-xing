@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {buildRiftItinerary,validateRiftItinerary} from '../src/story-itinerary.js';
+test('Erdbebenlauf validiert Kartenwechsel und Nachbarschritte',()=>{const steps=buildRiftItinerary('ground',[5,7]);assert.equal(validateRiftItinerary(steps,'ground',[5,7]),true);assert.equal(validateRiftItinerary([{kind:'step',mapId:'ground',x:9,y:9}],'ground',[5,7]),false);});

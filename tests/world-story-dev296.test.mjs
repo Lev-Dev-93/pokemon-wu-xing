@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {rollEncounter,isWildEncounterTerrain} from '../src/wild-encounters.js';import {maps} from '../src/maps.js';import {isTravelPath} from '../src/landscape.js';import {isWalkway} from '../src/route-layout.js';
+test('Keine Wildpokémon auf irgendeinem sichtbaren oder berechneten Reiseweg',()=>{for(const id of ['route1','waldrand','route2']){const m=maps[id];for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++)if(isTravelPath(id,x,y)||isWalkway(m,x,y)){assert.equal(isWildEncounterTerrain(id,x,y),false);assert.equal(rollEncounter({mapId:id,x,y,hatched:true,hasUsablePokemon:true,rng:()=>0}),null);}}});

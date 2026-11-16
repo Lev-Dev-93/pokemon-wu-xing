@@ -1,14 +1,15 @@
+import {isVillageRoad,isResearchRoad,isBerryRoad} from './path-geometry.js';
 import {landscapeObstacleCells,auditSafeVillageDecorations} from './landscape.js';
 // Gemeinsame Weltgrundrisse: Darstellung und Kollision verwenden dieselben Rechtecke.
 export const outdoorBuildings={
- village:[{x:2,y:6,w:3,h:2,color:'#9c705c',label:'HAUS'},{x:17,y:6,w:3,h:2,color:'#a67b64',label:'HAUS'},{x:2,y:10,w:3,h:2,color:'#8b89a3',label:'KAPELLE'},{x:16,y:10,w:3,h:2,color:'#9a6e55',label:'RIVALE'}],
- professor_clearing:[{x:2,y:2,w:4,h:2,color:'#557c8b',label:'LABOR'},{x:10,y:2,w:4,h:2,color:'#977357',label:'PROF.'}],
- beerendorf:[{x:2,y:3,w:2,h:2},{x:12,y:3,w:2,h:2},{x:2,y:11,w:2,h:2},{x:12,y:11,w:2,h:2}]
+ village:[{x:4,y:5,w:3,h:2,color:'#9c705c',label:'HAUS'},{x:17,y:6,w:3,h:2,color:'#a67b64',label:'HAUS'},{x:4,y:9,w:3,h:2,color:'#8b89a3',label:'KAPELLE'},{x:16,y:10,w:3,h:2,color:'#9a6e55',label:'RIVALE'}],
+ professor_clearing:[{x:4,y:2,w:4,h:2,color:'#557c8b',label:'LABOR'},{x:10,y:2,w:4,h:2,color:'#977357',label:'PROF.'}],
+ beerendorf:[{x:3,y:3,w:2,h:2},{x:13,y:3,w:2,h:2},{x:2,y:11,w:2,h:2},{x:12,y:11,w:2,h:2}]
 };
 // Wege werden nur auf begehbaren Feldern gezeichnet; Gebäude bleiben frei.
-export function isVillagePath(x,y){return ((x>=8&&x<=14&&y>=1&&y<=11)||(y===7&&x>=0&&x<=21)||(y===11&&x>=4&&x<=19)||(y===4&&x>=6&&x<=19)||(x===5&&y>=7&&y<=12)||(x===19&&y>=7&&y<=12)||(x===20&&y>=7&&y<=8));}
-export function isProfessorClearingPath(x,y){return (y===7&&x>=0&&x<=15)||(x>=5&&x<=11&&y>=4&&y<=7);}
-export function isBerryVillagePath(x,y){return (x>=7&&x<=8&&y>=1&&y<=13)||(y===7&&x>=0&&x<=15)||(y>=5&&y<=13&&x===4)||(y>=5&&y<=13&&x===14)||(y===13&&x>=3&&x<=13)||(x===3&&y>=13&&y<=14)||(x===13&&y>=13&&y<=14)||(x===4&&y>=5&&y<=7)||(x===14&&y>=5&&y<=7);}
+export const isVillagePath=isVillageRoad;
+export const isProfessorClearingPath=isResearchRoad;
+export const isBerryVillagePath=isBerryRoad;
 export const buildingCells=id=>(outdoorBuildings[id]||[]).flatMap(({x,y,w,h})=>Array.from({length:w*h},(_,i)=>[x+i%w,y+Math.floor(i/w)]));
 const room=(id,name,w,h,walls=[],portals=[],heights={},stairs=[])=>({id,name,w,h,walls:new Set(walls.map(p=>p.join(','))),portals,heights,stairs});
 const p=(x,y,target,tx,ty,kind='door')=>({x,y,target,tx,ty,kind});
@@ -160,6 +161,23 @@ export function auditBerryForestJourney(){
    if(map.walls.has(`${p.x},${p.y}`))issues.push(`${id}: Portal blockiert ${p.x},${p.y}`);
    if(maps[p.target]?.walls.has(`${p.tx},${p.ty}`))issues.push(`${id}: Ankunft blockiert ${p.target}`);
   }
+ }
+ return issues;
+}
+
+// Dev.300: Häuser stehen an ihrer jeweiligen Tür, ohne Hauptwege zu blockieren.
+export function auditOrderedSettlementLayout(){
+ const issues=[];
+ for(const id of ['village','professor_clearing','beerendorf']){
+  const map=maps[id],houses=outdoorBuildings[id],doors=map.portals.filter(p=>p.kind==='door');
+  if(houses.length!==doors.length)issues.push(`${id}: Haus-/Türzahl stimmt nicht`);
+  for(const door of doors){
+   const adjacent=houses.some(h=>door.x>=h.x-1&&door.x<=h.x+h.w&&door.y>=h.y-1&&door.y<=h.y+h.h);
+   if(!adjacent)issues.push(`${id}: Tür ${door.x},${door.y} ohne Haus`);
+   if(map.walls.has(`${door.x},${door.y}`))issues.push(`${id}: Tür blockiert`);
+  }
+  for(const h of houses)for(let y=h.y;y<h.y+h.h;y++)for(let x=h.x;x<h.x+h.w;x++)
+   if(!map.walls.has(`${x},${y}`))issues.push(`${id}: Hauskollision fehlt`);
  }
  return issues;
 }

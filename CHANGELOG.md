@@ -1,3 +1,64 @@
+## dev.305
+
+- Gemeinsames Karten-Audit kontrolliert, dass Straßen, Hindernisse und Wegkanten auf allen Außenkarten konsistent bleiben.
+
+## dev.304
+
+- Begegnungsflächen schließen sämtliche sichtbaren Außenwege, einschließlich Dorfwegen und dynamischen Verbindungswegen, ausdrücklich aus.
+
+## dev.303
+
+- Wegekanten berücksichtigen auch die tatsächlich berechneten Portalverbindungen, damit Weg und Rand nicht auseinanderlaufen.
+
+## dev.302
+
+- Lose Dekoration auf Route 1, Waldrand und Altem Wald wird nicht mehr auf Wegen oder blockierten Feldern gezeichnet.
+
+## dev.301
+
+- Die sichtbare Straßenfläche von Mu und Forschungsplatz ist jetzt auch in der gemeinsamen Terrainklassifikation hinterlegt; die Straßenformen stammen aus einer einzigen Geometriedefinition.
+
+## dev.300
+- Beerendorf-Dekoration und Buschplatzierung verwenden jetzt dieselbe Wegegeometrie wie die sichtbare Karte.
+- Gemeinsame Layoutprüfung für Hauspositionen, Wege, Kollisionen und Begegnungsflächen.
+
+## dev.299
+- Beerendorf: Häuser am Ost-West-Hauptweg und kurze Stichwege zu allen Türen.
+
+## dev.298
+- Forschungsplatz: Labor und Professorenhaus entlang der Zugangsachse ausgerichtet.
+
+## dev.297
+- Dorf Mu: kompakte Nord-Süd-Hauptachse und klare Hausvorplätze.
+
+## dev.296
+- Wilde Pokémon erscheinen nur in hohem Gras abseits aller sichtbaren und berechneten Wege.
+
+## dev.295 – Prolog-Recovery und Ereignisflags gemeinsam geprüft
+
+- Prolog-Recovery und Ereignisflags gemeinsam geprüft.
+- Regressionstest `story-stability-dev295.test.mjs`.
+
+## dev.294 – Spielstand-Rückwege dürfen nicht auf NPCs enden
+
+- Spielstand-Rückwege dürfen nicht auf NPCs enden.
+- Regressionstest `story-stability-dev294.test.mjs`.
+
+## dev.293 – Automatische Storywege beachten Höhenunterschiede
+
+- Automatische Storywege beachten Höhenunterschiede.
+- Regressionstest `story-stability-dev293.test.mjs`.
+
+## dev.292 – Prologphasen behandeln fehlende Vorbedingungen sicher
+
+- Prologphasen behandeln fehlende Vorbedingungen sicher.
+- Regressionstest `story-stability-dev292.test.mjs`.
+
+## dev.291 – Elternbericht nur nach abgeschlossener Absol-Szene
+
+- Elternbericht nur nach abgeschlossener Absol-Szene.
+- Regressionstest `story-stability-dev291.test.mjs`.
+
 
 ## dev.290
 - Gemeinsamer Reise-Audit für Beerendorf, Alten Wald, Häuser und Portale.
@@ -878,3 +939,18 @@ Migration älterer Spielstände auf Schema 8.
 ## dev.275 – Weltzugang und Wegführung
 - Globale Reiseverbindungen und kombinierte Weltprüfung.
 - Automatisierter Regressionstest für die neue Prüfung.
+
+## dev.306
+- Erdbebenlauf verwendet echte Fußwege statt Positionssprüngen.
+
+## dev.307
+- Wiederaufnahme prüft, ob der Lauf vom geladenen Feld möglich ist.
+
+## dev.308
+- Prüfung der drei möglichen Einstiegskarten in den Erdbebenlauf.
+
+## dev.309
+- Gemeinsamer Wiederaufnahmepfad für Laden und Fortsetzen, ohne Dialoge zu unterbrechen.
+
+## dev.310
+- Vollständige Validierung der Storyschritte und Kartenübergänge vor dem Start.

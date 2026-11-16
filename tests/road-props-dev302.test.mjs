@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {maps} from '../src/maps.js';import {terrainKind} from '../src/landscape.js';import {isWalkway} from '../src/route-layout.js';
+test('Routen-Requisiten werden nicht auf dem Hauptweg platziert',()=>{for(const id of ['route1','waldrand','route2'])for(const [x,y] of [[1,2],[3,8],[12,3],[14,10],[2,15],[13,16]]){const m=maps[id];const drawn=!m.walls.has(`${x},${y}`)&&terrainKind(id,x,y)!=='path'&&!isWalkway(m,x,y);if(drawn)assert.equal(m.walls.has(`${x},${y}`),false)}});

@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {Engine} from '../src/engine.js';
+test('Elternbericht nicht ohne abgeschlossenen Riss und Absol',()=>{const e=new Engine();e.state.mapId='ground';e.state.flags.rival_absol=true;assert.equal(e.beginParentsReport(),false);e.state.flags.egg_received=true;assert.equal(e.beginParentsReport(),false);e.state.flags.rift_closed=true;assert.equal(e.beginParentsReport(),true)});

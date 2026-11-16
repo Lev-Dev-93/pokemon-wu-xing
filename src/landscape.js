@@ -1,3 +1,4 @@
+import {isSettlementRoad} from './path-geometry.js';
 import {isWalkway} from './route-layout.js';
 // Deterministic, purely visual biome details. No collision or encounter changes.
 export const landscapeBiomes = Object.freeze({route1:'meadow',brook:'riverside',waldrand:'edge',beerendorf:'hamlet',route2:'ancientForest'});
@@ -11,7 +12,7 @@ export function isTravelPath(mapId,x,y){
 }
 export function terrainKind(mapId,x,y){
  if(mapId==='brook'&&y>=7&&y<=9)return x>=6&&x<=9?'bridge':'water';
- if(mapId==='beerendorf'&&((x>=6&&x<=9)||(y===7&&x>=4&&x<=13)))return 'path';
+ if(isSettlementRoad(mapId,x,y))return 'path';
  if(['route1','brook','waldrand','route2'].includes(mapId)&&isTravelPath(mapId,x,y))return 'path';
  return 'grass';
 }
@@ -36,10 +37,10 @@ export function landscapeDetails(map){
 // Surface edging is decorative only and is never used for collision.
 export function terrainEdgeMask(map,x,y){
  const here=terrainKind(map.id,x,y);
- if(here!=='path'||map.walls.has(`${x},${y}`))return 0;
+ if((here!=='path'&&!isWalkway(map,x,y))||map.walls.has(`${x},${y}`))return 0;
  let mask=0;for(const [dx,dy,bit] of [[0,-1,1],[1,0,2],[0,1,4],[-1,0,8]]){
   const nx=x+dx,ny=y+dy;
-  if(nx<0||ny<0||nx>=map.w||ny>=map.h||terrainKind(map.id,nx,ny)!=='path')mask|=bit;
+  if(nx<0||ny<0||nx>=map.w||ny>=map.h||(terrainKind(map.id,nx,ny)!=='path'&&!isWalkway(map,nx,ny)))mask|=bit;
  }return mask;
 }
 
@@ -87,4 +88,11 @@ export function auditSafeVillageDecorations(map){
   if(map.portals.some(p=>p.x===x&&p.y===y))issues.push(`${map.id}: Dekoration auf Portal ${x},${y}`);
  }
  return issues;
+}
+
+// Consistency audit for route surfaces and blocking berry bushes.
+export function auditRoadSurface(map){
+ const issues=[];for(let y=0;y<map.h;y++)for(let x=0;x<map.w;x++){
+  const cell=`${x},${y}`;if(map.landscapeBushes?.has(cell)&&(isWalkway(map,x,y)||terrainKind(map.id,x,y)==='path'))issues.push(`${map.id}: Busch auf Weg ${cell}`);
+ }return issues;
 }

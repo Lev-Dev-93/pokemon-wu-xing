@@ -1,3 +1,4 @@
+import {buildRiftItinerary,riftResumeReady,validateRiftItinerary} from './story-itinerary.js';
 import {prologuePhase,prologueRecoveryAction} from './story-sequence.js';
 import {findStoryWalk,storyWalkIsAdjacent,STORY_WALK_TARGETS} from './story-autowalk.js';
 import {pendingRiftRecovery} from './story-guards.js';
@@ -56,10 +57,11 @@ function playEarthquakeThenRun(){
 }
 function runToVillageSquare(){
  if(scriptedRun)return;scriptedRun=true;keys.clear();engine.message='Ein Erdbeben! Du rennst zum Dorfplatz!';draw();
- const route=[['ground',5,7],['yard',7,2],['yard',7,4],['yard',7,6],['yard',7,8],['yard',7,10],['village',10,1],['village',10,3],['village',10,5],['village',10,7],['village',11,7]];
- let i=0;if(engine.state.mapId==='yard')i=route.findIndex(step=>step[0]==='yard'&&step[2]>=engine.state.y);else if(engine.state.mapId==='village')i=route.findIndex(step=>step[0]==='village'&&step[2]>=engine.state.y);if(i<0)i=route.length;const generation=storyGeneration;
+ const route=buildRiftItinerary(engine.state.mapId,[engine.state.x,engine.state.y]);
+ if(!route||!validateRiftItinerary(route,engine.state.mapId,[engine.state.x,engine.state.y])){scriptedRun=false;engine.message='Der Weg zum Dorfplatz ist blockiert.';draw();return}
+ let i=0;const generation=storyGeneration;
  function next(){if(generation!==storyGeneration)return;if(i>=route.length){scriptedRun=false;engine.state.facing='up';engine.setFlag('visitedYard',true);engine.setFlag('visitedVillage',true);engine.beginRiftScene();autoSave();draw();return}
- const [mapId,x,y]=route[i++];engine.state.mapId=mapId;engine.state.x=x;engine.state.y=y;engine.state.elevation=0;engine.state.steps++;engine.state.facing='down';autoSave();draw();setTimeout(next,130)}
+ const step=route[i++],oldX=engine.state.x,oldY=engine.state.y;engine.state.mapId=step.mapId;engine.state.x=step.x;engine.state.y=step.y;engine.state.elevation=0;if(step.kind==='step')engine.state.steps++;engine.state.facing=step.kind==='portal'?'down':step.x>oldX?'right':step.x<oldX?'left':step.y>oldY?'down':'up';autoSave();draw();setTimeout(next,130)}
  next();
 }
 // Automatischer Prolog: Giratina → Rivale/Absol → Eltern → Professor.
@@ -106,10 +108,17 @@ function resumePrologue(){
  const phase=prologuePhase(engine.state.flags,engine.state.mapId);
  if(phase==='before-egg'&&engine.state.mapId==='ground'&&!engine.state.flags.spokenToBreederA&&!engine.state.flags.spokenToBreederB){runToBirthdayParents();return true}
  if(phase==='rift-scene'&&engine.state.mapId==='village'){engine.beginRiftScene();autoSave();draw();return true}
- if(phase==='rift-approach'&&['ground','yard'].includes(engine.state.mapId)){runToVillageSquare();return true}
+ if(phase==='rift-approach'&&['ground','yard'].includes(engine.state.mapId)&&riftResumeReady(engine.state.mapId,[engine.state.x,engine.state.y])){runToVillageSquare();return true}
  if(phase==='to-rival'&&engine.state.mapId==='village'){runToRival();return true}
  if(phase==='to-parents'&&['village','yard','ground'].includes(engine.state.mapId)){runToParents();return true}
  return false;
+}
+function recoverLoadedPrologue(){
+ if(engine.mode!=='exploration')return false;
+ const recovery=pendingRiftRecovery(engine.state.flags,engine.state.mapId);
+ if(recovery==='scene'){engine.beginRiftScene();autoSave();return true}
+ if(recovery==='run')return resumePrologue();
+ return resumePrologue();
 }
 function autoSave(){try{localStorage.setItem(autoKey,engine.save())}catch(e){console.warn('Automatisches Speichern nicht möglich',e)}}
 function renderStarters(){
@@ -159,9 +168,9 @@ window.addEventListener('keydown',e=>{if(e.target instanceof HTMLElement&&['INPU
 window.addEventListener('keyup',e=>keys.delete(e.key));window.addEventListener('blur',()=>keys.clear());
 for(const b of document.querySelectorAll('[data-dir]'))b.addEventListener('click',()=>move(b.dataset.dir));
 document.querySelector('#interact').addEventListener('click',interact);dialogBox.addEventListener('click',interact);
-journalButton.addEventListener('click',toggleJournal);document.querySelector('#continue').addEventListener('click',()=>{try{const raw=localStorage.getItem(autoKey)||localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');storyGeneration++;scriptedRun=false;canvas.classList.remove('earthquake');engine.load(raw);if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)!=='none'){if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)==='scene'){engine.beginRiftScene();autoSave()}else runToVillageSquare();}else resumePrologue();keys.clear();draw();notice.textContent='Letzten Stand fortgesetzt'}catch(e){notice.textContent=`Fortsetzen fehlgeschlagen: ${e.message}`}});
+journalButton.addEventListener('click',toggleJournal);document.querySelector('#continue').addEventListener('click',()=>{try{const raw=localStorage.getItem(autoKey)||localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');storyGeneration++;scriptedRun=false;canvas.classList.remove('earthquake');engine.load(raw);recoverLoadedPrologue();keys.clear();draw();notice.textContent='Letzten Stand fortgesetzt'}catch(e){notice.textContent=`Fortsetzen fehlgeschlagen: ${e.message}`}});
 document.querySelector('#save').addEventListener('click',()=>{try{localStorage.setItem(saveKey,engine.save());notice.textContent='Spielstand gespeichert'}catch(e){notice.textContent=`Speichern fehlgeschlagen: ${e.message}`}});
-document.querySelector('#load').addEventListener('click',()=>{try{const raw=localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');storyGeneration++;scriptedRun=false;canvas.classList.remove('earthquake');engine.load(raw);if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)!=='none'){if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)==='scene'){engine.beginRiftScene();autoSave()}else runToVillageSquare();}else resumePrologue();keys.clear();draw();notice.textContent='Spielstand geladen'}catch(e){notice.textContent=`Laden fehlgeschlagen: ${e.message}`}});
+document.querySelector('#load').addEventListener('click',()=>{try{const raw=localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');storyGeneration++;scriptedRun=false;canvas.classList.remove('earthquake');engine.load(raw);recoverLoadedPrologue();keys.clear();draw();notice.textContent='Spielstand geladen'}catch(e){notice.textContent=`Laden fehlgeschlagen: ${e.message}`}});
 document.querySelector('#reset').addEventListener('click',()=>{keys.clear();starterPanel.hidden=true;storyGeneration++;scriptedRun=false;engine.reset();try{localStorage.removeItem(autoKey)}catch(e){}draw();notice.textContent='Neues Spiel gestartet'});
 function frame(t){if(t-last>=125){if(engine.mode==='exploration'&&!menuOpen&&starterPanel.hidden&&battlePanel.hidden){const key=[...keys].at(-1);if(key)move(directions[key])}last=t}requestAnimationFrame(frame)}
 

@@ -84,7 +84,7 @@ function drawVillage(c,map){
  R(c,14*T+4,10*T+12,3,24,'#6d4b37');R(c,16*T+25,10*T+12,3,24,'#6d4b37');
  R(c,14*T+7,10*T+22,2*T+18,7,'#956a43');
  for(const x of [10,11]){const X=x*T,Y=9*T;R(c,X+1,Y+4,30,24,'#777d82');R(c,X+4,Y+7,24,17,'#5eaebc');R(c,X+9,Y+9,14,5,'#a0d9e0')}
- for(const [x,y] of [[1,5],[5,5],[19,5],[1,13],[20,13],[12,12],[7,13]])pot(c,x*T,y*T);
+ for(const [x,y] of [[1,5],[5,5],[19,5],[1,13],[20,13],[12,12],[7,13]])if(!map.walls.has(`${x},${y}`)&&terrainKind(map.id,x,y)!=='path'&&!isWalkway(map,x,y))pot(c,x*T,y*T);
  for(let x=0;x<map.w;x++){if(x!==10)fence(c,x*T,0);fence(c,x*T,(map.h-1)*T)}
  for(const [x,y] of [[5,7],[20,7],[5,11],[19,11]]){door(c,x*T,y*T);R(c,x*T+7,y*T+26,18,4,'#e4c88f')}
  R(c,10*T+4,0,24,9,'#b5a07c');
@@ -102,19 +102,19 @@ function drawProfessorClearing(c,map){
   if(typeof c.fillText==='function'){c.save();c.fillStyle='#fff2d1';c.font='bold 9px sans-serif';c.fillText(label,x*T+8,(y+h-1)*T+18);c.restore();}
  }
  for(const [x,y] of [[6,4],[11,4]])door(c,x*T,y*T);
- for(const [x,y] of [[1,3],[14,3],[3,9],[12,10]])pot(c,x*T,y*T);
+ for(const [x,y] of [[1,3],[14,3],[3,9],[12,10]])if(!map.walls.has(`${x},${y}`)&&terrainKind(map.id,x,y)!=='path'&&!isWalkway(map,x,y))pot(c,x*T,y*T);
  R(c,(map.w-1)*T,7*T+8,32,8,'#e2c99c');
 }
 function drawBeerendorf(c,map){
  // Eigenständige Dorfzeichnung: die Werkstatt-Tür liegt sichtbar auf (4,5).
  for(const {x,y,w,h} of outdoorBuildings.beerendorf)for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++){wallBlock(c,xx*T,yy*T);if(yy===y)roof(c,xx*T,yy*T)}
- for(let y=1;y<map.h;y++)for(let x=6;x<=9;x++)if(isBerryVillagePath(x,y))path(c,x*T,y*T,x+y*map.w);
- for(const [x,y] of [[1,8],[11,8],[1,12],[11,12]]){pot(c,x*T,y*T);flower(c,(x+1)*T,y*T)}
+ // Wege sind bereits einheitlich im Kartenhintergrund gezeichnet.
+ for(const [x,y] of [[1,8],[11,8],[1,12],[11,12]]){if(map.walls.has(`${x},${y}`)||terrainKind(map.id,x,y)==='path'||isWalkway(map,x,y))continue;pot(c,x*T,y*T);if(!map.walls.has(`${x+1},${y}`)&&terrainKind(map.id,x+1,y)!=='path'&&!isWalkway(map,x+1,y))flower(c,(x+1)*T,y*T)}
  for(const [x,y] of [[1,9],[2,9],[11,10],[12,10]]){R(c,x*T+5,y*T+15,22,11,'#7b9c58');R(c,x*T+8,y*T+11,16,7,'#a3b96b')}door(c,4*T,5*T);door(c,14*T,5*T);door(c,3*T,13*T);door(c,13*T,13*T);R(c,4*T+3,5*T-9,26,9,'#a87845');
  R(c,4*T+7,5*T-7,18,5,'#f3e0ac');
  R(c,10*T+5,10*T+6,22,20,'#a5a8a1');R(c,10*T+8,10*T+8,16,8,'#72b8c2');R(c,0,7*T+10,9,12,'#e2c99c');R(c,(map.w-1)*T+23,7*T+10,9,12,'#e2c99c');
 }
-function drawRoute1(c,map){for(let y=0;y<map.h;y++)for(let x=0;x<map.w;x++)if(isTravelPath(map.id,x,y)&&!map.walls.has(`${x},${y}`))path(c,x*T,y*T,x+y*map.w);for(const [x,y] of [[1,2],[3,8],[12,3],[14,10],[2,15],[13,16]]){pot(c,x*T,y*T);flower(c,(x+1)*T,y*T)}for(const [x,y] of [[2,4],[3,4],[12,6],[13,6],[4,12],[5,12],[11,14],[12,14]]){R(c,x*T,y*T,32,32,'#3c704a');R(c,x*T+6,y*T+3,20,25,'#5e985a')}if(map.id==='route1'){R(c,0,8*T+10,9,12,'#e2c99c');R(c,15*T+23,6*T+10,9,12,'#e2c99c')}}
+function drawRoute1(c,map){for(let y=0;y<map.h;y++)for(let x=0;x<map.w;x++)if(isTravelPath(map.id,x,y)&&!map.walls.has(`${x},${y}`))path(c,x*T,y*T,x+y*map.w);for(const [x,y] of [[1,2],[3,8],[12,3],[14,10],[2,15],[13,16]]){if(map.walls.has(`${x},${y}`)||terrainKind(map.id,x,y)==='path'||isWalkway(map,x,y))continue;pot(c,x*T,y*T);if(!map.walls.has(`${x+1},${y}`)&&terrainKind(map.id,x+1,y)!=='path'&&!isWalkway(map,x+1,y))flower(c,(x+1)*T,y*T)}for(const [x,y] of [[2,4],[3,4],[12,6],[13,6],[4,12],[5,12],[11,14],[12,14]]){R(c,x*T,y*T,32,32,'#3c704a');R(c,x*T+6,y*T+3,20,25,'#5e985a')}if(map.id==='route1'){R(c,0,8*T+10,9,12,'#e2c99c');R(c,15*T+23,6*T+10,9,12,'#e2c99c')}}
 function drawInterior(c,id){carpet(c,3*T,3*T,5*T,3*T,id==='study'?'#607d87':'#9b775b');window(c,5*T,0);shelf(c,2*T,4*T);shelf(c,3*T,4*T);desk(c,7*T,2*T);pot(c,9*T,5*T);door(c,5*T,7*T);if(id==='village_home'){sofa(c,T,T);table(c,4*T,4*T)}else{desk(c,T,T);shelf(c,8*T,T)}}
 function drawNpc(c,x,y,kind){
  const palette={brook_ranger:['#587f63','#8d6742'],brook_artist:['#ae8c6b','#9d677a'],merchant:['#d7aa43','#4e7256'],route1_trainer:['#df624f','#376caa'],route1_guide:['#6fa88e','#5b6e54'],route1_naturalist:['#86a16e','#b3a179'],route2_guide:['#ba9466','#607e5d'],route2_botanist:['#71a67a','#d4c293'],route2_hiker:['#b68e62','#685f4e'],route1_guide:['#6fa88e','#5b6e54'],route1_naturalist:['#86a16e','#b3a179'],route2_guide:['#ba9466','#607e5d'],route2_botanist:['#71a67a','#d4c293'],route2_hiker:['#b68e62','#685f4e'],route1_guide:['#6fa88e','#5b6e54'],route1_naturalist:['#86a16e','#b3a179'],route2_guide:['#ba9466','#607e5d'],route2_botanist:['#71a67a','#d4c293'],route2_hiker:['#b68e62','#685f4e'],herbal_witch:['#765486','#637c49'],resident:['#9a70b0','#e2bd80'],breeder_a:['#b87558','#668a65'],breeder_b:['#718ca8','#9a7757'],villager:['#c17f69','#6b965c'],rival:['#6c7cb1','#c0a17d'],professor:['#e9e8db','#e9e8db']};

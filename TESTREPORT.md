@@ -1,5 +1,16 @@
-# Testbericht dev.290
+# dev.310 – Testbericht
 
-Automatisierte Tests: 591/591 bestanden.
+Automatische Tests: bestanden.
 
-Interaktiver Browsertest nicht durchgeführt.
+  ...
+1..611
+# tests 611
+# suites 0
+# pass 611
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5339.798137
+
+JavaScript-Syntax: geprüft. Browserdurchlauf: nicht durchgeführt.

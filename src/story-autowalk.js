@@ -1,4 +1,4 @@
-import {maps,npcs,inside} from './maps.js';
+import {maps,npcs,inside,canMove} from './maps.js';
 // Deterministischer kürzester Fußweg ohne Hindernisse und NPC-Kollisionen.
 export function findStoryWalk(mapId,from,to){
  const map=maps[mapId];if(!map||!inside(map,...from)||!inside(map,...to))return null;
@@ -14,7 +14,7 @@ export function findStoryWalk(mapId,from,to){
   }
   for(const [dx,dy] of [[0,1],[1,0],[-1,0],[0,-1]]){
    const next=[at[0]+dx,at[1]+dy],k=key(next);
-   if(inside(map,...next)&&!blocked.has(k)&&!seen.has(k)){seen.add(k);previous.set(k,key(at));queue.push(next)}
+   if(inside(map,...next)&&canMove(map,...at,...next)&&!blocked.has(k)&&!seen.has(k)){seen.add(k);previous.set(k,key(at));queue.push(next)}
   }
  }
  return null;

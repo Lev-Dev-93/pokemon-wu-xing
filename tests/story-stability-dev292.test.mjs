@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {validatePrologueMilestones} from '../src/story-guards.js';
+test('Elternbericht erfordert abgeschlossenes Giratina- und Absol-Ereignis',()=>{assert.equal(validatePrologueMilestones({parents_briefed:true}),false);assert.equal(validatePrologueMilestones({parents_briefed:true,birthday_wish_pending:true,egg_received:true,rift_closed:true,rival_absol:true}),true)});

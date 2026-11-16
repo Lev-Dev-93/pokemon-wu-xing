@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {Engine} from '../src/engine.js';
+test('Manipulierte Rückkehrposition auf NPC wird beim Laden entfernt',()=>{const e=new Engine();const data=JSON.parse(e.save());data.state.returns['village->route1']={x:14,y:7};const loaded=new Engine();loaded.load(JSON.stringify(data));assert.equal(loaded.state.returns['village->route1'],undefined)});
