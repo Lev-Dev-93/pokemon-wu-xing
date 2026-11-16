@@ -1,3 +1,4 @@
+import {applyEntryAbility} from './battle-entry.js';
 import {currentPp} from './pp-items.js';
 import {getMove,speciesTypes,typeEffectiveness} from './moves.js';
 import {validatePokemon} from './team.js';
@@ -5,14 +6,14 @@ import {validatePokemon} from './team.js';
 const validRng=rng=>{const v=rng();if(!Number.isFinite(v)||v<0||v>=1)throw Error('Ungültiger Zufallswert');return v};
 const clone=p=>structuredClone(p);
 function fighter(p){if(!validatePokemon(p))throw Error('Ungültiges Kampf-Pokémon');return {pokemon:clone(p),pp:currentPp(p),stages:{attack:0,defense:0,specialAttack:0,specialDefense:0,speed:0,accuracy:0,evasion:0},volatile:{sleepTurns:0,confusionTurns:0,flinched:false,protected:false,enduring:false,protectStreak:0,seeded:false,aquaRing:false,ingrained:false,solarChargeIndex:null,flashFireBoost:false}}}
-export function startBattle(own,enemy){if(!validatePokemon(own)||!validatePokemon(enemy)||own.currentHp===0||enemy.currentHp===0)throw Error('Kampf benötigt zwei kampffähige Pokémon');return {turn:1,finished:false,winner:null,weather:null,weatherTurns:0,player:fighter(own),opponent:fighter(enemy),log:['Ein Testkampf beginnt.']}}
+export function startBattle(own,enemy){if(!validatePokemon(own)||!validatePokemon(enemy)||own.currentHp===0||enemy.currentHp===0)throw Error('Kampf benötigt zwei kampffähige Pokémon');const battle={turn:1,finished:false,winner:null,weather:null,weatherTurns:0,player:fighter(own),opponent:fighter(enemy),log:['Ein Testkampf beginnt.']};applyEntryAbility(battle,'player');applyEntryAbility(battle,'opponent');return battle}
 // Wolke Sieben (13) und Klimaschutz (76) unterdrücken Wettereinflüsse, nicht die Wetterdauer.
 function activeWeather(battle){return [battle.player,battle.opponent].some(f=>f.pokemon.currentHp>0&&[13,76].includes(f.pokemon.abilityId))?null:battle.weather}
 function stageMult(stage){return stage>=0?(2+stage)/2:2/(2-stage)}
 function accuracyMultiplier(stage){return stage>=0?(3+stage)/3:3/(3-stage)}
 function hitChance(actor,target,move,weather=null){if(move.id===87&&weather==='rain')return 1;if(move.accuracy===null)return 1;const weatherEvasion=(weather==='sand'&&target.pokemon.abilityId===8)||(weather==='hail'&&target.pokemon.abilityId===81)?0.8:1;const diff=Math.max(-6,Math.min(6,(actor.stages.accuracy??0)-(target.stages.evasion??0)));return Math.min(1,(move.id===87&&weather==='sun'?0.5:move.accuracy/100)*accuracyMultiplier(diff)*weatherEvasion)}
-function speed(f,weather=null){const p=f.pokemon;const boost=(weather==='sun'&&p.abilityId===34)||(weather==='rain'&&p.abilityId===33)?2:1;return p.stats.speed*stageMult(f.stages.speed)*(p.status==='paralysis'?0.5:1)*boost}
-function damage(attacker,defender,move,rng,weather=null){if(!move.power||![2,3].includes(move.category))return 0;const special=move.category===3;const atk=special?'specialAttack':'attack',def=special?'specialDefense':'defense';const solarPower=special&&weather==='sun'&&attacker.pokemon.abilityId===94?1.5:1;const flashFire=move.typeId===10&&attacker.pokemon.abilityId===18&&attacker.volatile.flashFireBoost?1.5:1;const guts=!special&&attacker.pokemon.abilityId===62&&attacker.pokemon.status&&attacker.pokemon.status!=='healthy'?1.5:1;const a=Math.max(1,attacker.pokemon.stats[atk]*stageMult(attacker.stages[atk])*solarPower*guts);const d=Math.max(1,defender.pokemon.stats[def]*stageMult(defender.stages[def]));const types=speciesTypes(defender.pokemon.speciesId);const effectiveness=typeEffectiveness(move.typeId,types);if(effectiveness===0||(move.typeId===5&&defender.pokemon.abilityId===26))return 0;const stab=speciesTypes(attacker.pokemon.speciesId).includes(move.typeId)?1.5:1;const burn=attacker.pokemon.status==='burn'&&!special&&attacker.pokemon.abilityId!==62?0.5:1;const variation=0.85+0.15*validRng(rng);const solarPenalty=move.id===76&&['rain','sand','hail'].includes(weather)?0.5:1;const heatproof=defender.pokemon.abilityId===85&&move.typeId===10?0.5:1;const thickFat=defender.pokemon.abilityId===47&&[10,15].includes(move.typeId)?0.5:1;const weatherPower=weather==='sun'?(move.typeId===10?1.5:move.typeId===11?0.5:1):weather==='rain'?(move.typeId===11?1.5:move.typeId===10?0.5:1):1;return Math.max(1,Math.floor((Math.floor((2*attacker.pokemon.level/5+2)*move.power*a/d/50)+2)*stab*effectiveness*burn*variation*weatherPower*solarPenalty*flashFire*thickFat*heatproof))}
+function speed(f,weather=null){const p=f.pokemon;const boost=(weather==='sun'&&p.abilityId===34)||(weather==='rain'&&p.abilityId===33)||(weather==='sand'&&p.abilityId===146)?2:1;return p.stats.speed*stageMult(f.stages.speed)*(p.status==='paralysis'?0.5:1)*boost}
+function damage(attacker,defender,move,rng,weather=null){if(!move.power||![2,3].includes(move.category))return 0;const special=move.category===3;const atk=special?'specialAttack':'attack',def=special?'specialDefense':'defense';const solarPower=special&&weather==='sun'&&attacker.pokemon.abilityId===94?1.5:1;const flashFire=move.typeId===10&&attacker.pokemon.abilityId===18&&attacker.volatile.flashFireBoost?1.5:1;const guts=!special&&attacker.pokemon.abilityId===62&&attacker.pokemon.status&&attacker.pokemon.status!=='healthy'?1.5:1;const a=Math.max(1,attacker.pokemon.stats[atk]*stageMult(attacker.stages[atk])*solarPower*guts);const d=Math.max(1,defender.pokemon.stats[def]*stageMult(defender.stages[def]));const types=speciesTypes(defender.pokemon.speciesId,defender.pokemon.formId);const effectiveness=typeEffectiveness(move.typeId,types);if(effectiveness===0||(move.typeId===5&&defender.pokemon.abilityId===26))return 0;const stab=speciesTypes(attacker.pokemon.speciesId,attacker.pokemon.formId).includes(move.typeId)?1.5:1;const burn=attacker.pokemon.status==='burn'&&!special&&attacker.pokemon.abilityId!==62?0.5:1;const variation=0.85+0.15*validRng(rng);const solarPenalty=move.id===76&&['rain','sand','hail'].includes(weather)?0.5:1;const heatproof=defender.pokemon.abilityId===85&&move.typeId===10?0.5:1;const thickFat=defender.pokemon.abilityId===47&&[10,15].includes(move.typeId)?0.5:1;const sandForce=weather==='sand'&&attacker.pokemon.abilityId===159&&[5,6,9].includes(move.typeId)?1.3:1;const weatherPower=weather==='sun'?(move.typeId===10?1.5:move.typeId===11?0.5:1):weather==='rain'?(move.typeId===11?1.5:move.typeId===10?0.5:1):1;return Math.max(1,Math.floor((Math.floor((2*attacker.pokemon.level/5+2)*move.power*a/d/50)+2)*stab*effectiveness*burn*variation*weatherPower*solarPenalty*flashFire*thickFat*heatproof*sandForce))}
 // Erste Stufenattacken: Änderung der Kampfstufen nur für die Dauer des Kampfes.
 // Weitere Statusattacken werden erst aktiviert, wenn ihre Effekte implementiert sind.
 // Rückstoß/Absorption beziehen sich auf tatsächlich verursachten Schaden.
@@ -61,9 +62,9 @@ function applyHitStage(battle,target,moveId,rng){
  if(after!==before)battle.log.push(`${STAGE_LABELS[effect.stat]} des Ziels sinkt!`);
  else battle.log.push(`${STAGE_LABELS[effect.stat]} kann nicht weiter sinken.`);
 }
-const STATUS_MOVES={92:{status:'poison'},95:{status:'sleep'},137:{status:'paralysis'},139:{status:'poison'}};
+const STATUS_MOVES={86:{status:'paralysis'},92:{status:'poison'},95:{status:'sleep'},137:{status:'paralysis'},139:{status:'poison'}};
 const HIT_STATUS={40:{status:'poison',chance:0.3},52:{status:'burn',chance:0.1},53:{status:'burn',chance:0.1},7:{status:'burn',chance:0.1},9:{status:'paralysis',chance:0.1},34:{status:'paralysis',chance:0.3}};
-function applyCondition(battle,target,status,rng){if(target.pokemon.status&&target.pokemon.status!=='healthy'){battle.log.push('Das Ziel hat bereits ein Statusproblem.');return false}const types=speciesTypes(target.pokemon.speciesId);if((status==='poison'&&(types.includes(4)||types.includes(9)))||(status==='burn'&&types.includes(10))||(status==='paralysis'&&types.includes(13))){battle.log.push('Das Ziel ist gegen diesen Status immun.');return false}target.pokemon.status=status;if(status==='sleep')target.volatile.sleepTurns=2+Math.floor(validRng(rng)*2);battle.log.push(({poison:'Das Ziel wurde vergiftet!',burn:'Das Ziel wurde verbrannt!',paralysis:'Das Ziel wurde paralysiert!',sleep:'Das Ziel ist eingeschlafen!'})[status]);return true}
+function applyCondition(battle,target,status,rng){if(target.pokemon.status&&target.pokemon.status!=='healthy'){battle.log.push('Das Ziel hat bereits ein Statusproblem.');return false}const types=speciesTypes(target.pokemon.speciesId,target.pokemon.formId);if((status==='poison'&&(types.includes(4)||types.includes(9)))||(status==='burn'&&types.includes(10))||(status==='freeze'&&types.includes(15))||(status==='paralysis'&&types.includes(13))){battle.log.push('Das Ziel ist gegen diesen Status immun.');return false}if((activeWeather(battle)==='sun'&&target.pokemon.abilityId===102)||(target.pokemon.abilityId===17&&status==='poison')||(target.pokemon.abilityId===41&&status==='burn')||(target.pokemon.abilityId===7&&status==='paralysis')||([15,72].includes(target.pokemon.abilityId)&&status==='sleep')||(target.pokemon.abilityId===40&&status==='freeze')){battle.log.push('Die Fähigkeit des Ziels verhindert das Statusproblem.');return false}target.pokemon.status=status;if(status==='sleep')target.volatile.sleepTurns=2+Math.floor(validRng(rng)*2);battle.log.push(({poison:'Das Ziel wurde vergiftet!',burn:'Das Ziel wurde verbrannt!',paralysis:'Das Ziel wurde paralysiert!',sleep:'Das Ziel ist eingeschlafen!'})[status]);return true}
 const STAGE_MOVES={
   14:{self:true,changes:{attack:2}}, // Schwerttanz
   39:{self:false,changes:{defense:-1}}, // Rutenschlag
@@ -95,12 +96,12 @@ function applyStageMove(battle,actor,target,moveId){
  if(!changed)battle.log.push('Die Statuswerte können sich nicht weiter verändern.');
  return true;
 }
-function confuse(battle,target,rng){if((target.volatile.confusionTurns||0)>0){battle.log.push('Das Ziel ist bereits verwirrt.');return false}target.volatile.confusionTurns=2+Math.floor(validRng(rng)*3);battle.log.push('Das Ziel wurde verwirrt!');return true}
+function confuse(battle,target,rng){if(target.pokemon.abilityId===20){battle.log.push('Tempomacher verhindert Verwirrung.');return false}if((target.volatile.confusionTurns||0)>0){battle.log.push('Das Ziel ist bereits verwirrt.');return false}target.volatile.confusionTurns=2+Math.floor(validRng(rng)*3);battle.log.push('Das Ziel wurde verwirrt!');return true}
 function perform(battle,actor,target,index,rng,tag){const moveId=actor.pokemon.moves[index];let move=getMove(moveId);if(!move||!Number.isInteger(index)||index<0||index>=actor.pp.length)throw Error('Ungültige Attackenauswahl');if(actor.pp[index]<=0)throw Error('Keine AP übrig');if(actor.pokemon.currentHp<=0)return;
  if(actor.volatile.flinched){if(!DEFENSIVE_MOVES.has(move.id))actor.volatile.protectStreak=0;actor.volatile.flinched=false;battle.log.push(`${tag} schreckt zurück!`);return}
- if(actor.pokemon.status==='sleep'){if((actor.volatile?.sleepTurns??0)>0){actor.volatile.sleepTurns--;battle.log.push(`${tag} schläft tief und fest.`);return}actor.pokemon.status=null;battle.log.push(`${tag} ist aufgewacht!`)}if(actor.pokemon.status==='freeze'){battle.log.push(`${tag} kann sich nicht bewegen.`);return}
+ if(actor.pokemon.status==='sleep'){if((actor.volatile?.sleepTurns??0)>0){actor.volatile.sleepTurns--;battle.log.push(`${tag} schläft tief und fest.`);return}actor.pokemon.status=null;battle.log.push(`${tag} ist aufgewacht!`)}if(actor.pokemon.status==='freeze'){if(validRng(rng)<0.2){actor.pokemon.status='healthy';battle.log.push(`${tag} taut auf!`)}else{battle.log.push(`${tag} kann sich nicht bewegen.`);return}}
  if(actor.pokemon.status==='paralysis'&&validRng(rng)<0.25){battle.log.push(`${tag} ist paralysiert.`);return}
- if((actor.volatile.confusionTurns||0)>0){actor.volatile.confusionTurns--;battle.log.push(`${tag} ist verwirrt!`);if(validRng(rng)<1/3){const hit=Math.max(1,Math.floor(actor.pokemon.stats.hp/8));actor.pokemon.currentHp=Math.max(0,actor.pokemon.currentHp-hit);battle.log.push(`${tag} verletzt sich selbst (${hit} KP).`);return}if(actor.volatile.confusionTurns===0)battle.log.push(`${tag} ist nicht mehr verwirrt.`)}
+ if((actor.volatile.confusionTurns||0)>0){actor.volatile.confusionTurns--;battle.log.push(`${tag} ist verwirrt!`);if(actor.volatile.confusionTurns===0){battle.log.push(`${tag} ist nicht mehr verwirrt.`)}else if(validRng(rng)<1/3){const hit=Math.max(1,Math.floor(actor.pokemon.stats.hp/8));actor.pokemon.currentHp=Math.max(0,actor.pokemon.currentHp-hit);battle.log.push(`${tag} verletzt sich selbst (${hit} KP).`);return}}
  const charging=actor.volatile.solarChargeIndex!==null&&actor.volatile.solarChargeIndex!==undefined;
  if(charging){index=actor.volatile.solarChargeIndex;actor.volatile.solarChargeIndex=null;move=getMove(actor.pokemon.moves[index]);battle.log.push(`${tag} entfesselt ${move.de||move.name}!`)}
  else {actor.pp[index]--;battle.log.push(`${tag} setzt ${move.de||move.name} ein.`);
@@ -134,6 +135,16 @@ function perform(battle,actor,target,index,rng,tag){const moveId=actor.pokemon.m
   }
   return;
  }
+ // Angriffsabsorbierende Fähigkeiten greifen auch vor der normalen Schadensberechnung.
+ if(move.category!==1||STATUS_MOVES[move.id]||CONFUSION_MOVES.has(move.id)||move.id===LEECH_SEED_MOVE||(STAGE_MOVES[move.id]&&!STAGE_MOVES[move.id].self)){
+  const absorbers={31:{type:13,stat:'specialAttack',name:'Blitzfänger'},114:{type:11,stat:'specialAttack',name:'Sturmsog'},157:{type:12,stat:'attack',name:'Vegetarier'},78:{type:13,stat:'speed',name:'Starthilfe'},87:{type:11,heal:true,name:'Trockenheit'}};
+  const effect=absorbers[target.pokemon.abilityId];
+  if(effect&&effect.type===move.typeId&&(move.category!==1||[157,114,31,78].includes(target.pokemon.abilityId))){
+   if(effect.heal){const healed=Math.min(target.pokemon.stats.hp-target.pokemon.currentHp,Math.max(1,Math.floor(target.pokemon.stats.hp/4)));target.pokemon.currentHp+=healed;battle.log.push(`${effect.name} absorbiert die Attacke! ${healed} KP regeneriert.`)}
+   else{const old=target.stages[effect.stat];target.stages[effect.stat]=Math.min(6,old+1);battle.log.push(`${effect.name} absorbiert die Attacke! ${effect.stat} steigt${old===6?' nicht weiter':''}.`)}
+   return;
+  }
+ }
  if(move.category===1||move.power===null||move.power===0){if(WEATHER_MOVES[move.id]){
   const [weather,label]=WEATHER_MOVES[move.id];battle.weather=weather;battle.weatherTurns=5;battle.log.push(`${label} beginnt!`);
  }else if(RECOVERY_MOVES.has(move.id)){
@@ -141,7 +152,7 @@ function perform(battle,actor,target,index,rng,tag){const moveId=actor.pokemon.m
   if(missing>0){const heal=Math.min(missing,Math.max(1,Math.floor(actor.pokemon.stats.hp*( [234,235].includes(move.id)?(activeWeather(battle)==='sun'?2/3:activeWeather(battle)?1/4:1/2):1/2))));actor.pokemon.currentHp+=heal;battle.log.push(`${tag} erhält ${heal} KP zurück.`)}
   else battle.log.push('Die KP sind bereits vollständig aufgefüllt.');
  }else if(move.id===LEECH_SEED_MOVE){
-  if(speciesTypes(target.pokemon.speciesId).includes(12))battle.log.push('Pflanzen-Pokémon sind gegen Egelsamen immun.');
+  if(speciesTypes(target.pokemon.speciesId,target.pokemon.formId).includes(12))battle.log.push('Pflanzen-Pokémon sind gegen Egelsamen immun.');
   else if(target.volatile.seeded)battle.log.push('Das Ziel ist bereits von Egelsamen befallen.');
   else {target.volatile.seeded=true;battle.log.push('Egelsamen wurden am Ziel gepflanzt!')}
  }else if(move.id===AQUA_RING_MOVE||move.id===INGRAIN_MOVE){
@@ -160,7 +171,7 @@ function perform(battle,actor,target,index,rng,tag){const moveId=actor.pokemon.m
  }
  battle.log.push(value?`${value} Schadenspunkte.`:'Keine Wirkung.');
  if(MULTI_HIT_MOVES[move.id]&&hits>0)battle.log.push(`${hits} Treffer!`);
- if(target.volatile.enduring&&target.pokemon.currentHp===1&&hits>0&&typeEffectiveness(move.typeId,speciesTypes(target.pokemon.speciesId))>0)battle.log.push('Das Ziel übersteht den Angriff dank Ausdauer mit 1 KP!');
+ if(target.volatile.enduring&&target.pokemon.currentHp===1&&hits>0&&typeEffectiveness(move.typeId,speciesTypes(target.pokemon.speciesId,target.pokemon.formId))>0)battle.log.push('Das Ziel übersteht den Angriff dank Ausdauer mit 1 KP!');
  if(inflicted>0&&DRAIN_MOVES[move.id]){
   const heal=Math.min(actor.pokemon.stats.hp-actor.pokemon.currentHp,Math.max(1,Math.floor(inflicted*DRAIN_MOVES[move.id])));
   if(heal>0){actor.pokemon.currentHp+=heal;battle.log.push(`${tag} absorbiert ${heal} KP.`)}
@@ -172,23 +183,25 @@ function perform(battle,actor,target,index,rng,tag){const moveId=actor.pokemon.m
  }if(value>0&&target.pokemon.currentHp>0&&HIT_STATUS[move.id]&&validRng(rng)<HIT_STATUS[move.id].chance)applyCondition(battle,target,HIT_STATUS[move.id].status,rng);
  if(value>0&&target.pokemon.currentHp>0)applyHitStage(battle,target,move.id,rng);
  if(value>0&&target.pokemon.currentHp>0&&HIT_CONFUSION[move.id]&&validRng(rng)<HIT_CONFUSION[move.id])confuse(battle,target,rng);
- if(value>0&&target.pokemon.currentHp>0&&HIT_FLINCH[move.id]&&validRng(rng)<HIT_FLINCH[move.id]){target.volatile.flinched=true;battle.log.push('Das Ziel schreckt zurück!');}
- const factor=typeEffectiveness(move.typeId,speciesTypes(target.pokemon.speciesId));if(factor>1)battle.log.push('Das ist sehr effektiv!');if(factor>0&&factor<1)battle.log.push('Das ist nicht sehr effektiv.');
+ if(value>0&&target.pokemon.currentHp>0&&!target.volatile.actedThisTurn&&HIT_FLINCH[move.id]&&validRng(rng)<HIT_FLINCH[move.id]){target.volatile.flinched=true;battle.log.push('Das Ziel schreckt zurück!');}
+ const factor=typeEffectiveness(move.typeId,speciesTypes(target.pokemon.speciesId,target.pokemon.formId));if(factor>1)battle.log.push('Das ist sehr effektiv!');if(factor>0&&factor<1)battle.log.push('Das ist nicht sehr effektiv.');
 }
 export function availableMoves(f){return f.pokemon.moves.map((id,index)=>({index,id,name:getMove(id)?.de||getMove(id)?.name,pp:f.pp[index],maxPp:getMove(id)?.pp}));}
-function applyEndTurnStatus(battle){
+function applyEndTurnStatus(battle,rng=Math.random){
  const p=battle.player,e=battle.opponent;
  const weather=activeWeather(battle);
  if(weather==='sand'||weather==='hail'){
   for(const [f,tag] of [[p,'Dein Pokémon'],[e,'Gegner']]){
-   const types=speciesTypes(f.pokemon.speciesId);const immune=weather==='sand'?[5,6,9].some(t=>types.includes(t)):types.includes(15);
-   if(f.pokemon.currentHp>0&&!immune&&f.pokemon.abilityId!==98){const amount=Math.max(1,Math.floor(f.pokemon.stats.hp/16));f.pokemon.currentHp=Math.max(0,f.pokemon.currentHp-amount);battle.log.push(`${tag} erleidet ${amount} KP durch ${weather==='sand'?'Sandsturm':'Hagel'}.`)}
+   const types=speciesTypes(f.pokemon.speciesId,f.pokemon.formId);const immune=weather==='sand'?[5,6,9].some(t=>types.includes(t)):types.includes(15);
+   if(f.pokemon.currentHp>0&&!immune&&![98,142].includes(f.pokemon.abilityId)){const amount=Math.max(1,Math.floor(f.pokemon.stats.hp/16));f.pokemon.currentHp=Math.max(0,f.pokemon.currentHp-amount);battle.log.push(`${tag} erleidet ${amount} KP durch ${weather==='sand'?'Sandsturm':'Hagel'}.`)}
   }
  }
  // Wetterfähigkeiten werden vor dem Wetterablauf angewendet, damit die letzte Runde zählt.
  for(const [f,tag] of [[p,'Dein Pokémon'],[e,'Gegner']]){
   if(f.pokemon.currentHp<=0)continue;
   const ability=f.pokemon.abilityId;
+  if(ability===61&&f.pokemon.status&&f.pokemon.status!=='healthy'&&validRng(rng)<1/3){f.pokemon.status='healthy';f.volatile.sleepTurns=0;battle.log.push(`${tag} wird durch Expidermis geheilt.`)}
+  if(weather==='rain'&&ability===93&&f.pokemon.status&&f.pokemon.status!=='healthy'){f.pokemon.status='healthy';f.volatile.sleepTurns=0;battle.log.push(`${tag} wird durch Hydration geheilt.`)}
   if((weather==='rain'&&ability===44)||(weather==='hail'&&ability===115)){
    const heal=Math.min(f.pokemon.stats.hp-f.pokemon.currentHp,Math.max(1,Math.floor(f.pokemon.stats.hp/16)));
    if(heal>0){f.pokemon.currentHp+=heal;battle.log.push(`${tag} regeneriert ${heal} KP durch ${ability===44?'Regengenuss':'Eishaut'}.`)}
@@ -239,9 +252,9 @@ function settleTurn(battle){
  return battle;
 }
 export function playTurn(battle,playerMoveIndex,enemyMoveIndex,{rng=Math.random}={}){if(!battle||battle.finished)throw Error('Kampf bereits beendet oder ungültig');if(!Number.isInteger(playerMoveIndex)||!Number.isInteger(enemyMoveIndex))throw Error('Attackenindex erforderlich');const p=battle.player,e=battle.opponent;for(const [f,i] of [[p,playerMoveIndex],[e,enemyMoveIndex]])if(!f.pokemon.moves[i]||f.pp[i]<=0)throw Error('Attacke nicht verfügbar');
- battle.log=[];battle.turnEvents=[];p.volatile.flinched=false;e.volatile.flinched=false;p.volatile.protected=false;e.volatile.protected=false;p.volatile.enduring=false;e.volatile.enduring=false;const pm=getMove(p.pokemon.moves[p.volatile.solarChargeIndex??playerMoveIndex]),em=getMove(e.pokemon.moves[e.volatile.solarChargeIndex??enemyMoveIndex]);const first=pm.priority!==em.priority?(pm.priority>em.priority?'p':'e'):speed(p,activeWeather(battle))!==speed(e,activeWeather(battle))?(speed(p,activeWeather(battle))>speed(e,activeWeather(battle))?'p':'e'):(validRng(rng)<0.5?'p':'e');
- const turns=first==='p'?[[p,e,playerMoveIndex,'Dein Pokémon'],[e,p,enemyMoveIndex,'Gegner']]:[[e,p,enemyMoveIndex,'Gegner'],[p,e,playerMoveIndex,'Dein Pokémon']];for(const [a,d,i,tag] of turns){if(a.pokemon.currentHp===0||d.pokemon.currentHp===0)break;perform(battle,a,d,i,rng,tag);battle.turnEvents.push({actor:a===p?'player':'opponent',playerHp:p.pokemon.currentHp,opponentHp:e.pokemon.currentHp,playerPp:[...p.pp],opponentPp:[...e.pp],log:[...battle.log]})}
- applyEndTurnStatus(battle);
+ battle.log=[];battle.turnEvents=[];p.volatile.flinched=false;e.volatile.flinched=false;p.volatile.actedThisTurn=false;e.volatile.actedThisTurn=false;p.volatile.protected=false;e.volatile.protected=false;p.volatile.enduring=false;e.volatile.enduring=false;const pm=getMove(p.pokemon.moves[p.volatile.solarChargeIndex??playerMoveIndex]),em=getMove(e.pokemon.moves[e.volatile.solarChargeIndex??enemyMoveIndex]);const first=pm.priority!==em.priority?(pm.priority>em.priority?'p':'e'):speed(p,activeWeather(battle))!==speed(e,activeWeather(battle))?(speed(p,activeWeather(battle))>speed(e,activeWeather(battle))?'p':'e'):(validRng(rng)<0.5?'p':'e');
+ const turns=first==='p'?[[p,e,playerMoveIndex,'Dein Pokémon'],[e,p,enemyMoveIndex,'Gegner']]:[[e,p,enemyMoveIndex,'Gegner'],[p,e,playerMoveIndex,'Dein Pokémon']];for(const [a,d,i,tag] of turns){if(a.pokemon.currentHp===0||d.pokemon.currentHp===0)break;perform(battle,a,d,i,rng,tag);a.volatile.actedThisTurn=true;battle.turnEvents.push({actor:a===p?'player':'opponent',playerHp:p.pokemon.currentHp,opponentHp:e.pokemon.currentHp,playerPp:[...p.pp],opponentPp:[...e.pp],log:[...battle.log]})}
+ applyEndTurnStatus(battle,rng);
  return settleTurn(battle);
 }
 
@@ -249,8 +262,8 @@ export function playTurn(battle,playerMoveIndex,enemyMoveIndex,{rng=Math.random}
 export function playEnemyOnlyTurn(battle,enemyMoveIndex,{rng=Math.random}={}){
  if(!battle||battle.finished)throw Error('Kampf bereits beendet oder ungültig');
  const e=battle.opponent,p=battle.player;if(!Number.isInteger(enemyMoveIndex)||!e.pokemon.moves[enemyMoveIndex]||e.pp[enemyMoveIndex]<=0)throw Error('Attacke nicht verfügbar');
- battle.log=[];battle.turnEvents=[];p.volatile.flinched=false;e.volatile.flinched=false;p.volatile.protected=false;e.volatile.protected=false;p.volatile.enduring=false;e.volatile.enduring=false;perform(battle,e,p,enemyMoveIndex,rng,'Gegner');
+ battle.log=[];battle.turnEvents=[];p.volatile.flinched=false;e.volatile.flinched=false;p.volatile.actedThisTurn=false;e.volatile.actedThisTurn=false;p.volatile.protected=false;e.volatile.protected=false;p.volatile.enduring=false;e.volatile.enduring=false;perform(battle,e,p,enemyMoveIndex,rng,'Gegner');
  battle.turnEvents.push({actor:'opponent',playerHp:p.pokemon.currentHp,opponentHp:e.pokemon.currentHp,playerPp:[...p.pp],opponentPp:[...e.pp],log:[...battle.log]});
- applyEndTurnStatus(battle);
+ applyEndTurnStatus(battle,rng);
  return settleTurn(battle);
 }

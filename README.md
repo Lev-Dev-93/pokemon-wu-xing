@@ -294,3 +294,10 @@ Automatische Storywege und korrigierte Gebäudeplatzierung. Siehe CHANGELOG.md.
 
 ### dev.182
 End-to-End-Regressionsprüfungen für Fußwege und Speicherstände.
+
+### Pokémon-Erweiterungskatalog (dev.188–192)
+`src/pokemon-extensions.js` liefert aus PokeAPI-CSV abgeleitete spätere Entwicklungen und Alola-/Galarformen für ursprüngliche Arten #001–493. Die vorhandene Team-/Kampfengine unterstützt weiterhin nur die ursprünglichen 493 Arten; zusätzliche Arten/Formen sind noch nicht im Kampf, in Entwicklungen oder in der Grafik spielbar.
+
+
+### dev.212: Einwechsel-Fähigkeiten
+Wetterfähigkeiten, Bedroher und Innere Kraft sind im Kampfmodul ergänzt. Weitere Fähigkeiten und Spezialattacken bleiben offen.

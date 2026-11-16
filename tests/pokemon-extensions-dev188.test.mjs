@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {isEligibleSpecies,isLaterEvolution,getLaterEvolutionSpecies,getRegionalForms,getEvolutionParent,getEvolutionChildren,getEvolutionConditions,getRegionalFormByPokemonId,EXTENSION_IMPLEMENTATION_STATUS} from '../src/pokemon-extensions.js';
+test('spätere Entwicklungen der ursprünglichen Arten enthalten',()=>{assert.equal(isEligibleSpecies(493),true);assert.equal(isLaterEvolution(700),true);assert.equal(isLaterEvolution(863),true);assert.equal(isEligibleSpecies(494),false);assert.equal(isEligibleSpecies(906),false);assert.ok(getLaterEvolutionSpecies().length>10)});
+test('Alola- und Galarformen von ursprünglichen Arten',()=>{assert.ok(getRegionalForms(52).some(f=>f.region==='alola'));assert.ok(getRegionalForms(52).some(f=>f.region==='galar'));assert.ok(getRegionalForms(37).some(f=>f.region==='alola'));assert.equal(getRegionalForms(700).length,0);const form=getRegionalForms(52)[0];assert.equal(getRegionalFormByPokemonId(form.pokemonId).speciesId,52)});
+test('Entwicklungsstammbaum und Bedingungen',()=>{assert.equal(getEvolutionParent(700),133);assert.ok(getEvolutionChildren(133).includes(700));assert.ok(getEvolutionConditions(700).length>0);assert.equal(getEvolutionParent(1),null)});
+test('keine fälschliche Zusage der Kampf- oder Grafikimplementierung',()=>{assert.equal(EXTENSION_IMPLEMENTATION_STATUS.evolutionExecution,'not-implemented');assert.equal(EXTENSION_IMPLEMENTATION_STATUS.regionalBattleStats,'not-implemented')});

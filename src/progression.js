@@ -1,3 +1,6 @@
+import {laterEvolutionOptions} from './later-evolutions.js';
+import {extendedEntry} from './extended-pokemon.js';
+import {isEligibleSpecies} from './pokemon-extensions.js';
 import {experienceForLevel,getLearnset,getLevelEvolutionCandidates,getEvolutions,getMove,movesAtLevel} from './moves.js';
 import {calculateStats,validatePokemon,MAX_LEVEL} from './team.js';
 import {POKEMON_DATA} from './pokemon-data.js';
@@ -7,7 +10,7 @@ function requirePokemon(p){if(!validatePokemon(p))throw Error('Ungültiges Poké
 export function levelProgress(p){requirePokemon(p);const current=experienceForLevel(p.speciesId,p.level);const next=p.level===MAX_LEVEL?null:experienceForLevel(p.speciesId,p.level+1);return {level:p.level,experience:Math.max(p.experience,current),currentLevelExperience:current,nextLevelExperience:next};}
 export function awardExperience(p,amount){requirePokemon(p);if(!integer(amount,0,100000000))throw Error('Ungültige Erfahrungspunkte');const start=p.level;const base=experienceForLevel(p.speciesId,p.level);p.experience=Math.min(experienceForLevel(p.speciesId,MAX_LEVEL),Math.max(p.experience,base)+amount);const learned=[];const evolutionOptions=[];
  while(p.level<MAX_LEVEL&&p.experience>=experienceForLevel(p.speciesId,p.level+1)){
-  const oldHp=p.stats.hp;p.level++;p.stats=calculateStats(p.speciesId,p.level,p.ivs,p.evs);p.currentHp=Math.min(p.stats.hp,p.currentHp+(p.stats.hp-oldHp));
+  const oldHp=p.stats.hp;p.level++;p.stats=calculateStats(p.formId??p.speciesId,p.level,p.ivs,p.evs);p.currentHp=Math.min(p.stats.hp,p.currentHp+(p.stats.hp-oldHp));
   for(const x of getLearnset(p.speciesId).filter(x=>x.level===p.level))if(!p.moves.includes(x.moveId)&&!learned.includes(x.moveId))learned.push(x.moveId);
   evolutionOptions.push(...getLevelEvolutionCandidates(p.speciesId,p.level).map(e=>({...e,atLevel:p.level})));
  }
@@ -20,9 +23,9 @@ export function learnMove(p,moveId,replaceIndex=null){requirePokemon(p);if(!inte
  if(!integer(replaceIndex,0,3))throw Error('Ersetzen einer Attacke erforderlich');p.moves[replaceIndex]=moveId;pp[replaceIndex]=getMove(moveId).pp;p.pp=pp;return true;
 }
 export function availableLevelEvolutions(p){requirePokemon(p);return getLevelEvolutionCandidates(p.speciesId,p.level);}
-export function evolvePokemon(p,targetSpeciesId){requirePokemon(p);if(!integer(targetSpeciesId,1,493)||!availableLevelEvolutions(p).some(e=>e.to===targetSpeciesId))throw Error('Entwicklungsbedingung nicht erfüllt');
- const oldMax=p.stats.hp,oldCurrent=p.currentHp;p.speciesId=targetSpeciesId;p.stats=calculateStats(p.speciesId,p.level,p.ivs,p.evs);p.currentHp=oldCurrent===0?0:Math.min(p.stats.hp,oldCurrent+p.stats.hp-oldMax);
- const abilities=POKEMON_DATA[p.speciesId].abilities;const next=abilities.find(a=>a.id===p.abilityId)||abilities.find(a=>a.hidden===p.hiddenAbility)||abilities[0];p.abilityId=next.id;p.hiddenAbility=next.hidden;
+export function evolvePokemon(p,targetSpeciesId){requirePokemon(p);if(!isEligibleSpecies(targetSpeciesId)||!availableLevelEvolutions(p).some(e=>e.to===targetSpeciesId))throw Error('Entwicklungsbedingung nicht erfüllt');
+ const oldMax=p.stats.hp,oldCurrent=p.currentHp;p.speciesId=targetSpeciesId;delete p.formId;p.stats=calculateStats(p.speciesId,p.level,p.ivs,p.evs);p.currentHp=oldCurrent===0?0:Math.min(p.stats.hp,oldCurrent+p.stats.hp-oldMax);
+ const abilities=extendedEntry(p.formId??p.speciesId).abilities;const next=abilities.find(a=>a.id===p.abilityId)||abilities.find(a=>a.hidden===p.hiddenAbility)||abilities[0];p.abilityId=next.id;p.hiddenAbility=next.hidden;
  return p;
 }
 
@@ -47,8 +50,8 @@ export function evolveWithStone(p,stoneId,target){
  return applyEvolution(p,target);
 }
 function applyEvolution(p,target){
- const oldMax=p.stats.hp,oldCurrent=p.currentHp;p.speciesId=target;p.stats=calculateStats(target,p.level,p.ivs,p.evs);p.currentHp=oldCurrent===0?0:Math.min(p.stats.hp,oldCurrent+p.stats.hp-oldMax);
- const abilities=POKEMON_DATA[target].abilities;const next=abilities.find(a=>a.id===p.abilityId)||abilities.find(a=>a.hidden===p.hiddenAbility)||abilities[0];p.abilityId=next.id;p.hiddenAbility=next.hidden;return p;
+ const oldMax=p.stats.hp,oldCurrent=p.currentHp;p.speciesId=target;delete p.formId;p.stats=calculateStats(target,p.level,p.ivs,p.evs);p.currentHp=oldCurrent===0?0:Math.min(p.stats.hp,oldCurrent+p.stats.hp-oldMax);
+ const abilities=extendedEntry(target).abilities;const next=abilities.find(a=>a.id===p.abilityId)||abilities.find(a=>a.hidden===p.hiddenAbility)||abilities[0];p.abilityId=next.id;p.hiddenAbility=next.hidden;return p;
 }
 
 export function friendshipEvolutionOptions(p,timeOfDay='day'){
@@ -75,7 +78,7 @@ export function pendingLevelMoves(p,fromLevel,toLevel=p.level){
 
 // A pure preview lets the UI show the result without mutating the team.
 export function previewEvolution(p,target){
- requirePokemon(p);if(!integer(target,1,493)||!POKEMON_DATA[target])throw Error('Ungültige Entwicklungsart');
+ requirePokemon(p);if(!isEligibleSpecies(target)||!extendedEntry(target))throw Error('Ungültige Entwicklungsart');
  const copy=structuredClone(p);applyEvolution(copy,target);return {speciesId:copy.speciesId,stats:{...copy.stats},abilityId:copy.abilityId,hiddenAbility:copy.hiddenAbility,currentHp:copy.currentHp};
 }
 
@@ -87,4 +90,12 @@ export function levelUpSummary(p,amount){
 export function evolutionPreservesIdentity(before,after){
  if(!validatePokemon(before)||!validatePokemon(after))return false;
  return before.level===after.level&&before.experience===after.experience&&before.shiny===after.shiny&&before.friendship===after.friendship&&JSON.stringify(before.ivs)===JSON.stringify(after.ivs)&&JSON.stringify(before.evs)===JSON.stringify(after.evs)&&JSON.stringify(before.moves)===JSON.stringify(after.moves);
+}
+
+// Explicit context prevents weather/time/item evolutions from happening by accident.
+export function availableLaterEvolutions(p,context={}){requirePokemon(p);return laterEvolutionOptions(p,context);}
+export function evolveLaterPokemon(p,target,context={}){
+ requirePokemon(p);
+ if(!laterEvolutionOptions(p,context).some(x=>x.to===target))throw Error('Spätere Entwicklungsbedingung nicht erfüllt');
+ return applyEvolution(p,target);
 }

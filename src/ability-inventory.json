@@ -1,0 +1,1358 @@
+{
+  "scope": "Nationaldex 1–493, eligible later evolutions and Alola/Galar forms; including hidden abilities",
+  "speciesForms": 508,
+  "abilities": [
+    {
+      "abilityId": 1,
+      "speciesCount": 7,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 2,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 3,
+      "speciesCount": 8,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 4,
+      "speciesCount": 9,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 5,
+      "speciesCount": 24,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 6,
+      "speciesCount": 16,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 7,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 8,
+      "speciesCount": 17,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 9,
+      "speciesCount": 13,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 10,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 11,
+      "speciesCount": 15,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 12,
+      "speciesCount": 20,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 13,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 14,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 15,
+      "speciesCount": 11,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 16,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 17,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 18,
+      "speciesCount": 13,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 19,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 20,
+      "speciesCount": 15,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 21,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 22,
+      "speciesCount": 22,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 23,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 24,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 25,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 26,
+      "speciesCount": 26,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 27,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 28,
+      "speciesCount": 11,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 29,
+      "speciesCount": 8,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 30,
+      "speciesCount": 13,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 31,
+      "speciesCount": 13,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 32,
+      "speciesCount": 9,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 33,
+      "speciesCount": 33,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 34,
+      "speciesCount": 25,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 35,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 36,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 37,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 38,
+      "speciesCount": 13,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 39,
+      "speciesCount": 23,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 40,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 41,
+      "speciesCount": 11,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 42,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 43,
+      "speciesCount": 11,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 44,
+      "speciesCount": 11,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 45,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 46,
+      "speciesCount": 23,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 47,
+      "speciesCount": 19,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 48,
+      "speciesCount": 14,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 49,
+      "speciesCount": 9,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 50,
+      "speciesCount": 23,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 51,
+      "speciesCount": 23,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 52,
+      "speciesCount": 9,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 53,
+      "speciesCount": 9,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 54,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 55,
+      "speciesCount": 13,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 56,
+      "speciesCount": 11,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 57,
+      "speciesCount": 4,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 58,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 59,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 60,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 61,
+      "speciesCount": 12,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 62,
+      "speciesCount": 19,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 63,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 64,
+      "speciesCount": 4,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 65,
+      "speciesCount": 12,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 66,
+      "speciesCount": 12,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 67,
+      "speciesCount": 12,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 68,
+      "speciesCount": 13,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 69,
+      "speciesCount": 18,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 70,
+      "speciesCount": 4,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 71,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 72,
+      "speciesCount": 12,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 73,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 74,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 75,
+      "speciesCount": 14,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 76,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 77,
+      "speciesCount": 8,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 78,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 79,
+      "speciesCount": 10,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 80,
+      "speciesCount": 10,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 81,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 82,
+      "speciesCount": 12,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 83,
+      "speciesCount": 4,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 84,
+      "speciesCount": 7,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 85,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 86,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 87,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 88,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 89,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 90,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 91,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 92,
+      "speciesCount": 4,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 93,
+      "speciesCount": 12,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 94,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 95,
+      "speciesCount": 9,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 96,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 97,
+      "speciesCount": 12,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 98,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 99,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 100,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 101,
+      "speciesCount": 12,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 102,
+      "speciesCount": 11,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 103,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 104,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 105,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 106,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 107,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 108,
+      "speciesCount": 4,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 109,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 110,
+      "speciesCount": 8,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 111,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 112,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 113,
+      "speciesCount": 7,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 114,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 115,
+      "speciesCount": 10,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 116,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 117,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 118,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 119,
+      "speciesCount": 12,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 120,
+      "speciesCount": 8,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 121,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 122,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 123,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 124,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 125,
+      "speciesCount": 17,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 126,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 127,
+      "speciesCount": 13,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 128,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 130,
+      "speciesCount": 4,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 131,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 132,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 133,
+      "speciesCount": 9,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 134,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 135,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 136,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 137,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 138,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 139,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 140,
+      "speciesCount": 10,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 141,
+      "speciesCount": 7,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 142,
+      "speciesCount": 7,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 143,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 144,
+      "speciesCount": 7,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 145,
+      "speciesCount": 4,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 146,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 147,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 148,
+      "speciesCount": 8,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 150,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 151,
+      "speciesCount": 9,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 153,
+      "speciesCount": 6,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 154,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 155,
+      "speciesCount": 11,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 156,
+      "speciesCount": 3,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 157,
+      "speciesCount": 8,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 158,
+      "speciesCount": 5,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 159,
+      "speciesCount": 8,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "partial",
+      "notes": "Source contains ability-specific handling; completeness not established"
+    },
+    {
+      "abilityId": 168,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 171,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 172,
+      "speciesCount": 7,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 181,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 182,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 251,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 252,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 253,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 256,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 274,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 291,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 292,
+      "speciesCount": 2,
+      "formCount": 0,
+      "hiddenAvailable": true,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    },
+    {
+      "abilityId": 296,
+      "speciesCount": 1,
+      "formCount": 0,
+      "hiddenAvailable": false,
+      "status": "unverified",
+      "notes": "No verified complete behavior; needs audit"
+    }
+  ]
+}

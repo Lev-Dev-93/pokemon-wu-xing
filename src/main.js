@@ -35,18 +35,25 @@ const menu=document.querySelector('#game-menu'),menuContent=document.querySelect
 const journal=document.querySelector('#journal'),journalButton=document.querySelector('#journal-toggle');
 const devMode=developerModeEnabled(window.location.search);
 
-function move(dir){if(scriptedRun||menuOpen||!starterPanel.hidden||!battlePanel.hidden)return;engine.step(dir);if(engine.lastEvent==='transition')autoSave();if(engine.lastEvent==='wildEncounter'){const wild=engine.pendingWild;engine.pendingWild=null;engine.lastEvent=null;startWildBattle(wild);return}engine.lastEvent=null;draw()}
-function interact(){if(scriptedRun||menuOpen||!starterPanel.hidden||!battlePanel.hidden)return;keys.clear();const before=engine.mode;engine.interact();const event=engine.lastEvent;if(event==='storageOpened'){engine.lastEvent=null;toggleMenu(true);menuPanel('storage');draw();return}if(event==='shopOpened'){engine.lastEvent=null;toggleMenu(true);menuPanel('shop');draw();return}if(event==='trainerChallenge'){const trainer=engine.pendingTrainer;engine.pendingTrainer=null;engine.lastEvent=null;startTrainerBattle(trainer);return}if(['stationHealed','suppliesCollected','dialogueFinished','birthdayPreviewFinished','starterWishFinished','riftSceneFinished','absolSceneFinished','parentsReportFinished','professorDemoFinished','route1Hatched'].includes(event))autoSave();engine.lastEvent=null;
+function move(dir){if(scriptedRun||menuOpen||!starterPanel.hidden||!battlePanel.hidden)return;engine.step(dir);if(engine.lastEvent==='transition'){autoSave();if(engine.state.mapId==='ground'&&!engine.state.flags.spokenToBreederA&&!engine.state.flags.spokenToBreederB&&!engine.state.flags.egg_received){engine.lastEvent=null;runToBirthdayParents();return}}if(engine.lastEvent==='wildEncounter'){const wild=engine.pendingWild;engine.pendingWild=null;engine.lastEvent=null;startWildBattle(wild);return}engine.lastEvent=null;draw()}
+function interact(){if(scriptedRun||menuOpen||!starterPanel.hidden||!battlePanel.hidden)return;keys.clear();const before=engine.mode;engine.interact();const event=engine.lastEvent;if(event==='storageOpened'){engine.lastEvent=null;toggleMenu(true);menuPanel('storage');draw();return}if(event==='shopOpened'){engine.lastEvent=null;toggleMenu(true);menuPanel('shop');draw();return}if(event==='trainerChallenge'){const trainer=engine.pendingTrainer;engine.pendingTrainer=null;engine.lastEvent=null;startTrainerBattle(trainer);return}if(['stationHealed','suppliesCollected','dialogueFinished','birthdayGreetingFinished','birthdayPreviewFinished','starterWishFinished','riftSceneFinished','absolSceneFinished','parentsReportFinished','professorDemoFinished','route1Hatched'].includes(event))autoSave();engine.lastEvent=null;
  if(before==='dialogue'&&engine.mode==='exploration'){
   if(event==='riftSceneFinished'){runToRival();return}
   if(event==='absolSceneFinished'){runToParents();return}
   if(event==='birthdayPreviewFinished'&&!engine.state.flags.egg_received){draw();openStarters();return}
-  if(event==='starterWishFinished'&&engine.state.flags.egg_received&&!engine.state.flags.rift_closed){runToVillageSquare();return}
+  if(event==='starterWishFinished'&&engine.state.flags.egg_received&&!engine.state.flags.rift_closed){playEarthquakeThenRun();return}
   if(!engine.state.flags.birthday_wish_pending&&!engine.state.flags.egg_received&&engine.state.mapId==='ground'&&engine.state.flags.spokenToBreederA&&engine.state.flags.spokenToBreederB){engine.beginBirthdayPreview();autoSave()}
  }
  draw()}
 // Story-controlled run: earthquake at the breeders' house, then the player runs to the village square.
 // Movement is locked until the rift scene begins; all intermediate maps are rendered.
+function playEarthquakeThenRun(){
+ if(scriptedRun)return;
+ scriptedRun=true;keys.clear();engine.message='Der Boden bebt heftig! Die Wände erzittern!';
+ canvas.classList.add('earthquake');draw();
+ const generation=storyGeneration;
+ setTimeout(()=>{canvas.classList.remove('earthquake');if(generation!==storyGeneration)return;scriptedRun=false;runToVillageSquare()},1700);
+}
 function runToVillageSquare(){
  if(scriptedRun)return;scriptedRun=true;keys.clear();engine.message='Ein Erdbeben! Du rennst zum Dorfplatz!';draw();
  const route=[['ground',5,7],['yard',7,2],['yard',7,4],['yard',7,6],['yard',7,8],['yard',7,10],['village',10,1],['village',10,3],['village',10,5],['village',10,7],['village',11,7]];
@@ -66,6 +73,12 @@ function walkStoryTo(mapId,target,done){
   autoSave();draw();setTimeout(advance,110);
  }
  advance();
+}
+function runToBirthdayParents(){
+ if(scriptedRun||engine.mode!=='exploration'||engine.state.mapId!=='ground'||engine.state.flags.egg_received)return;
+ scriptedRun=true;keys.clear();walkStoryTo('ground',STORY_WALK_TARGETS.parents,()=>{
+  scriptedRun=false;engine.state.facing='up';engine.beginBirthdayGreeting();autoSave();draw();
+ });
 }
 function runToRival(){
  if(scriptedRun||engine.state.mapId!=='village'||engine.state.flags.rival_absol)return;
@@ -91,6 +104,7 @@ function runToParents(){
 function resumePrologue(){
  if(engine.mode!=='exploration')return false;
  const phase=prologuePhase(engine.state.flags,engine.state.mapId);
+ if(phase==='before-egg'&&engine.state.mapId==='ground'&&!engine.state.flags.spokenToBreederA&&!engine.state.flags.spokenToBreederB){runToBirthdayParents();return true}
  if(phase==='rift-scene'&&engine.state.mapId==='village'){engine.beginRiftScene();autoSave();draw();return true}
  if(phase==='rift-approach'&&['ground','yard'].includes(engine.state.mapId)){runToVillageSquare();return true}
  if(phase==='to-rival'&&engine.state.mapId==='village'){runToRival();return true}
@@ -145,9 +159,9 @@ window.addEventListener('keydown',e=>{if(e.target instanceof HTMLElement&&['INPU
 window.addEventListener('keyup',e=>keys.delete(e.key));window.addEventListener('blur',()=>keys.clear());
 for(const b of document.querySelectorAll('[data-dir]'))b.addEventListener('click',()=>move(b.dataset.dir));
 document.querySelector('#interact').addEventListener('click',interact);dialogBox.addEventListener('click',interact);
-journalButton.addEventListener('click',toggleJournal);document.querySelector('#continue').addEventListener('click',()=>{try{const raw=localStorage.getItem(autoKey)||localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');storyGeneration++;scriptedRun=false;engine.load(raw);if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)!=='none'){if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)==='scene'){engine.beginRiftScene();autoSave()}else runToVillageSquare();}else resumePrologue();keys.clear();draw();notice.textContent='Letzten Stand fortgesetzt'}catch(e){notice.textContent=`Fortsetzen fehlgeschlagen: ${e.message}`}});
+journalButton.addEventListener('click',toggleJournal);document.querySelector('#continue').addEventListener('click',()=>{try{const raw=localStorage.getItem(autoKey)||localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');storyGeneration++;scriptedRun=false;canvas.classList.remove('earthquake');engine.load(raw);if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)!=='none'){if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)==='scene'){engine.beginRiftScene();autoSave()}else runToVillageSquare();}else resumePrologue();keys.clear();draw();notice.textContent='Letzten Stand fortgesetzt'}catch(e){notice.textContent=`Fortsetzen fehlgeschlagen: ${e.message}`}});
 document.querySelector('#save').addEventListener('click',()=>{try{localStorage.setItem(saveKey,engine.save());notice.textContent='Spielstand gespeichert'}catch(e){notice.textContent=`Speichern fehlgeschlagen: ${e.message}`}});
-document.querySelector('#load').addEventListener('click',()=>{try{const raw=localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');storyGeneration++;scriptedRun=false;engine.load(raw);if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)!=='none'){if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)==='scene'){engine.beginRiftScene();autoSave()}else runToVillageSquare();}else resumePrologue();keys.clear();draw();notice.textContent='Spielstand geladen'}catch(e){notice.textContent=`Laden fehlgeschlagen: ${e.message}`}});
+document.querySelector('#load').addEventListener('click',()=>{try{const raw=localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');storyGeneration++;scriptedRun=false;canvas.classList.remove('earthquake');engine.load(raw);if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)!=='none'){if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)==='scene'){engine.beginRiftScene();autoSave()}else runToVillageSquare();}else resumePrologue();keys.clear();draw();notice.textContent='Spielstand geladen'}catch(e){notice.textContent=`Laden fehlgeschlagen: ${e.message}`}});
 document.querySelector('#reset').addEventListener('click',()=>{keys.clear();starterPanel.hidden=true;storyGeneration++;scriptedRun=false;engine.reset();try{localStorage.removeItem(autoKey)}catch(e){}draw();notice.textContent='Neues Spiel gestartet'});
 function frame(t){if(t-last>=125){if(engine.mode==='exploration'&&!menuOpen&&starterPanel.hidden&&battlePanel.hidden){const key=[...keys].at(-1);if(key)move(directions[key])}last=t}requestAnimationFrame(frame)}
 

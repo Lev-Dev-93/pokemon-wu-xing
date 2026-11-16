@@ -1,3 +1,18 @@
+
+## dev.207 – Regressionstests und Abschluss
+
+## dev.206 – Pokémon-Wechsel und temporäre Effekte
+
+## dev.205 – Zurückschrecken und Aktionsreihenfolge
+
+## dev.204 – Verwirrung und Kampfrunden
+
+## dev.203 – Auftauen und Status-Immunitäten
+## dev.197
+- Erweiterte Pokémon-Kampf- und Teamdaten aus PokeAPI-CSV; Alola/Galar mit Form-ID.
+- Spätere Entwicklungen der ursprünglichen 493 Arten.
+- Regressionstests für Teamvalidierung, Werte, Typen und Lernlisten.
+
 ## dev.177
 - Regressionstests für Kartenlayout, automatische Prologfolge und Story-Fortschritt.
 
@@ -592,3 +607,102 @@ Menü startet in Teamübersicht, Tastaturfokus und Dialogschutz.
 
 ## dev.182
 - End-to-End-Regressionsprüfungen für Fußwege und Speicherstände.
+
+## dev.183
+Automatischer Gang zu den Adoptiveltern nach der Treppe, Geburtstagslied und Dialog.
+
+## dev.184
+Deutlich sichtbares Erdbeben vor dem Aufbruch zur Giratina-Szene.
+
+## dev.185
+Übergang zum Geburtstagsdialog ohne doppelte Auslösung.
+
+## dev.186
+Erdbebeneffekt beim Laden zuverlässig zurücksetzen.
+
+## dev.187
+Zusätzliche Absicherung des automatischen Geburtstagswegs und Regressionstests.
+
+## dev.192
+- Regressionsprüfung und Kennzeichnung noch nicht spielbarer Erweiterungsmechaniken.
+
+## dev.198
+Sicherer Auswerter für spätere Entwicklungsbedingungen; unbekannte Trigger werden nicht stillschweigend akzeptiert.
+
+## dev.199
+Evolution beseitigt veraltete Regionalform-IDs; Arten bis jenseits #493 werden bei Levelentwicklungen zugelassen.
+
+## dev.200
+Explizite API zur Prüfung und Ausführung späterer Entwicklungen mit Kontext.
+
+## dev.201
+Identitäts- und Vorschaupfade auf die neue Entwicklungslogik abgestimmt; Regionalform-Vererbung bewusst nicht pauschalisiert.
+
+## dev.202
+Tests für Feelinara, regionale Voraussetzungen und nicht unterstützte Spezialtrigger.
+
+## dev.212
+Abschlussprüfung der Kampffähigkeiten und Tests; offene Spezialfähigkeiten bleiben als Folgearbeit.
+
+## dev.213
+Wetterfest schützt vor Sandsturm-/Hagelschaden.
+
+## dev.214
+Sandscharrer verdoppelt Initiative im Sandsturm.
+
+## dev.215
+Sandgewalt verstärkt Boden-, Gesteins- und Stahlattacken bei Sandsturm.
+
+## dev.216
+Laubschutz verhindert primäre Statusprobleme bei Sonne.
+
+## dev.217
+Automatisierte Regressionstests für Wetterfähigkeiten.
+
+## dev.218
+- Blitzfänger: Elektro-Immunität und Spezial-Angriffssteigerung.
+
+## dev.219
+- Sturmsog: Wasser-Immunität und Spezial-Angriffssteigerung.
+
+## dev.220
+- Vegetarier: Pflanzen-Immunität und Angriffssteigerung.
+
+## dev.221
+- Starthilfe: Elektro-Immunität und Initiativsteigerung.
+
+## dev.222
+- Trockenheit: Wasserattacken regenerieren KP.
+
+## dev.223
+- Tempomacher (20) verhindert Verwirrung.
+
+## dev.224
+- Magmapanzer (40) verhindert Einfrieren.
+
+## dev.225
+- Insomnia (72) verhindert Schlaf.
+
+## dev.226
+- Hydration (93) heilt Statusprobleme am Rundenende bei Regen.
+
+## dev.227
+- Expidermis (61) heilt Statusprobleme mit 1/3 Wahrscheinlichkeit am Rundenende.
+
+## dev.228
+Regionalformen: Form-spezifische Typen in Schadensberechnung, Statusimmunität und Wetter.
+
+## dev.229
+Typabsorbierende Fähigkeiten reagieren nun auch auf gegnerische Statusattacken des passenden Typs.
+
+## dev.230
+Absorptionslogik für Elektro-/Wasser-/Pflanzen-Statusattacken konsolidiert.
+
+## dev.231
+Eis-Pokémon sind gegen Einfrieren immun.
+
+## dev.232
+Eigene Status-/Heilattacken lösen keine gegnerischen Absorptionsfähigkeiten aus.
+
+## dev.237 – Fähigkeitsinventur
+Phasenweiser Implementierungsplan und Audit-Regressionstest.

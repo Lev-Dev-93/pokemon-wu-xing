@@ -1,0 +1,11 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {applyEntryAbility,cureOnSwitchOut} from '../src/battle-entry.js';
+const battle=(abilityId=22)=>({player:{pokemon:{abilityId,currentHp:50},stages:{attack:0}},opponent:{pokemon:{abilityId:1,currentHp:50},stages:{attack:0}},weather:null,weatherTurns:0,log:[]});
+test('Bedroher reduziert gegnerischen Angriff',()=>{const b=battle();applyEntryAbility(b,'player');assert.equal(b.opponent.stages.attack,-1)});
+test('Bedroher bleibt bei -6 gedeckelt',()=>{const b=battle();b.opponent.stages.attack=-6;applyEntryAbility(b,'player');assert.equal(b.opponent.stages.attack,-6)});
+test('Niesel setzt Regen',()=>{const b=battle(2);applyEntryAbility(b,'player');assert.equal(b.weather,'rain');assert.equal(b.weatherTurns,5)});
+test('Dürre setzt Sonne',()=>{const b=battle(70);applyEntryAbility(b,'player');assert.equal(b.weather,'sun')});
+test('Sandsturm durch Sandsturm-Fähigkeit',()=>{const b=battle(45);applyEntryAbility(b,'player');assert.equal(b.weather,'sand')});
+test('Hagelalarm löst Hagel aus',()=>{const b=battle(117);applyEntryAbility(b,'player');assert.equal(b.weather,'hail')});
+test('Innere Kraft heilt beim Wechsel',()=>{const p={abilityId:30,status:'burn'};cureOnSwitchOut(p);assert.equal(p.status,'healthy')});
+test('Ohne Innere Kraft bleibt Status erhalten',()=>{const p={abilityId:1,status:'burn'};cureOnSwitchOut(p);assert.equal(p.status,'burn')});

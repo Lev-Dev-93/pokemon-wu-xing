@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {abilityAudit} from '../src/ability-audit.js';test('no unverified ability is falsely marked complete',()=>{const a=abilityAudit();assert.equal(a.complete,0);assert.equal(a.total,a.partial+a.unverified);});

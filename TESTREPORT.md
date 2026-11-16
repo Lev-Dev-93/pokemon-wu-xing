@@ -1,3 +1,4 @@
-Automatisierte Tests: # tests 479, # pass 479, # fail 0
-Exit-Code: 0
-Browserprüfung: nicht durchgeführt.
+# Testbericht dev.237
+
+Automatische Tests: 523 bestanden, 0 fehlgeschlagen.
+Browser-Interaktion nicht getestet.
