@@ -17,7 +17,7 @@ export function landscapeDetails(map){
   if(biome==='meadow')type=seed<13?'wildflower':seed<24?'tuft':seed===40?'stone':null;
   if(biome==='riverside')type=seed<11?'reeds':seed<19?'pebbles':seed<25?'wildflower':null;
   if(biome==='edge')type=seed<20?'fern':seed<30?'tuft':seed<34?'mushroom':null;
-  if(biome==='hamlet')type=seed<12?'berryBush':seed<20?'wildflower':seed<23?'stone':null;
+  if(biome==='hamlet')type=seed<37?'berryBush':seed<43?'wildflower':seed<46?'stone':null;
   if(biome==='ancientForest')type=seed<24?'fern':seed<37?'mushroom':seed<44?'roots':null;
   if(type)result.push({x,y,type});
  }

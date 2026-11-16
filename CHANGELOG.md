@@ -1,17 +1,13 @@
-# Pokémon Wu Xing – dev.119
+## dev.121 – Beerendorf, Waldhütte und Baumkollisionen
 
-## Startdorf Mu
-- Sieben betretbare Gebäude: Forschungslabor des Professors (`study`), Professorenhaus, Markt, kleine Kapelle, Rivalenhaus und zwei Wohnhäuser.
-- Labor und Professorenhaus bilden ein eigenes Viertel im Norden; die übrigen Gebäude liegen um den gepflasterten Dorfplatz.
-- Dorfbrunnen auf zwei nicht begehbaren Kacheln.
-- Der Professor ist im Labor, der Händler im Markt; der Rivale bleibt für die Story am Dorfplatz.
+Vier Gebäude in Beerendorf: Werkstatt, Kräuterladen, Kräuterhexe (Heilung), Wohnhaus. Zusätzliche dekorative Beerensträucher. Alte Dame in eigener Waldhütte. Sichtbare Baumgruppen sind unpassierbar. Keine Sammelitems oder Nebenaufgaben.
 
-## Zuchtfarm
-- Der bisherige Heilungs-NPC im Dorfhaus ist entfernt.
-- Die Adoptivmutter (`breeder_a`) heilt nach dem Schlüpfen des Starter-Pokémon.
-- Der Pokémon-PC steht im Erdgeschoss (`ground`) und ermöglicht dort Lagerzugriff nach dem Schlüpfen.
+## dev.120 – Zuchtfarm, Marktstand, einheitliche Kamera
 
-Keine neuen Sammelgegenstände, Nebenaufgaben oder nicht storyrelevanten NPCs.
+- Weide mit Zaun und Zugang; Teich mit Wasser-Kollisionen.
+- Küche und Wohnzimmer neu eingerichtet.
+- Marktgebäude entfernt, Marktstand und Händler auf Dorfplatz.
+- Einheitliche 512 × 384 Pixel Spielfläche, Kamera folgt Spieler auf großen Karten.
 
 ## dev.118 – Vollbild, Kampf im Spielfenster, Bach und Waldgestaltung
 

@@ -4,10 +4,10 @@ import {maps,npcs,objects,canMove} from '../src/maps.js';
 import {Engine} from '../src/engine.js';
 import {createPokemon} from '../src/team.js';
 
-const interiors=['study','professor_house','market','chapel','rival_house','village_home','village_house_east'];
-test('Startdorf hat genau sieben benannte Gebäude mit jeweils einem Rückweg',()=>{
+const interiors=['study','professor_house','chapel','rival_house','village_home','village_house_east'];
+test('Startdorf hat sechs Gebäude nach Marktstand-Umbau mit jeweils einem Rückweg',()=>{
  const doors=maps.village.portals.filter(p=>interiors.includes(p.target));
- assert.equal(doors.length,7);
+ assert.equal(doors.length,6);
  assert.deepEqual(new Set(doors.map(p=>p.target)),new Set(interiors));
  for(const door of doors){
   assert.equal(maps.village.walls.has(`${door.x},${door.y}`),false);
@@ -36,10 +36,10 @@ test('PC befindet sich im Erdgeschoss der Zuchtfarm, nicht im Dorfhaus',()=>{
  assert.equal(e.canAccessStorage(),true);
 });
 test('Markt bleibt funktional, Professor im Labor und Rivale auf dem Platz',()=>{
- assert.ok(npcs.market.some(n=>n.id==='merchant'));
+ assert.ok(npcs.village.some(n=>n.id==='merchant'));
  assert.ok(npcs.study.some(n=>n.id==='professor'));
  assert.ok(npcs.village.some(n=>n.id==='rival'));
- const e=new Engine();e.state.mapId='market';e.state.flags.route1_hatched=true;
- e.state.x=7;e.state.y=5;e.state.facing='up';
+ const e=new Engine();e.state.mapId='village';e.state.flags.route1_hatched=true;
+ e.state.x=17;e.state.y=10;e.state.facing='up';
  assert.equal(e.interact(),true);assert.equal(e.lastEvent,'shopOpened');
 });

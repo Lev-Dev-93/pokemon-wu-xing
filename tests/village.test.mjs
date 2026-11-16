@@ -10,7 +10,7 @@ test('Züchterhof führt ins Dorf und zurück ohne Softlock',()=>{
  assert.equal(e.state.mapId,'yard');assert.deepEqual([e.state.x,e.state.y],[7,10]);
 });
 test('Dorf-Portal und Spawn sind begehbar und NPC-frei',()=>{
- const m=maps.village;assert.equal(m.portals.length,9);
+ const m=maps.village;assert.equal(m.portals.length,8);
  assert.equal(m.walls.has('10,1'),false);assert.equal(m.walls.has('10,0'),false);
  assert.equal(npcs.village.some(n=>n.x===10&&n.y===1),false);
 });

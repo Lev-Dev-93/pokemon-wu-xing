@@ -8,7 +8,7 @@ test('kanonische Gebietsfolge bleibt unverändert',()=>{
  }
 });
 test('alle drei Gebäude in Beerendorf haben Rückwege',()=>{
- for(const id of ['beerendorf_werkstatt','beerendorf_haus','beerendorf_haus2']){
+ for(const id of ['beerendorf_werkstatt','beerendorf_haus','beerendorf_haus2','beerendorf_wohnhaus']){
  assert.ok(maps.beerendorf.portals.some(p=>p.target===id));
  assert.ok(maps[id].portals.some(p=>p.target==='beerendorf'));
  }
