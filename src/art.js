@@ -1,3 +1,4 @@
+import {outdoorBuildings,isVillagePath,isBerryVillagePath} from './maps.js';
 import {landscapeDetails,terrainKind} from './landscape.js';
 import {npcs,objects} from './maps.js';
 // Pokémon Wu Xing: all visual primitives and tiles are original, generated locally.
@@ -58,8 +59,8 @@ function drawYard(c,map){const W=map.w*T;
 }
 function drawVillage(c,map){
  // Sieben Häuser; Labor und Professorenhaus zusammen im nördlichen Viertel.
- const buildings=[[2,2,4,2,'#557c8b','LABOR'],[7,2,3,2,'#977357','PROF.'],[2,6,3,2,'#9c705c','HAUS'],[17,6,3,2,'#a67b64','HAUS'],[2,10,3,2,'#8b89a3','KAPELLE'],[16,10,3,2,'#9a6e55','RIVALE']];
- for(const [x,y,w,h,color,label] of buildings){
+ const buildings=outdoorBuildings.village;
+ for(const {x,y,w,h,color,label} of buildings){
   for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++){wallBlock(c,xx*T,yy*T);if(yy===y)roof(c,xx*T,yy*T)}
   R(c,x*T+5,(y+h-1)*T+6,w*T-10,16,color);
   if(typeof c.fillText==='function'){c.save();c.fillStyle='#fff2d1';c.font='bold 9px sans-serif';c.fillText(label,x*T+8,(y+h-1)*T+18);c.restore()}
@@ -76,10 +77,10 @@ function drawVillage(c,map){
 }
 function drawBeerendorf(c,map){
  // Eigenständige Dorfzeichnung: die Werkstatt-Tür liegt sichtbar auf (4,5).
- for(const [x,y,w,h] of [[2,3,2,2],[12,3,2,2],[2,11,2,2],[12,11,2,2]])for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++){wallBlock(c,xx*T,yy*T);if(yy===y)roof(c,xx*T,yy*T)}
+ for(const {x,y,w,h} of outdoorBuildings.beerendorf)for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++){wallBlock(c,xx*T,yy*T);if(yy===y)roof(c,xx*T,yy*T)}
  for(let y=1;y<map.h;y++)for(let x=6;x<=9;x++)path(c,x*T,y*T,x+y*map.w);
- for(const [x,y] of [[1,8],[13,8],[3,12],[12,12]]){pot(c,x*T,y*T);flower(c,(x+1)*T,y*T)}
- for(const [x,y] of [[2,8],[3,8],[12,10],[13,10]]){R(c,x*T+5,y*T+15,22,11,'#7b9c58');R(c,x*T+8,y*T+11,16,7,'#a3b96b')}for(const [x,y] of [[2,8],[3,8],[12,10],[13,10]]){R(c,x*T+5,y*T+15,22,11,'#7b9c58');R(c,x*T+8,y*T+11,16,7,'#a3b96b')}door(c,4*T,5*T);door(c,14*T,5*T);door(c,3*T,13*T);door(c,13*T,13*T);R(c,4*T+3,5*T-9,26,9,'#a87845');
+ for(const [x,y] of [[1,8],[11,8],[1,12],[11,12]]){pot(c,x*T,y*T);flower(c,(x+1)*T,y*T)}
+ for(const [x,y] of [[1,9],[2,9],[11,10],[12,10]]){R(c,x*T+5,y*T+15,22,11,'#7b9c58');R(c,x*T+8,y*T+11,16,7,'#a3b96b')}for(const [x,y] of [[1,9],[2,9],[11,10],[12,10]]){R(c,x*T+5,y*T+15,22,11,'#7b9c58');R(c,x*T+8,y*T+11,16,7,'#a3b96b')}door(c,4*T,5*T);door(c,14*T,5*T);door(c,3*T,13*T);door(c,13*T,13*T);R(c,4*T+3,5*T-9,26,9,'#a87845');
  R(c,4*T+7,5*T-7,18,5,'#f3e0ac');
  R(c,10*T+5,10*T+6,22,20,'#a5a8a1');R(c,10*T+8,10*T+8,16,8,'#72b8c2');R(c,7*T,0,32,8,'#e2c99c');R(c,7*T,(map.h-1)*T,32,8,'#e2c99c');
 }
@@ -109,7 +110,7 @@ function drawLandscapeDetails(c,map){
   if(type==='roots'){R(c,X+4,Y+24,24,3,'#795f44');R(c,X+8,Y+20,4,7,'#8d6c4b');R(c,X+21,Y+22,3,5,'#8d6c4b')}
  }
 }
-export function drawScene(c,map,state){c.imageSmoothingEnabled=false;for(let y=0;y<map.h;y++)for(let x=0;x<map.w;x++){const px=x*T,py=y*T,n=x+y*map.w;if(map.id==='yard'){if(x===7&&y>=2||y===10&&x>=4&&x<=10)path(c,px,py,n);else grass(c,px,py,n)}else if((((map.id==='route1'||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))){if(x>=6&&x<=9)path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='brook'){if(y>=7&&y<=9){R(c,px,py,32,32,x>=6&&x<=9?'#aa8356':'#4d9eaf')}else if(x>=6&&x<=9)path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='village'){if((x>=8&&x<=14&&y>=5&&y<=11)||(x>=9&&x<=11)||(y===7&&x>=4&&x<=20)||(y===11&&x>=4&&x<=19)||(y===3&&x>=6&&x<=19))path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='beerendorf'){if((x>=9&&x<=11)||(y===7&&x>=5&&x<=18)||(y>=4&&y<=11&&x>=12&&x<=13))path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='ground')stone(c,px,py,n);else wood(c,px,py,n);if(!['yard','village','route1','route2','waldrand','beerendorf','brook'].includes(map.id)&&y===0)wallpaper(c,px,py,n)}
+export function drawScene(c,map,state){c.imageSmoothingEnabled=false;for(let y=0;y<map.h;y++)for(let x=0;x<map.w;x++){const px=x*T,py=y*T,n=x+y*map.w;if(map.id==='yard'){if(x===7&&y>=2||y===10&&x>=4&&x<=10)path(c,px,py,n);else grass(c,px,py,n)}else if((((map.id==='route1'||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))){if(x>=6&&x<=9)path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='brook'){if(y>=7&&y<=9){R(c,px,py,32,32,x>=6&&x<=9?'#aa8356':'#4d9eaf')}else if(x>=6&&x<=9)path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='village'){if(isVillagePath(x,y)&&!map.walls.has(`${x},${y}`))path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='beerendorf'){if(isBerryVillagePath(x,y)&&!map.walls.has(`${x},${y}`))path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='ground')stone(c,px,py,n);else wood(c,px,py,n);if(!['yard','village','route1','route2','waldrand','beerendorf','brook'].includes(map.id)&&y===0)wallpaper(c,px,py,n)}
 if(map.id==='bedroom'){drawBedroom(c);R(c,4*T+4,2*T+8,24,13,'#8a6b4c');R(c,4*T+8,2*T+10,16,7,'#c8b58a');R(c,8*T+8,4*T+8,16,14,'#679568')}if(map.id==='ground'){drawGround(c);R(c,4*T+4,6*T+5,24,20,'#9b7650');R(c,4*T+9,6*T+8,14,10,'#e2ca96')}if(map.id==='yard'){drawYard(c,map);for(const [fx,fy] of [[1,6],[4,7],[12,8],[14,6]]){R(c,fx*T+6,fy*T+11,20,15,'#6b8e50');R(c,fx*T+10,fy*T+6,12,12,'#96b36c')}}if(map.id==='village')drawVillage(c,map);if(map.id==='beerendorf')drawBeerendorf(c,map);if(map.id==='route2'){for(let y=9;y<=10;y++)for(let x=10;x<=11;x++){wallBlock(c,x*T,y*T);if(y===9)roof(c,x*T,y*T)}door(c,11*T,10*T);}if(map.id==='beerendorf_haus2'){drawInterior(c,'village_home');shelf(c,2*T,T);shelf(c,8*T,T);counter(c,4*T,3*T);for(const [x,y] of [[2,2],[8,2],[2,5]]){R(c,x*T+10,y*T+12,13,13,'#608b51');R(c,x*T+13,y*T+15,5,5,'#c95667')}}if(map.id==='beerendorf_haus'){drawInterior(c,'village_home');shelf(c,8*T,T);table(c,4*T,4*T);pot(c,2*T,2*T);pot(c,8*T,5*T)}if(map.id==='beerendorf_wohnhaus'){drawInterior(c,'village_home');sofa(c,T,T)}if(map.id==='forest_elder_house'){drawInterior(c,'village_home');shelf(c,8*T,T);table(c,3*T,4*T);pot(c,2*T,2*T)}if(map.id==='beerendorf_werkstatt'){drawInterior(c,'study');counter(c,2*T,4*T);shelf(c,8*T,T);table(c,4*T,4*T)}if(((map.id==='route1'||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))drawRoute1(c,map);if(map.id==='brook'){for(let x=0;x<map.w;x++)for(let y=7;y<=9;y++)if(x<6||x>9){const X=x*T,Y=y*T;R(c,X+4,Y+9,18,2,'#82c6ce');R(c,X+12,Y+23,12,2,'#75b8c5')}for(const [x,y] of [[1,3],[3,5],[12,2],[14,5],[2,12],[12,13]]){pot(c,x*T,y*T);flower(c,(x+1)*T,y*T)}for(let x=0;x<map.w;x++){if(x<6||x>9){for(let y of [6,10]){R(c,x*T,y*T+18,32,14,'#739c66');R(c,x*T+8,y*T+12,3,15,'#4c7e57');R(c,x*T+21,y*T+10,3,18,'#527d51')}}}for(let y=7;y<=9;y++)for(let x=6;x<=9;x++){const X=x*T,Y=y*T;R(c,X,Y,32,32,'#a47848');R(c,X+2,Y+3,28,5,'#d4a36b');R(c,X+2,Y+19,28,4,'#744e32');R(c,X+14,Y,3,32,'#5f402b');if(x===6||x===9){R(c,X+(x===6?2:26),Y+3,4,26,'#66462f');R(c,X+(x===6?2:26),Y+3,4,3,'#e7b77e')}}}if(map.id==='village_home'||map.id==='village_house_east'||map.id==='professor_house'||map.id==='chapel'||map.id==='rival_house'||map.id==='study'){drawInterior(c,map.id==='study'?'study':'village_home');if(map.id==='chapel'){carpet(c,4*T,T,3*T,5*T,'#927b9c')}if(map.id==='study'){shelf(c,8*T,T);desk(c,3*T,2*T)}}
 drawLandscapeDetails(c,map);
 // Collision layer is always visually indicated, without changing the engine's walls.
@@ -135,6 +136,18 @@ if(map.id==='route2'){
  }
 }
 if(map.id==='route2'){for(const [x,y] of [[4,2],[5,6],[10,3],[11,7],[4,13],[10,15]]){const X=x*T,Y=y*T;R(c,X+11,Y+15,10,17,'#674c35');R(c,X+2,Y+2,28,23,'#326844');R(c,X+7,Y+4,18,12,'#4a8750')}}
+if(map.id==='route2'){
+ // Wegmarkierungen stehen auf dem Boden und blockieren keine Kachel.
+ for(const [x,y] of [[7,3],[8,7],[7,12],[8,15]]){
+  const X=x*T,Y=y*T;R(c,X+13,Y+23,6,5,'#766344');R(c,X+15,Y+17,2,7,'#c7ad75');
+ }
+}
+if(map.id==='route2'){
+ // Waldlichtungen: gedämpfte Bodenakzente, keine unsichtbaren Hindernisse.
+ for(const [x,y] of [[6,4],[9,5],[6,11],[9,13],[6,16]]){
+  const X=x*T,Y=y*T;R(c,X+4,Y+19,9,3,'#638354');R(c,X+17,Y+12,3,3,'#d1b777');R(c,X+21,Y+21,5,2,'#6b8b5a');
+ }
+}
 if(map.id==='yard'){// raised garden tiles must stay visible above the ground
 R(c,8*32,8*32,3*32,2,'#e7c99b')}
 if(map.id==='ground'){hero(c,6*32,2*32,'down',0);hero(c,3*32,3*32,'left',0)}

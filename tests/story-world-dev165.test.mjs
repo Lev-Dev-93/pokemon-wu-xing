@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {maps} from '../src/maps.js';test('Lichtungsdetails verdecken keine Hindernisse',()=>{for(const [x,y] of [[6,4],[9,5],[6,11],[9,13],[6,16]])assert.ok(!maps.route2.walls.has(`${x},${y}`));});

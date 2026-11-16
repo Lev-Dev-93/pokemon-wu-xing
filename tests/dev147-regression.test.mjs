@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
+const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');const main=fs.readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
+import {pendingRiftRecovery} from '../src/story-guards.js';test('Unterbrochener Prolog wird korrekt fortgesetzt',()=>{assert.equal(pendingRiftRecovery({egg_received:true,rift_closed:false},'village'),'scene');assert.equal(pendingRiftRecovery({egg_received:true,rift_closed:false},'yard'),'run');assert.equal(pendingRiftRecovery({egg_received:true,rift_closed:true},'village'),'none')});

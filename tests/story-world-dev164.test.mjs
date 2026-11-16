@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {maps} from '../src/maps.js';test('Wegmarkierungen auf Route 2 sind frei',()=>{for(const [x,y] of [[7,3],[8,7],[7,12],[8,15]])assert.ok(!maps.route2.walls.has(`${x},${y}`));});

@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {npcs} from '../src/maps.js';test('Alte Dame verweist auf Celebi und Ruinen ohne vorgezogenen Bosskampf',()=>{const d=npcs.forest_elder_house.find(n=>n.id==='forest_elder').dialogue.join(' ');assert.match(d,/Celebi/);assert.match(d,/Ruinen/);assert.doesNotMatch(d,/Kampf wird|Entwicklungsschritt/);});

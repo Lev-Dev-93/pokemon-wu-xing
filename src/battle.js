@@ -12,7 +12,7 @@ function stageMult(stage){return stage>=0?(2+stage)/2:2/(2-stage)}
 function accuracyMultiplier(stage){return stage>=0?(3+stage)/3:3/(3-stage)}
 function hitChance(actor,target,move,weather=null){if(move.id===87&&weather==='rain')return 1;if(move.accuracy===null)return 1;const weatherEvasion=(weather==='sand'&&target.pokemon.abilityId===8)||(weather==='hail'&&target.pokemon.abilityId===81)?0.8:1;const diff=Math.max(-6,Math.min(6,(actor.stages.accuracy??0)-(target.stages.evasion??0)));return Math.min(1,(move.id===87&&weather==='sun'?0.5:move.accuracy/100)*accuracyMultiplier(diff)*weatherEvasion)}
 function speed(f,weather=null){const p=f.pokemon;const boost=(weather==='sun'&&p.abilityId===34)||(weather==='rain'&&p.abilityId===33)?2:1;return p.stats.speed*stageMult(f.stages.speed)*(p.status==='paralysis'?0.5:1)*boost}
-function damage(attacker,defender,move,rng,weather=null){if(!move.power||![2,3].includes(move.category))return 0;const special=move.category===3;const atk=special?'specialAttack':'attack',def=special?'specialDefense':'defense';const solarPower=special&&weather==='sun'&&attacker.pokemon.abilityId===94?1.5:1;const flashFire=move.typeId===10&&attacker.pokemon.abilityId===18&&attacker.volatile.flashFireBoost?1.5:1;const a=Math.max(1,attacker.pokemon.stats[atk]*stageMult(attacker.stages[atk])*solarPower);const d=Math.max(1,defender.pokemon.stats[def]*stageMult(defender.stages[def]));const types=speciesTypes(defender.pokemon.speciesId);const effectiveness=typeEffectiveness(move.typeId,types);if(effectiveness===0)return 0;const stab=speciesTypes(attacker.pokemon.speciesId).includes(move.typeId)?1.5:1;const burn=attacker.pokemon.status==='burn'&&!special?0.5:1;const variation=0.85+0.15*validRng(rng);const solarPenalty=move.id===76&&['rain','sand','hail'].includes(weather)?0.5:1;const weatherPower=weather==='sun'?(move.typeId===10?1.5:move.typeId===11?0.5:1):weather==='rain'?(move.typeId===11?1.5:move.typeId===10?0.5:1):1;return Math.max(1,Math.floor((Math.floor((2*attacker.pokemon.level/5+2)*move.power*a/d/50)+2)*stab*effectiveness*burn*variation*weatherPower*solarPenalty*flashFire))}
+function damage(attacker,defender,move,rng,weather=null){if(!move.power||![2,3].includes(move.category))return 0;const special=move.category===3;const atk=special?'specialAttack':'attack',def=special?'specialDefense':'defense';const solarPower=special&&weather==='sun'&&attacker.pokemon.abilityId===94?1.5:1;const flashFire=move.typeId===10&&attacker.pokemon.abilityId===18&&attacker.volatile.flashFireBoost?1.5:1;const guts=!special&&attacker.pokemon.abilityId===62&&attacker.pokemon.status&&attacker.pokemon.status!=='healthy'?1.5:1;const a=Math.max(1,attacker.pokemon.stats[atk]*stageMult(attacker.stages[atk])*solarPower*guts);const d=Math.max(1,defender.pokemon.stats[def]*stageMult(defender.stages[def]));const types=speciesTypes(defender.pokemon.speciesId);const effectiveness=typeEffectiveness(move.typeId,types);if(effectiveness===0||(move.typeId===5&&defender.pokemon.abilityId===26))return 0;const stab=speciesTypes(attacker.pokemon.speciesId).includes(move.typeId)?1.5:1;const burn=attacker.pokemon.status==='burn'&&!special&&attacker.pokemon.abilityId!==62?0.5:1;const variation=0.85+0.15*validRng(rng);const solarPenalty=move.id===76&&['rain','sand','hail'].includes(weather)?0.5:1;const heatproof=defender.pokemon.abilityId===85&&move.typeId===10?0.5:1;const thickFat=defender.pokemon.abilityId===47&&[10,15].includes(move.typeId)?0.5:1;const weatherPower=weather==='sun'?(move.typeId===10?1.5:move.typeId===11?0.5:1):weather==='rain'?(move.typeId===11?1.5:move.typeId===10?0.5:1):1;return Math.max(1,Math.floor((Math.floor((2*attacker.pokemon.level/5+2)*move.power*a/d/50)+2)*stab*effectiveness*burn*variation*weatherPower*solarPenalty*flashFire*thickFat*heatproof))}
 // Erste Stufenattacken: Änderung der Kampfstufen nur für die Dauer des Kampfes.
 // Weitere Statusattacken werden erst aktiviert, wenn ihre Effekte implementiert sind.
 // Rückstoß/Absorption beziehen sich auf tatsächlich verursachten Schaden.
@@ -122,6 +122,7 @@ function perform(battle,actor,target,index,rng,tag){const moveId=actor.pokemon.m
  // Typabsorption gilt für gegnerische Attacken, nicht für eigene Statusattacken.
  // Fähigkeit 11 H2O-Absorber, 10 Voltabsorber, 18 Feuerfänger (Gen IV).
  const absorbType={11:11,10:13,18:10}[target.pokemon.abilityId];
+ if(move.category!==1&&move.power>0&&move.typeId===5&&target.pokemon.abilityId===26){battle.log.push('Schwebe schützt vor der Bodenattacke!');return;}
  if(move.category!==1&&move.power>0&&absorbType===move.typeId){
   if(target.pokemon.abilityId===18){
    target.volatile.flashFireBoost=true;
@@ -181,7 +182,7 @@ function applyEndTurnStatus(battle){
  if(weather==='sand'||weather==='hail'){
   for(const [f,tag] of [[p,'Dein Pokémon'],[e,'Gegner']]){
    const types=speciesTypes(f.pokemon.speciesId);const immune=weather==='sand'?[5,6,9].some(t=>types.includes(t)):types.includes(15);
-   if(f.pokemon.currentHp>0&&!immune){const amount=Math.max(1,Math.floor(f.pokemon.stats.hp/16));f.pokemon.currentHp=Math.max(0,f.pokemon.currentHp-amount);battle.log.push(`${tag} erleidet ${amount} KP durch ${weather==='sand'?'Sandsturm':'Hagel'}.`)}
+   if(f.pokemon.currentHp>0&&!immune&&f.pokemon.abilityId!==98){const amount=Math.max(1,Math.floor(f.pokemon.stats.hp/16));f.pokemon.currentHp=Math.max(0,f.pokemon.currentHp-amount);battle.log.push(`${tag} erleidet ${amount} KP durch ${weather==='sand'?'Sandsturm':'Hagel'}.`)}
   }
  }
  // Wetterfähigkeiten werden vor dem Wetterablauf angewendet, damit die letzte Runde zählt.
@@ -209,7 +210,7 @@ function applyEndTurnStatus(battle){
  }
  if(battle.weatherTurns>0&&--battle.weatherTurns===0){battle.log.push('Das Wetter normalisiert sich.');battle.weather=null;}
  for(const [f,tag] of [[p,'Dein Pokémon'],[e,'Gegner']]){
-  if(f.pokemon.currentHp>0&&f.volatile.seeded){
+  if(f.pokemon.currentHp>0&&f.volatile.seeded&&f.pokemon.abilityId!==98){
    const drain=Math.min(f.pokemon.currentHp,Math.max(1,Math.floor(f.pokemon.stats.hp/8)));
    f.pokemon.currentHp-=drain;
    const recipient=f===p?e:p;
@@ -224,7 +225,7 @@ function applyEndTurnStatus(battle){
     if(heal>0){f.pokemon.currentHp+=heal;battle.log.push(`${tag} erhält ${heal} KP durch ${label} zurück.`)}
    }
   }
-  if(f.pokemon.currentHp>0&&['poison','burn'].includes(f.pokemon.status)){
+  if(f.pokemon.currentHp>0&&f.pokemon.abilityId!==98&&['poison','burn'].includes(f.pokemon.status)){
    const residual=Math.max(1,Math.floor(f.pokemon.stats.hp/8));
    f.pokemon.currentHp=Math.max(0,f.pokemon.currentHp-residual);
    battle.log.push(`${tag} erleidet ${residual} Statusschaden.`);

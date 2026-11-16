@@ -1,3 +1,53 @@
+## dev.172
+- Zugangs- und Regressionsprüfungen für Waldhütte, Storygrenzen und Kampfsperre.
+
+## dev.171
+- Engine-Schnittstelle zur unverbindlichen Prüfung der Begegnungsbereitschaft.
+
+## dev.170
+- Validierung von Kampfentwürfen und sichere Ablehnung unvollständiger Konfigurationen.
+
+## dev.169
+- Vorbedingungen für eine künftige Waldhütten-Begegnung als reine Abfrage.
+
+## dev.168
+- Story-Begegnungsmodell mit ausdrücklich unbestimmtem Gegner und ohne automatischen Kampfbeginn.
+
+## dev.167
+- Breitensuche prüft zusammenhängende Zugänglichkeit aller Portale in Beerendorf und Altem Wald.
+
+## dev.166
+- Dialog der alten Dame stimmungsvoll überarbeitet: Celebi-Erinnerung und Ruinenhinweis, kein vorgezogener Bosskampf.
+
+## dev.165
+- Alter Wald erhält Lichtungsdetails und atmosphärische Bodenakzente ohne neue Kollisionen.
+
+## dev.164
+- Dezente Wegmarkierungen entlang Route 2 auf ausschließlich begehbaren Feldern.
+
+## dev.163
+- Gemeinsame, gebäudefreie Wegdarstellung in Mu und Beerendorf; durchgehender Dorfweg zum südlichen Ausgang.
+
+# dev.157
+
+- Magieschild: indirekten Schaden durch Wetter, Status und Egelsamen verhindern.
+
+# dev.156
+
+- Hitzeschutz: Feuerschaden halbieren.
+
+# dev.155
+
+- Speckschicht: Feuer- und Eisschaden halbieren.
+
+# dev.154
+
+- Adrenalin: Angriffsschub bei Statusproblemen und keine Verbrennungs-Halbierung.
+
+# dev.153
+
+- Schwebe: Immunität gegen Bodenattacken.
+
 # dev.137
 
 - Belohnungsdialog bleibt bei fehlgeschlagener Auswahl offen; Identitätstest für Entwicklungen.
@@ -491,3 +541,48 @@ Menü startet in Teamübersicht, Tastaturfokus und Dialogschutz.
 
 ## dev.142
 - Bedienbarkeit und Tests für Inventar, Itemziele, AP und Entwicklungssteine.
+
+## dev.143
+- Escape schließt das Spielmenü nicht mehr; M öffnet und schließt es.
+
+## dev.144
+- Starter-Ei-Auswahl als scrollbares Overlay im Spielfenster, auch im Vollbild.
+
+## dev.145
+- Zentrale, testbare Story-Zugangssperren für Hof, Route 1 und Folgegebiete.
+
+## dev.146
+- Ladeprüfung verhindert unzulässige Folgegebiete vor dem Schlüpfen.
+
+## dev.147
+- Einheitliche Wiederaufnahme des offenen Dimensionsereignisses beim Laden/Fortsetzen.
+
+## dev.148 – UI und Stabilisierung
+- Kampfansicht direkt in den Spielrahmen integriert, identische Rahmenlogik für alle Overlays.
+
+## dev.149 – UI und Stabilisierung
+- Escape beendet den Kampf nicht mehr; Vollbild- und Spielsteuerung entkoppelt.
+
+## dev.150 – UI und Stabilisierung
+- Tagebuch im Spielfenster, mit Konfliktschutz für andere Fenster.
+
+## dev.151 – UI und Stabilisierung
+- Responsives Layout, große Schrift, Kontrast und Scrollbarkeit verbessert.
+
+## dev.152 – UI und Stabilisierung
+- Overlay-Wechsel und Tastaturfokus beim Schließen des Menüs abgesichert.
+
+## dev.158
+- Gemeinsame Gebäudegrundrisse für Startdorf und Beerendorf.
+
+## dev.159
+- Wegführung vor Eingängen und Marktstand korrigiert.
+
+## dev.160
+- Kollisionsflächen für Gebäude und dekorative Hindernisse vereinheitlicht.
+
+## dev.161
+- Erreichbarkeit aller Außentüren und Kartenübergänge automatisch geprüft.
+
+## dev.162
+- Weltlayout-Regressionsprüfungen und Dokumentation.

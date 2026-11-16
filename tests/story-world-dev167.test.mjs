@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {auditStoryRouteAccess} from '../src/maps.js';test('Beerendorf und Alter Wald: jedes Portal vom Nordeingang erreichbar',()=>assert.deepEqual(auditStoryRouteAccess(),[]));
