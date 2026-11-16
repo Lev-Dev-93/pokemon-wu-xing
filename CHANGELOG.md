@@ -1,3 +1,9 @@
+## dev.32 – Sichtbare NPCs und Reisevorräte; Flucht aus Trainerkämpfen
+
+- Kartenrenderer zeichnet nun alle NPCs aus den Kartendaten, darunter Händler und Trainer.
+- Reisevorräte werden als Truhe dargestellt.
+- Gewöhnliche Trainerkämpfe können ohne Belohnung aufgegeben werden.
+
 ## dev.30 – Teamverwaltung und Lager
 
 - Pokémon im Team an die erste Position setzen.

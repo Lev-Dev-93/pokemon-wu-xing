@@ -1,3 +1,4 @@
+import {npcs,objects} from './maps.js';
 // Pokémon Wu Xing: all visual primitives and tiles are original, generated locally.
 // One 32px world tile equals one engine cell. Renderer never mutates game state.
 const T=32;
@@ -71,6 +72,7 @@ for(const cell of map.walls){const [x,y]=cell.split(',').map(Number);if(map.id==
 if(map.id==='yard'){// raised garden tiles must stay visible above the ground
 R(c,8*32,8*32,3*32,2,'#e7c99b')}
 if(map.id==='ground'){hero(c,6*32,2*32,'down',0);hero(c,3*32,3*32,'left',0)}
-if(map.id==='village_home')drawNpc(c,7,3,'resident');if(map.id==='village'){for(const [id,x,y] of [['villager',8,6],['rival',14,7],['professor',17,5]])drawNpc(c,x,y,id)}
+for(const item of objects[map.id]||[]){if(item.id==='supply_box'){R(c,item.x*T+3,item.y*T+9,26,20,'#8d6135');R(c,item.x*T+3,item.y*T+9,26,5,'#e0b967');R(c,item.x*T+13,item.y*T+10,6,17,'#e8d19a')}else if(item.id==='village_sign'||item.id==='professor_sign'){R(c,item.x*T+7,item.y*T+6,18,20,'#a77a4c');R(c,item.x*T+5,item.y*T+3,22,13,'#e6c990')}}
+for(const npc of npcs[map.id]||[])drawNpc(c,npc.x,npc.y,npc.id);
 hero(c,state.x*32,state.y*32,state.facing,state.steps);
 }

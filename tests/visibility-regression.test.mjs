@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {npcs,objects} from '../src/maps.js';
+const art=readFileSync(new URL('../src/art.js',import.meta.url),'utf8');
+const main=readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
+test('Händler und Trainer stehen in den Kartendaten',()=>{assert.ok(npcs.village.some(n=>n.id==='merchant'));assert.ok(npcs.route1.some(n=>n.id==='route1_trainer'))});
+test('Reisevorräte sind in Dorfhaus-Kartendaten',()=>assert.ok(objects.village_home.some(o=>o.id==='supply_box')));
+test('Renderer zeichnet datengetrieben NPCs und Vorratstruhe',()=>{assert.match(art,/npcs\[map\.id\]/);assert.match(art,/drawNpc\(c,npc\.x,npc\.y,npc\.id\)/);assert.match(art,/item\.id==='supply_box'/)});
+test('Trainerflucht wird angeboten und ohne Belohnung beendet',()=>{assert.match(main,/\['wild','trainer'\]\.includes\(battleKind\)/);assert.match(main,/battleKind==='trainer'\)\{battle\.finished=true;battle\.winner='escape'/);assert.match(main,/finishTrainerBattle\(battle\.winner==='player'\)/)});
