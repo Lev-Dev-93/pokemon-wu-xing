@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {createPokemon} from '../src/team.js';import {evolutionPreservesIdentity} from '../src/progression.js';
+test('Entwicklungsidentität erfordert erhaltene AP',()=>{const before=createPokemon(1,{level:20});before.pp=before.moves.map(()=>1);const after=structuredClone(before);assert.equal(evolutionPreservesIdentity(before,after),true);after.pp[0]=2;assert.equal(evolutionPreservesIdentity(before,after),false);});

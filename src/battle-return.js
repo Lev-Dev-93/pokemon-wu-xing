@@ -1,0 +1,2 @@
+export function sameWorldPosition(origin,state){return Boolean(origin&&state&&typeof origin.mapId==='string'&&origin.mapId.length>0&&origin.mapId===state.mapId&&Number.isInteger(origin.x)&&Number.isInteger(origin.y)&&origin.x===state.x&&origin.y===state.y)}
+export function battleExitPermitted({finished,busy=false,pending=0,choices=0,forcedSwitch=false}={}){return Boolean(finished&&!busy&&Number.isInteger(pending)&&pending===0&&Number.isInteger(choices)&&choices===0&&!forcedSwitch)}

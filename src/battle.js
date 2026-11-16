@@ -1,3 +1,7 @@
+import {canContinueBattle} from './battle-turn-guards.js';
+import {typeBlocksStatus} from './battle-status-rules.js';
+import {tickWeather} from './battle-weather-cycle.js';
+import {residualDamage} from './battle-residual.js';
 import {effectiveWeather,preventsStatus,preventsConfusion,weatherSpeedMultiplier,weatherEvasionMultiplier,weatherDamageImmune,statusCureAbility,absorptionEffect,absorbsGround,offensiveAbilityMultiplier,defensiveAbilityMultiplier,ignoresBurnAttackPenalty,weatherAbilityHpFraction,ignoresIndirectDamage} from './ability-effects.js';
 import {applyEntryAbility} from './battle-entry.js';
 import {currentPp} from './pp-items.js';
@@ -65,7 +69,7 @@ function applyHitStage(battle,target,moveId,rng){
 }
 const STATUS_MOVES={86:{status:'paralysis'},92:{status:'poison'},95:{status:'sleep'},137:{status:'paralysis'},139:{status:'poison'}};
 const HIT_STATUS={40:{status:'poison',chance:0.3},52:{status:'burn',chance:0.1},53:{status:'burn',chance:0.1},7:{status:'burn',chance:0.1},9:{status:'paralysis',chance:0.1},34:{status:'paralysis',chance:0.3}};
-function applyCondition(battle,target,status,rng){if(target.pokemon.status&&target.pokemon.status!=='healthy'){battle.log.push('Das Ziel hat bereits ein Statusproblem.');return false}const types=speciesTypes(target.pokemon.speciesId,target.pokemon.formId);if((status==='poison'&&(types.includes(4)||types.includes(9)))||(status==='burn'&&types.includes(10))||(status==='freeze'&&types.includes(15))||(status==='paralysis'&&types.includes(13))){battle.log.push('Das Ziel ist gegen diesen Status immun.');return false}if(preventsStatus(target,status,activeWeather(battle))){battle.log.push('Die Fähigkeit des Ziels verhindert das Statusproblem.');return false}target.pokemon.status=status;if(status==='sleep')target.volatile.sleepTurns=2+Math.floor(validRng(rng)*2);battle.log.push(({poison:'Das Ziel wurde vergiftet!',burn:'Das Ziel wurde verbrannt!',paralysis:'Das Ziel wurde paralysiert!',sleep:'Das Ziel ist eingeschlafen!'})[status]);return true}
+function applyCondition(battle,target,status,rng){if(target.pokemon.status&&target.pokemon.status!=='healthy'){battle.log.push('Das Ziel hat bereits ein Statusproblem.');return false}const types=speciesTypes(target.pokemon.speciesId,target.pokemon.formId);if(typeBlocksStatus(status,types)){battle.log.push('Das Ziel ist gegen diesen Status immun.');return false}if(preventsStatus(target,status,activeWeather(battle))){battle.log.push('Die Fähigkeit des Ziels verhindert das Statusproblem.');return false}target.pokemon.status=status;if(status==='sleep')target.volatile.sleepTurns=2+Math.floor(validRng(rng)*2);battle.log.push(({poison:'Das Ziel wurde vergiftet!',burn:'Das Ziel wurde verbrannt!',paralysis:'Das Ziel wurde paralysiert!',sleep:'Das Ziel ist eingeschlafen!'})[status]);return true}
 const STAGE_MOVES={
   14:{self:true,changes:{attack:2}}, // Schwerttanz
   39:{self:false,changes:{defense:-1}}, // Rutenschlag
@@ -179,7 +183,7 @@ function applyEndTurnStatus(battle,rng=Math.random){
  if(weather==='sand'||weather==='hail'){
   for(const [f,tag] of [[p,'Dein Pokémon'],[e,'Gegner']]){
    const types=speciesTypes(f.pokemon.speciesId,f.pokemon.formId);const immune=weatherDamageImmune(f,weather,types);
-   if(f.pokemon.currentHp>0&&!immune){const amount=Math.max(1,Math.floor(f.pokemon.stats.hp/16));f.pokemon.currentHp=Math.max(0,f.pokemon.currentHp-amount);battle.log.push(`${tag} erleidet ${amount} KP durch ${weather==='sand'?'Sandsturm':'Hagel'}.`)}
+   if(f.pokemon.currentHp>0&&!immune){const amount=residualDamage(f.pokemon,16);f.pokemon.currentHp-=amount;battle.log.push(`${tag} erleidet ${amount} KP durch ${weather==='sand'?'Sandsturm':'Hagel'}.`)}
   }
  }
  // Wetterfähigkeiten werden vor dem Wetterablauf angewendet, damit die letzte Runde zählt.
@@ -195,7 +199,7 @@ function applyEndTurnStatus(battle,rng=Math.random){
    else {const lost=Math.min(amount,f.pokemon.currentHp);f.pokemon.currentHp-=lost;if(lost)battle.log.push(`${tag} verliert ${lost} KP durch ${hpEffect.name}.`)}
   }
  }
- if(battle.weatherTurns>0&&--battle.weatherTurns===0){battle.log.push('Das Wetter normalisiert sich.');battle.weather=null;}
+ if(tickWeather(battle))battle.log.push('Das Wetter normalisiert sich.');
  for(const [f,tag] of [[p,'Dein Pokémon'],[e,'Gegner']]){
   if(f.pokemon.currentHp>0&&f.volatile.seeded&&!ignoresIndirectDamage(f)){
    const drain=Math.min(f.pokemon.currentHp,Math.max(1,Math.floor(f.pokemon.stats.hp/8)));
@@ -213,8 +217,8 @@ function applyEndTurnStatus(battle,rng=Math.random){
    }
   }
   if(f.pokemon.currentHp>0&&!ignoresIndirectDamage(f)&&['poison','burn'].includes(f.pokemon.status)){
-   const residual=Math.max(1,Math.floor(f.pokemon.stats.hp/8));
-   f.pokemon.currentHp=Math.max(0,f.pokemon.currentHp-residual);
+   const residual=residualDamage(f.pokemon,8);
+   f.pokemon.currentHp-=residual;
    battle.log.push(`${tag} erleidet ${residual} Statusschaden.`);
   }
  }
@@ -225,7 +229,7 @@ function settleTurn(battle){
  if(p.pokemon.currentHp===0||e.pokemon.currentHp===0){battle.finished=true;battle.winner=p.pokemon.currentHp>0?'player':e.pokemon.currentHp>0?'opponent':'draw';battle.log.push('Kampf beendet.')}else battle.turn++;
  return battle;
 }
-export function playTurn(battle,playerMoveIndex,enemyMoveIndex,{rng=Math.random}={}){if(!battle||battle.finished)throw Error('Kampf bereits beendet oder ungültig');if(!Number.isInteger(playerMoveIndex)||!Number.isInteger(enemyMoveIndex))throw Error('Attackenindex erforderlich');const p=battle.player,e=battle.opponent;for(const [f,i] of [[p,playerMoveIndex],[e,enemyMoveIndex]])if(!f.pokemon.moves[i]||f.pp[i]<=0)throw Error('Attacke nicht verfügbar');
+export function playTurn(battle,playerMoveIndex,enemyMoveIndex,{rng=Math.random}={}){if(!canContinueBattle(battle))throw Error('Kampf bereits beendet oder ungültig');if(!Number.isInteger(playerMoveIndex)||!Number.isInteger(enemyMoveIndex))throw Error('Attackenindex erforderlich');const p=battle.player,e=battle.opponent;for(const [f,i] of [[p,playerMoveIndex],[e,enemyMoveIndex]])if(!f.pokemon.moves[i]||f.pp[i]<=0||!getMove(f.pokemon.moves[i]))throw Error('Attacke nicht verfügbar');
  battle.log=[];battle.turnEvents=[];p.volatile.flinched=false;e.volatile.flinched=false;p.volatile.actedThisTurn=false;e.volatile.actedThisTurn=false;p.volatile.protected=false;e.volatile.protected=false;p.volatile.enduring=false;e.volatile.enduring=false;const pm=getMove(p.pokemon.moves[p.volatile.solarChargeIndex??playerMoveIndex]),em=getMove(e.pokemon.moves[e.volatile.solarChargeIndex??enemyMoveIndex]);const first=pm.priority!==em.priority?(pm.priority>em.priority?'p':'e'):speed(p,activeWeather(battle))!==speed(e,activeWeather(battle))?(speed(p,activeWeather(battle))>speed(e,activeWeather(battle))?'p':'e'):(validRng(rng)<0.5?'p':'e');
  const turns=first==='p'?[[p,e,playerMoveIndex,'Dein Pokémon'],[e,p,enemyMoveIndex,'Gegner']]:[[e,p,enemyMoveIndex,'Gegner'],[p,e,playerMoveIndex,'Dein Pokémon']];for(const [a,d,i,tag] of turns){if(a.pokemon.currentHp===0||d.pokemon.currentHp===0)break;perform(battle,a,d,i,rng,tag);a.volatile.actedThisTurn=true;battle.turnEvents.push({actor:a===p?'player':'opponent',playerHp:p.pokemon.currentHp,opponentHp:e.pokemon.currentHp,playerPp:[...p.pp],opponentPp:[...e.pp],log:[...battle.log]})}
  applyEndTurnStatus(battle,rng);
@@ -234,8 +238,8 @@ export function playTurn(battle,playerMoveIndex,enemyMoveIndex,{rng=Math.random}
 
 // Der gegnerische Zug nach einem fehlgeschlagenen Fangversuch (ohne Spielerattacke).
 export function playEnemyOnlyTurn(battle,enemyMoveIndex,{rng=Math.random}={}){
- if(!battle||battle.finished)throw Error('Kampf bereits beendet oder ungültig');
- const e=battle.opponent,p=battle.player;if(!Number.isInteger(enemyMoveIndex)||!e.pokemon.moves[enemyMoveIndex]||e.pp[enemyMoveIndex]<=0)throw Error('Attacke nicht verfügbar');
+ if(!canContinueBattle(battle))throw Error('Kampf bereits beendet oder ungültig');
+ const e=battle.opponent,p=battle.player;if(!Number.isInteger(enemyMoveIndex)||!e.pokemon.moves[enemyMoveIndex]||e.pp[enemyMoveIndex]<=0||!getMove(e.pokemon.moves[enemyMoveIndex]))throw Error('Attacke nicht verfügbar');
  battle.log=[];battle.turnEvents=[];p.volatile.flinched=false;e.volatile.flinched=false;p.volatile.actedThisTurn=false;e.volatile.actedThisTurn=false;p.volatile.protected=false;e.volatile.protected=false;p.volatile.enduring=false;e.volatile.enduring=false;perform(battle,e,p,enemyMoveIndex,rng,'Gegner');
  battle.turnEvents.push({actor:'opponent',playerHp:p.pokemon.currentHp,opponentHp:e.pokemon.currentHp,playerPp:[...p.pp],opponentPp:[...e.pp],log:[...battle.log]});
  applyEndTurnStatus(battle,rng);

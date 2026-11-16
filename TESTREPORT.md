@@ -1,14 +1,7 @@
-## dev.313 – Karten-Neuprogrammierung
+# Testbericht dev.369
 
-629/629 automatisierte Tests bestanden. Neue autoritative Weggeometrie, keine berechneten Zusatzwege. Browser-Visualtest nicht durchgeführt.
-
-# dev.312 – Neuplanung der Außenwelt
-
-625/625 automatische Tests erfolgreich (npm test). JavaScript-Syntaxprüfung erfolgreich. Kein vollständiger Browser-Test.
-
-# Testbericht dev.311
-
-- 617/617 automatisierte Node-Tests bestanden.
-- Syntax aller src/*.js Dateien geprueft.
-- Vollstaendiger interaktiver Browsertest nicht ausgefuehrt.
-- Alte positionsgebundene Tests wurden auf die neuen Grundrisse angepasst; sechs neue Layout-Regressionstests ergaenzt.
+- Automatisierte Node-Tests: **688/688 bestanden**.
+- JavaScript-Syntaxprüfung: bestanden.
+- ZIP-Integritätsprüfung: bestanden.
+- Visueller Browsertest: **nicht durchgeführt**.
+- Integration: Welt, Portale, Erreichbarkeit und Storywege.

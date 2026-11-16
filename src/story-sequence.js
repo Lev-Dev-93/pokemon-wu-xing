@@ -1,5 +1,6 @@
 // Deterministic, save-safe prologue phase resolver. No new story flags are required.
 export function prologuePhase(flags,mapId){
+ if(!flags||typeof flags!=='object'||Array.isArray(flags))return 'before-egg';
  if(!flags?.egg_received)return 'before-egg';
  if(!flags.rift_closed)return mapId==='village'?'rift-scene':'rift-approach';
  if(!flags.rival_absol)return 'to-rival';
@@ -10,6 +11,7 @@ export function storyControlsLocked(flags,mapId){return ['rift-scene','rift-appr
 
 // Einheitliche Wiederaufnahmeentscheidung für Speicherstände im Prolog.
 export function prologueRecoveryAction(flags,mapId){
+ if(typeof mapId!=='string'||!mapId)return 'none';
  const phase=prologuePhase(flags,mapId);
  if(phase==='rift-scene')return 'rift-scene';
  if(phase==='rift-approach'&&['ground','yard'].includes(mapId))return 'rift-approach';

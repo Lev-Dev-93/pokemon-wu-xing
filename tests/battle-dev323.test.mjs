@@ -1,0 +1,1 @@
+import {test} from 'node:test';import {strict as assert} from 'node:assert';import {battleOutcome} from '../src/battle-flow.js';test('Gleichzeitiges K.O. führt zu Ersatzwahl oder Niederlage',()=>{assert.equal(battleOutcome('wild','draw',1,0),'switch');assert.equal(battleOutcome('wild','draw',0,0),'blackout')});

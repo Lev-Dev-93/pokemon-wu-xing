@@ -1,0 +1,1 @@
+import {test} from 'node:test';import {strict as assert} from 'node:assert';import {residualDamage} from '../src/battle-residual.js';test('Restschaden wird auf vorhandene KP begrenzt',()=>{assert.equal(residualDamage({stats:{hp:160},currentHp:3}),3);assert.equal(residualDamage({stats:{hp:160},currentHp:0}),0)});

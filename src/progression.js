@@ -11,14 +11,14 @@ export function levelProgress(p){requirePokemon(p);const current=experienceForLe
 export function awardExperience(p,amount){requirePokemon(p);if(!integer(amount,0,100000000))throw Error('Ungültige Erfahrungspunkte');const start=p.level;const base=experienceForLevel(p.speciesId,p.level);p.experience=Math.min(experienceForLevel(p.speciesId,MAX_LEVEL),Math.max(p.experience,base)+amount);const learned=[];const evolutionOptions=[];
  while(p.level<MAX_LEVEL&&p.experience>=experienceForLevel(p.speciesId,p.level+1)){
   const oldHp=p.stats.hp;p.level++;p.stats=calculateStats(p.formId??p.speciesId,p.level,p.ivs,p.evs);p.currentHp=Math.min(p.stats.hp,p.currentHp+(p.stats.hp-oldHp));
-  for(const x of getLearnset(p.speciesId).filter(x=>x.level===p.level))if(!p.moves.includes(x.moveId)&&!learned.includes(x.moveId))learned.push(x.moveId);
+  for(const x of getLearnset(p.speciesId,p.formId??null).filter(x=>x.level===p.level))if(!p.moves.includes(x.moveId)&&!learned.includes(x.moveId))learned.push(x.moveId);
   evolutionOptions.push(...getLevelEvolutionCandidates(p.speciesId,p.level).map(e=>({...e,atLevel:p.level})));
  }
  return {oldLevel:start,newLevel:p.level,levelsGained:p.level-start,learnableMoves:learned,evolutionOptions:[...new Map(evolutionOptions.map(e=>[e.to,e])).values()]};
 }
 export function learnMove(p,moveId,replaceIndex=null){requirePokemon(p);if(!integer(moveId,1,10000)||!getMove(moveId))throw Error('Unbekannte Attacke');if(p.moves.includes(moveId))return false;
  // Only level-up moves already reached may be learned here; item/tutor moves need a separate system.
- if(!getLearnset(p.speciesId).some(x=>x.moveId===moveId&&x.level<=p.level))throw Error('Attacke noch nicht erlernbar');
+ if(!getLearnset(p.speciesId,p.formId??null).some(x=>x.moveId===moveId&&x.level<=p.level))throw Error('Attacke noch nicht erlernbar');
  const pp=currentPp(p);if(p.moves.length<4){p.moves.push(moveId);p.pp=[...pp,getMove(moveId).pp];return true}
  if(!integer(replaceIndex,0,3))throw Error('Ersetzen einer Attacke erforderlich');p.moves[replaceIndex]=moveId;pp[replaceIndex]=getMove(moveId).pp;p.pp=pp;return true;
 }
@@ -73,7 +73,7 @@ export function evolveWithFriendship(p,target,timeOfDay='day'){
 // Level-up candidates are computed across the entire level range, including skipped levels.
 export function pendingLevelMoves(p,fromLevel,toLevel=p.level){
  requirePokemon(p);if(!integer(fromLevel,1,MAX_LEVEL)||!integer(toLevel,fromLevel,MAX_LEVEL)||toLevel>p.level)throw Error('Ungültiger Levelbereich');
- return [...new Set(getLearnset(p.speciesId).filter(x=>x.level>fromLevel&&x.level<=toLevel).map(x=>x.moveId))].filter(id=>!p.moves.includes(id));
+ return [...new Set(getLearnset(p.speciesId,p.formId??null).filter(x=>x.level>fromLevel&&x.level<=toLevel).map(x=>x.moveId))].filter(id=>!p.moves.includes(id));
 }
 
 // A pure preview lets the UI show the result without mutating the team.
@@ -89,7 +89,7 @@ export function levelUpSummary(p,amount){
 // Evolution never changes the unique individual attributes of a Pokémon.
 export function evolutionPreservesIdentity(before,after){
  if(!validatePokemon(before)||!validatePokemon(after))return false;
- return before.level===after.level&&before.experience===after.experience&&before.shiny===after.shiny&&before.friendship===after.friendship&&JSON.stringify(before.ivs)===JSON.stringify(after.ivs)&&JSON.stringify(before.evs)===JSON.stringify(after.evs)&&JSON.stringify(before.moves)===JSON.stringify(after.moves);
+ return before.level===after.level&&before.experience===after.experience&&before.shiny===after.shiny&&before.friendship===after.friendship&&JSON.stringify(before.ivs)===JSON.stringify(after.ivs)&&JSON.stringify(before.evs)===JSON.stringify(after.evs)&&JSON.stringify(before.moves)===JSON.stringify(after.moves)&&JSON.stringify(currentPp(before))===JSON.stringify(currentPp(after));
 }
 
 // Explicit context prevents weather/time/item evolutions from happening by accident.

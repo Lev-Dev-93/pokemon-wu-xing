@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {createPokemon,validatePokemon} from '../src/team.js';import {awardExperience} from '../src/progression.js';import {getLearnset} from '../src/moves.js';
+test('dev.351: Pokémon-Lernliste und Fortschritt bleiben gültig',()=>{const p=createPokemon(1,{level:5});assert.equal(validatePokemon(p),true);assert.ok(Array.isArray(getLearnset(p.speciesId,p.formId??null)));const r=awardExperience(p,0);assert.equal(r.levelsGained,0);});

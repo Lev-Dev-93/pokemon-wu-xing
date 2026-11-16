@@ -3,19 +3,28 @@ export function auditWorld(){
  const errors=[];
  for(const [id,map] of Object.entries(maps)){
   if(id!==map.id)errors.push(`${id}: Karten-ID stimmt nicht`);
+  if(!Array.isArray(map.portals)){errors.push(`${id}: Portalliste fehlt`);continue;}
   for(const portal of map.portals){
+   if(!portal||!Number.isInteger(portal.x)||!Number.isInteger(portal.y)||!Number.isInteger(portal.tx)||!Number.isInteger(portal.ty)||typeof portal.target!=='string'||!portal.target.trim()){
+    errors.push(`${id}: ungültige Portaldaten`);continue;
+   }
+
    const dest=maps[portal.target];
    if(!inside(map,portal.x,portal.y)||map.walls.has(`${portal.x},${portal.y}`))errors.push(`${id}: Portal nicht betretbar`);
    if(!dest){errors.push(`${id}: Zielkarte ${portal.target} fehlt`);continue;}
    if(!inside(dest,portal.tx,portal.ty)||dest.walls.has(`${portal.tx},${portal.ty}`)||(npcs[dest.id]||[]).some(n=>n.x===portal.tx&&n.y===portal.ty))errors.push(`${id}: Zielposition blockiert`);
-   if(!dest.portals.some(back=>back.target===id))errors.push(`${id}: kein Rückweg aus ${dest.id}`);
+   if(!Array.isArray(dest.portals)||!dest.portals.some(back=>back.target===id))errors.push(`${id}: kein Rückweg aus ${dest.id}`);
   }
+  const npcIds=new Set();
+  for(const npc of npcs[id]||[]){if(npcIds.has(npc.id))errors.push(`${id}: doppelte NPC-ID ${npc.id}`);npcIds.add(npc.id);}
   for(const npc of npcs[id]||[])if(!inside(map,npc.x,npc.y)||map.walls.has(`${npc.x},${npc.y}`))errors.push(`${id}: NPC ${npc.id} außerhalb oder in Wand`);
   for(const object of objects[id]||[])if(!inside(map,object.x,object.y))errors.push(`${id}: Objekt ${object.id} außerhalb`);
  }
  return errors;
 }
 export function reachableMaps(origin='bedroom'){
+ if(typeof origin!=='string'||!Object.hasOwn(maps,origin))return new Set();
+
  const seen=new Set([origin]),queue=[origin];
  for(let i=0;i<queue.length;i++)for(const portal of maps[queue[i]]?.portals||[])if(!seen.has(portal.target)){seen.add(portal.target);queue.push(portal.target);}
  return seen;

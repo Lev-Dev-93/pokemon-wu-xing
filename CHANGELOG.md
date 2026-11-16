@@ -1,3 +1,88 @@
+## dev.369 – Integration und Qualitätssicherung
+
+- Integrationsprüfung fasst Welt-, Portal-, Story- und Erreichbarkeitsaudits zusammen.
+- Neue automatisierte Regressionstests.
+
+## dev.368 – Integration und Qualitätssicherung
+
+- Weltprüfung erkennt mehrfach verwendete NPC-Kennungen innerhalb einer Karte.
+- Neue automatisierte Regressionstests.
+
+## dev.367 – Integration und Qualitätssicherung
+
+- Erreichbarkeitsanalyse startet nur auf vorhandenen Karten.
+- Neue automatisierte Regressionstests.
+
+## dev.366 – Integration und Qualitätssicherung
+
+- Portalprüfung verhindert Absturz bei fehlender Portal-Liste.
+- Neue automatisierte Regressionstests.
+
+## dev.365 – Integration und Qualitätssicherung
+
+- Portal-Daten werden auf ganzzahlige Koordinaten und gültige Zielkennungen geprüft.
+- Neue automatisierte Regressionstests.
+
+## dev.364
+- Richtungsabhängige Figur-Details.
+- Visueller Regressionstest hinzugefügt.
+
+## dev.363
+- Lichtakzente an PC und Vorratskiste.
+- Visueller Regressionstest hinzugefügt.
+
+## dev.362
+- Dezente Reflexe auf Wasserflächen.
+- Visueller Regressionstest hinzugefügt.
+
+## dev.361
+- Bodenschatten für NPCs.
+- Visueller Regressionstest hinzugefügt.
+
+## dev.360
+- Bodenschatten unter der Spielfigur.
+- Visueller Regressionstest hinzugefügt.
+
+## dev.354
+- Entwicklungsidentität prüft zusätzlich erhaltene Attacken-AP.
+- Regressionstest hinzugefügt.
+
+## dev.353
+- Nachholbare Attacken berücksichtigen die Lernliste der Regionalform.
+- Regressionstest hinzugefügt.
+
+## dev.352
+- Attackenlernen berücksichtigt die Lernliste der Regionalform.
+- Regressionstest hinzugefügt.
+
+## dev.351
+- Levelaufstieg berücksichtigt die Lernliste der Regionalform.
+- Regressionstest hinzugefügt.
+
+## dev.350
+- Doppelte Attacken in Team- und Speicherdaten ablehnen.
+- Regressionstest hinzugefügt.
+
+## dev.339
+- Kampfabschluss und Weltposition strenger prüfen.
+- Neuer Regressionstest.
+
+## dev.338
+- Statusimmunität nur mit gültigen Typ-IDs.
+- Neuer Regressionstest.
+
+## dev.337
+- Restschaden bei gebrochenen KP-Werten absichern.
+- Neuer Regressionstest.
+
+## dev.336
+- Wetterzyklus ohne aktives Wetter konsistent halten.
+- Neuer Regressionstest.
+
+## dev.335
+- Ungültige AP-Werte bei der Attackenwahl ausschließen.
+- Neuer Regressionstest.
+
 ## 1.0.0-dev.313
 - Einheitliche explizite Zwei-Kachel-Wegsegmente für alle sieben Außenkarten.
 - Keine automatisch erzeugten Zusatzwege mehr; Dorfplätze ausdrücklich definiert.
@@ -969,3 +1054,113 @@ Migration älterer Spielstände auf Schema 8.
 
 ## dev.311 – Neuorganisation der Karten
 Symmetrische Haeuser und Gaerten, neu zugeordnete Portale, neu gefuehrte Dorfwege und geordnete Waldbaumgruppen; neue Layout-Regressionstests.
+
+## 1.0.0-dev.314
+- Kampfablauf: validierter Einstieg.
+
+## 1.0.0-dev.315
+- Kampfablauf: einheitliche Attackenauswahl.
+
+## 1.0.0-dev.316
+- Kampfablauf: Wechselprüfung.
+
+## 1.0.0-dev.317
+- Kampfablauf: Ergebnisermittlung.
+
+## 1.0.0-dev.318
+- Kampfablauf: Positionsschutz bei Rückkehr.
+
+## 1.0.0-dev.319
+- Restschaden auf tatsächlich verbleibende KP begrenzt.
+
+## 1.0.0-dev.320
+- Wetterdauer in eigenständige, testbare Ablaufregel ausgelagert.
+
+## 1.0.0-dev.321
+- Status-Typimmunitäten zentralisiert.
+
+## 1.0.0-dev.322
+- Kampfrunden nach K.O. gesperrt.
+
+## 1.0.0-dev.323
+- Gleichzeitiges K.O. korrekt als Wechsel oder Niederlage aufgelöst.
+
+## dev.324
+- Erzwungener Wechsel bei gleichzeitigem K. o..
+
+## dev.325
+- Kampffortsetzung nach Doppel-KO bei Wechsel.
+
+## dev.326
+- Ungültige Einwechsel-Seiten werden abgefangen.
+
+## dev.327
+- Einwechsel-Wetter wird nur einmal ausgewertet.
+
+## dev.328
+- Reserve-KP beim Wiedereinwechseln mit Teamzustand synchronisieren.
+
+## dev.329
+- Attackenauswahl validiert jetzt auch bekannte Attackendaten, bevor der Zug den Kampfzustand verändert.
+
+## dev.330
+- Gegnerische Einzelzüge prüfen ebenfalls die Attackendaten vor jeglicher Zustandsänderung.
+
+## dev.331
+- Restschaden wird nur mit einer positiven ganzzahligen Schadensquote berechnet.
+
+## dev.332
+- Abgelaufenes Wetter wird auch bei einem inkonsistenten Wetterzähler bereinigt.
+
+## dev.333
+- Einwechsel-Fähigkeiten ignorieren fehlende oder kampfunfähige Gegenspieler sicher.
+
+## dev.334
+- Einwechsel-Fähigkeiten verarbeiten unvollständige Kampfzustände (fehlende Log- und Statusstufen-Container) sicher.
+- Bedroher normalisiert ungültige Angriffsstufen vor der Absenkung.
+- Drei zusätzliche Regressionstests.
+
+## dev.340
+- Story-Fortsetzung: zusätzliche Eingabevalidierung in src/story-sequence.js.
+
+## dev.341
+- Story-Fortsetzung: zusätzliche Eingabevalidierung in src/story-sequence.js.
+
+## dev.342
+- Story-Fortsetzung: zusätzliche Eingabevalidierung in src/story-itinerary.js.
+
+## dev.343
+- Story-Fortsetzung: zusätzliche Eingabevalidierung in src/story-itinerary.js.
+
+## dev.344
+- Story-Fortsetzung: zusätzliche Eingabevalidierung in src/story-guards.js.
+
+## dev.345
+- Weltvalidierung: portal coordinates; neue Prüffunktion validatePortalCoordinates mit Regressionstest.
+
+## dev.346
+- Weltvalidierung: portal targets; neue Prüffunktion validatePortalDestinations mit Regressionstest.
+
+## dev.347
+- Weltvalidierung: portal return routes; neue Prüffunktion validateReciprocalPortals mit Regressionstest.
+
+## dev.348
+- Weltvalidierung: npc placement; neue Prüffunktion validateActors mit Regressionstest.
+
+## dev.349
+- Weltvalidierung: interactable objects; neue Prüffunktion validateObjects mit Regressionstest.
+
+## dev.355
+- Inventar: Gegenstände ohne Mengenüberlauf hinzufügen.
+
+## dev.356
+- Inventar: ungültige Gegenstandskennungen beim Entfernen zurückweisen.
+
+## dev.357
+- Beutel: beschädigte Inventareinträge ohne Absturz ausblenden.
+
+## dev.358
+- Speicherstand: doppelte Inventarpositionen verhindern.
+
+## dev.359
+- Beutel: ungültige Zielteams bei Gegenstandsauswahl ignorieren.
