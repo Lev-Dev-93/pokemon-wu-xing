@@ -1223,3 +1223,11 @@ Menügestaltung, Team-KP-Farbstufen, Pokédex für vorhandene Arten, gespeichert
 - dev.400–404: Eigenständige Umgebungsanimation für Außenkarten und reproduzierbare Dekorationspositionen.
 - dev.405–409: Animationsphasen, Bewegungsreduktion, sichere Integration und fünf neue Tests.
 - Noch kein abgeschlossener Gesamtblock dev.400–449.
+
+## dev.452–460 – zusammengefasster Implementierungsblock
+NPC-Animationszyklus, prozedurale Kampf-Pixelsilhouetten und Cutscene-Overlays. Siehe RELEASE_DEV460.md.
+
+## dev.461 – Grafische Nacharbeit
+- Neun eigenständige handgezeichnete Pixelmasken für frühe und storyrelevante Pokémon statt einheitlicher prozeduraler Silhouetten.
+- Rückansichten und deterministischer Fallback für nicht abgedeckte Arten.
+- Drei neue automatisierte Grafiktests, insgesamt 744/744 erfolgreich.
