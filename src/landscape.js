@@ -1,15 +1,9 @@
-import {isSettlementRoad} from './path-geometry.js';
+import {isSettlementRoad,isPlannedRoad} from './path-geometry.js';
 import {isWalkway} from './route-layout.js';
 // Deterministic, purely visual biome details. No collision or encounter changes.
 export const landscapeBiomes = Object.freeze({route1:'meadow',brook:'riverside',waldrand:'edge',beerendorf:'hamlet',route2:'ancientForest'});
 // Sichtbare Hauptwege orientieren sich an den tatsächlichen Kartenübergängen.
-export function isTravelPath(mapId,x,y){
- if(mapId==='route1')return (y>=6&&y<=8)||(x>=6&&x<=9&&y>=6&&y<=12);
- if(mapId==='brook')return (y===6)||(x>=6&&x<=9&&y>=6&&y<=15);
- if(mapId==='waldrand')return (x>=6&&x<=9&&y<=8)||(y>=7&&y<=9&&x>=7);
- if(mapId==='route2')return (y===8)||(x>=6&&x<=9);
- return false;
-}
+export function isTravelPath(mapId,x,y){return isPlannedRoad(mapId,x,y);}
 export function terrainKind(mapId,x,y){
  if(mapId==='brook'&&y>=7&&y<=9)return x>=6&&x<=9?'bridge':'water';
  if(isSettlementRoad(mapId,x,y))return 'path';
@@ -27,7 +21,10 @@ export function landscapeDetails(map){
   if(biome==='meadow')type=seed<13?'wildflower':seed<24?'tuft':seed===40?'stone':null;
   if(biome==='riverside')type=seed<11?'reeds':seed<19?'pebbles':seed<25?'wildflower':null;
   if(biome==='edge')type=seed<20?'fern':seed<30?'tuft':seed<34?'mushroom':null;
-  if(biome==='hamlet')type=seed<37?'berryBush':seed<43?'wildflower':seed<46?'stone':null;
+  if(biome==='hamlet'){
+   const hedge=new Set(['1,2','14,2','1,11','14,11']);
+   type=hedge.has(`${x},${y}`)?'berryBush':(seed===17?'wildflower':null);
+  }
   if(biome==='ancientForest')type=seed<24?'fern':seed<37?'mushroom':seed<44?'roots':null;
   if(type)result.push({x,y,type});
  }
@@ -45,14 +42,14 @@ export function terrainEdgeMask(map,x,y){
 }
 
 export const villageDecorationPlan=Object.freeze({
- village:[[7,2,'flowerbed'],[15,2,'flowerbed'],[7,13,'bench'],[14,13,'bench']],
- professor_clearing:[[2,8,'researchPlot'],[12,9,'researchPlot'],[7,9,'flowerbed']],
- yard:[[1,5,'flowerbed'],[12,9,'flowerbed']]
+ village:[[7,3,'flowerbed'],[14,3,'flowerbed'],[7,11,'bench'],[14,11,'bench']],
+ professor_clearing:[[2,9,'researchPlot'],[13,9,'researchPlot'],[7,9,'flowerbed']],
+ yard:[[1,8,'flowerbed'],[14,8,'flowerbed']]
 });
 export function safeVillageDecorations(map){
  return (villageDecorationPlan[map.id]||[]).filter(([x,y])=>
  x>=0&&y>=0&&x<map.w&&y<map.h&&!map.walls.has(`${x},${y}`)&&
- !map.portals.some(p=>p.x===x&&p.y===y));
+ !isPlannedRoad(map.id,x,y)&&!map.portals.some(p=>p.x===x&&p.y===y));
 }
 
 export function brookBankCells(map){
@@ -74,8 +71,8 @@ export function woodlandAccentCells(map){
 
 export function berryVillageDecorations(map){
  if(map.id!=='beerendorf')return [];
- return [[5,2,'crate'],[10,2,'barrel'],[5,11,'basket'],[10,11,'basket']].filter(([x,y])=>
- !map.walls.has(`${x},${y}`)&&terrainKind(map.id,x,y)!=='path'&&!isWalkway(map,x,y)&&!map.portals.some(p=>p.x===x&&p.y===y));
+ return [[5,2,'crate'],[10,2,'barrel'],[5,10,'basket'],[10,10,'basket']].filter(([x,y])=>
+ !map.walls.has(`${x},${y}`)&&terrainKind(map.id,x,y)!=='path'&&!isWalkway(map,x,y)&&!isPlannedRoad(map.id,x,y)&&!map.portals.some(p=>p.x===x&&p.y===y));
 }
 
 export function landscapeObstacleCells(map){return landscapeDetails(map).filter(d=>d.type==='berryBush').map(({x,y})=>[x,y]);}

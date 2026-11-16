@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Engine} from '../src/engine.js';
 import {maps,npcs} from '../src/maps.js';
-for(const [x,y,target,flag] of [[4,6,'village_home','visitedVillageHome'],[17,6,'village_house_east',null],[4,12,'chapel',null],[17,12,'rival_house',null]]){
+for(const [x,y,target,flag] of [[4,5,'village_home','visitedVillageHome'],[17,5,'village_house_east',null],[4,12,'chapel',null],[17,12,'rival_house',null]]){
  test(`Dorfgebäude ${target}: Eingang, Rückweg und Speicherstand`,()=>{
   const e=new Engine();e.state.mapId='village';e.state.x=x;e.state.y=y+1;e.state.facing='up';
   assert.equal(e.step('up'),true);assert.equal(e.state.mapId,target);assert.deepEqual([e.state.x,e.state.y],[5,6]);

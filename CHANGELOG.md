@@ -1,3 +1,15 @@
+## 1.0.0-dev.313
+- Einheitliche explizite Zwei-Kachel-Wegsegmente für alle sieben Außenkarten.
+- Keine automatisch erzeugten Zusatzwege mehr; Dorfplätze ausdrücklich definiert.
+- Gebäude und Hindernisse aus gemeinsamen Kartendaten; Kartenübersicht beigefügt.
+- 629/629 Tests erfolgreich.
+
+## dev.312 – Vollständige Neuplanung der Außenkarten
+
+- Alle sieben Außenkarten und der Züchterhof mit neu abgestimmten Objektpositionen, geordneten Gebäudeparzellen, Wegachsen und spiegelnden Baumgruppen.
+- Hausportale, Rückkehrpunkte und Wege an die neuen Positionen angepasst.
+- Bestehende Weltgeografie, Story, Kämpfe und Innenräume beibehalten.
+
 ## dev.305
 
 - Gemeinsames Karten-Audit kontrolliert, dass Straßen, Hindernisse und Wegkanten auf allen Außenkarten konsistent bleiben.

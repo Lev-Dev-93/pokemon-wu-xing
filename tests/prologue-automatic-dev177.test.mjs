@@ -9,7 +9,7 @@ test('Professorenhaus liegt nicht auf Wegen, Eingang frei',()=>{
  const door=maps.professor_clearing.portals.find(p=>p.target==='professor_house');assert.deepEqual([door.x,door.y],[12,4]);assert.equal(maps.professor_clearing.walls.has('12,4'),false);
 });
 test('Marktstand verdeckt kein Wohnhaus und Händler ist erreichbar',()=>{
- const home=outdoorBuildings.village.find(b=>b.x===16&&b.y===4);
+ const home=outdoorBuildings.village.find(b=>b.x===16&&b.y===3);
  assert.ok(home);const merchant=npcs.village.find(n=>n.id==='merchant');assert.deepEqual([merchant.x,merchant.y],[15,11]);
  assert.ok(findStoryWalk('village',[10,7],[15,12]));
 });

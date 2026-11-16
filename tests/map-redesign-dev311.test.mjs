@@ -12,7 +12,7 @@ for(const id of ['village','professor_clearing','beerendorf'])test(`${id}: neue 
  }
 });
 test('Mu: symmetrische Hausreihen mit freien Achsen',()=>{
- const b=outdoorBuildings.village;assert.deepEqual(b.map(h=>h.y),[4,4,10,10]);
+ const b=outdoorBuildings.village;assert.deepEqual(b.map(h=>h.y),[3,3,10,10]);
  for(let x=0;x<22;x++)assert.ok(!maps.village.walls.has(`${x},7`));
 });
 test('Alter Wald: symmetrische Baumsaeume ohne Baeume auf der Durchgangsstrasse',()=>{
