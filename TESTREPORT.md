@@ -1,16 +1,6 @@
-# dev.310 – Testbericht
+# Testbericht dev.311
 
-Automatische Tests: bestanden.
-
-  ...
-1..611
-# tests 611
-# suites 0
-# pass 611
-# fail 0
-# cancelled 0
-# skipped 0
-# todo 0
-# duration_ms 5339.798137
-
-JavaScript-Syntax: geprüft. Browserdurchlauf: nicht durchgeführt.
+- 617/617 automatisierte Node-Tests bestanden.
+- Syntax aller src/*.js Dateien geprueft.
+- Vollstaendiger interaktiver Browsertest nicht ausgefuehrt.
+- Alte positionsgebundene Tests wurden auf die neuen Grundrisse angepasst; sechs neue Layout-Regressionstests ergaenzt.

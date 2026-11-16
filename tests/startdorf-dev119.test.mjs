@@ -15,8 +15,8 @@ test('Startdorf hat vier Gebäude nach Marktstand-Umbau mit jeweils einem Rückw
   assert.ok(maps[door.target].portals.some(p=>p.target==='village'));
  }
 });
-test('Brunnen steht auf gesperrten Kacheln, aber der Storyweg bleibt frei',()=>{
- for(const x of [10,11])assert.equal(maps.village.walls.has(`${x},9`),true);
+test('Zentraler Dorfplatz bleibt frei und Storyweg begehbar',()=>{
+ for(const x of [10,11])assert.equal(maps.village.walls.has(`${x},9`),false);
  for(const [x,y] of [[10,1],[10,3],[10,5],[10,7],[11,7]])assert.equal(maps.village.walls.has(`${x},${y}`),false);
 });
 test('Heilungs-NPC im Dorfhaus entfernt, Adoptivmutter heilt im eigenen Haus',()=>{

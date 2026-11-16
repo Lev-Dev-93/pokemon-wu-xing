@@ -2,9 +2,9 @@ import {isVillageRoad,isResearchRoad,isBerryRoad} from './path-geometry.js';
 import {landscapeObstacleCells,auditSafeVillageDecorations} from './landscape.js';
 // Gemeinsame Weltgrundrisse: Darstellung und Kollision verwenden dieselben Rechtecke.
 export const outdoorBuildings={
- village:[{x:4,y:5,w:3,h:2,color:'#9c705c',label:'HAUS'},{x:17,y:6,w:3,h:2,color:'#a67b64',label:'HAUS'},{x:4,y:9,w:3,h:2,color:'#8b89a3',label:'KAPELLE'},{x:16,y:10,w:3,h:2,color:'#9a6e55',label:'RIVALE'}],
- professor_clearing:[{x:4,y:2,w:4,h:2,color:'#557c8b',label:'LABOR'},{x:10,y:2,w:4,h:2,color:'#977357',label:'PROF.'}],
- beerendorf:[{x:3,y:3,w:2,h:2},{x:13,y:3,w:2,h:2},{x:2,y:11,w:2,h:2},{x:12,y:11,w:2,h:2}]
+ village:[{x:3,y:4,w:3,h:2,color:'#9c705c',label:'HAUS'},{x:16,y:4,w:3,h:2,color:'#a67b64',label:'HAUS'},{x:3,y:10,w:3,h:2,color:'#8b89a3',label:'KAPELLE'},{x:16,y:10,w:3,h:2,color:'#9a6e55',label:'RIVALE'}],
+ professor_clearing:[{x:2,y:2,w:4,h:2,color:'#557c8b',label:'LABOR'},{x:10,y:2,w:4,h:2,color:'#977357',label:'PROF.'}],
+ beerendorf:[{x:2,y:3,w:3,h:2},{x:11,y:3,w:3,h:2},{x:2,y:11,w:3,h:2},{x:11,y:11,w:3,h:2}]
 };
 // Wege werden nur auf begehbaren Feldern gezeichnet; Gebäude bleiben frei.
 export const isVillagePath=isVillageRoad;
@@ -17,37 +17,40 @@ const p=(x,y,target,tx,ty,kind='door')=>({x,y,target,tx,ty,kind});
 export const forestTreeCells=(id,w=16,h=18)=>{
  const cells=[];
  if(id==='route2'){
-  for(const [sx,sy,bw,bh] of [[0,0,3,4],[12,0,4,4],[0,5,4,4],[12,5,4,4],[0,10,4,4],[12,10,4,4],[0,15,4,3],[12,15,4,3]])
-   for(let y=sy;y<sy+bh;y++)for(let x=sx;x<sx+bw;x++)if(x<6||x>9)cells.push([x,y]);
-  for(const [x,y] of [[4,2],[5,6],[10,3],[11,7],[4,13],[10,15]])cells.push([x,y]);
+  // Symmetrische Waldsaeume: freier Ost-West-Weg auf y=8, freie Huettenzufahrt.
+  for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+   if((x<=2||x>=13)&&y!==8&&y!==9&&y!==10)cells.push([x,y]);
+  }
+  for(const [x,y] of [[4,3],[5,3],[10,3],[11,3],[4,14],[5,14],[10,14],[11,14]])cells.push([x,y]);
+ }else if(id==='waldrand'){
+  for(const [x,y] of [[2,2],[3,2],[12,2],[13,2],[2,5],[3,5],[12,5],[13,5],[2,12],[3,12],[12,12],[13,12],[2,15],[3,15],[12,15],[13,15]])cells.push([x,y]);
  }
- if(id==='waldrand')for(const cell of [[1,2],[4,4],[12,2],[14,5],[2,9],[4,12],[12,10],[14,14],[1,16],[11,16],[1,3],[2,6],[13,3],[14,7],[1,14],[13,15]])cells.push(cell);
- return cells.filter(([x,y])=>x>=0&&y>=0&&x<w&&y<h&&!(id==='route2'&&y===8&&x<=4));
+ return cells.filter(([x,y])=>x>=0&&y>=0&&x<w&&y<h);
 };
 export const maps={
  bedroom:room('bedroom','Schlafzimmer',10,8,[[1,1],[2,1],[1,2],[7,1],[8,1]], [p(5,7,'ground',10,2,'stairs')]),
  ground:room('ground','Erdgeschoss',12,9,[[1,1],[2,1],[8,1],[9,1],[2,5],[3,5]], [p(10,1,'bedroom',5,6,'stairs'),p(5,8,'yard',7,2)]),
  yard:room('yard','Züchterhof',16,12,[[2,3],[3,3],[4,3],...Array.from({length:6},(_,i)=>[9+i,3]),...Array.from({length:6},(_,i)=>[9+i,7]).filter(([x])=>x!==10),...Array.from({length:3},(_,i)=>[9,4+i]),...Array.from({length:3},(_,i)=>[14,4+i]),...[ [2,8],[3,8],[4,8],[2,9],[3,9],[4,9] ]], [p(7,1,'ground',5,7),p(7,11,'village',10,1,'path')],{'8,8':1,'9,8':1,'10,8':1,'8,9':1,'9,9':1,'10,9':1},[[7,8],[7,9]]),
  village:room('village','Startdorf · Mu',22,16,
-  [...buildingCells('village'),[10,9],[11,9],[16,8],[18,8],...Array.from({length:22},(_,x)=>[x,15])],
-  [p(10,0,'yard',7,10,'path'),p(0,7,'professor_clearing',14,7,'path'),p(21,7,'route1',1,8,'path'),p(5,7,'village_home',5,6),p(20,7,'village_house_east',5,6),p(5,11,'chapel',5,6),p(19,11,'rival_house',5,6)]),
- professor_clearing:room('professor_clearing','Forschungsplatz · Westlich von Mu',16,12,buildingCells('professor_clearing'),[p(15,7,'village',1,7,'path'),p(6,4,'study',5,6),p(11,4,'professor_house',5,6)]),
- village_home:room('village_home','Wohnhaus · Mu',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',5,8)]),
- village_house_east:room('village_house_east','Wohnhaus am Dorfplatz',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',20,8)]),
- professor_house:room('professor_house','Haus des Professors',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'professor_clearing',11,5)]),
- chapel:room('chapel','Kleine Kapelle · Mu',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',5,12)]),
- rival_house:room('rival_house','Haus des Rivalen',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',19,12)]),
+  [...buildingCells('village'),...Array.from({length:22},(_,x)=>[x,15])],
+  [p(10,0,'yard',7,10,'path'),p(0,7,'professor_clearing',14,7,'path'),p(21,7,'route1',1,8,'path'),p(4,6,'village_home',5,6),p(17,6,'village_house_east',5,6),p(4,12,'chapel',5,6),p(17,12,'rival_house',5,6)]),
+ professor_clearing:room('professor_clearing','Forschungsplatz · Westlich von Mu',16,12,buildingCells('professor_clearing'),[p(15,7,'village',1,7,'path'),p(4,4,'study',5,6),p(12,4,'professor_house',5,6)]),
+ village_home:room('village_home','Wohnhaus · Mu',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',4,7)]),
+ village_house_east:room('village_house_east','Wohnhaus am Dorfplatz',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',17,7)]),
+ professor_house:room('professor_house','Haus des Professors',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'professor_clearing',12,5)]),
+ chapel:room('chapel','Kleine Kapelle · Mu',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',4,13)]),
+ rival_house:room('rival_house','Haus des Rivalen',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',17,13)]),
  route1:room('route1','Route 1 · Mu',16,18,[[2,4],[3,4],[12,6],[13,6],[4,12],[5,12],[11,14],[12,14]], [p(0,8,'village',20,7,'path'),p(15,6,'brook',1,6,'path')]),
  brook:room('brook','Bachübergang · Mu',16,16,Array.from({length:16},(_,y)=>y).flatMap(y=>y>=7&&y<=9?Array.from({length:16},(_,x)=>x).filter(x=>x<6||x>9).map(x=>[x,y]):[]),[p(0,6,'route1',14,6,'path'),p(7,15,'waldrand',7,1,'path')]),
- beerendorf:room('beerendorf','Beerendorf · Mu',16,16,buildingCells('beerendorf'),[p(0,7,'waldrand',14,8,'path'),p(15,7,'route2',1,8,'path'),p(4,5,'beerendorf_werkstatt',5,6),p(14,5,'beerendorf_haus',5,6),p(3,13,'beerendorf_haus2',5,6),p(13,13,'beerendorf_wohnhaus',5,6)]),
+ beerendorf:room('beerendorf','Beerendorf · Mu',16,16,buildingCells('beerendorf'),[p(0,7,'waldrand',14,8,'path'),p(15,7,'route2',1,8,'path'),p(3,5,'beerendorf_werkstatt',5,6),p(12,5,'beerendorf_haus',5,6),p(3,13,'beerendorf_haus2',5,6),p(12,13,'beerendorf_wohnhaus',5,6)]),
  beerendorf_haus2:room('beerendorf_haus2','Beeren- und Kräuterladen · Beerendorf',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'beerendorf',3,13)]),
- beerendorf_haus:room('beerendorf_haus','Haus der Kräuterhexe · Beerendorf',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'beerendorf',14,6)]),
- beerendorf_wohnhaus:room('beerendorf_wohnhaus','Wohnhaus · Beerendorf',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'beerendorf',13,13)]),
- beerendorf_werkstatt:room('beerendorf_werkstatt','Werkstatt · Beerendorf',11,8,[[1,1],[2,1],[7,1],[8,1],[2,4],[3,4]],[p(5,7,'beerendorf',4,6)]),
- route2:room('route2','Route 2 · Alter Wald',16,18,[...forestTreeCells('route2').filter(([x,y])=>!(y===8&&x<=4)),[10,9],[11,9],[10,10],[2,5],[3,5],[12,6],[13,6],[3,12],[4,12],[11,14],[12,14]],[p(0,8,'beerendorf',14,7,'path'),p(11,10,'forest_elder_house',5,6)]),
- waldrand:room('waldrand','Waldrand · Mu',16,18,[...forestTreeCells('waldrand'),[2,5],[3,5],[12,6],[13,6],[3,12],[4,12],[11,14],[12,14]],[p(7,0,'brook',7,14,'path'),p(15,8,'beerendorf',1,7,'path')]),
+ beerendorf_haus:room('beerendorf_haus','Haus der Kräuterhexe · Beerendorf',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'beerendorf',12,6)]),
+ beerendorf_wohnhaus:room('beerendorf_wohnhaus','Wohnhaus · Beerendorf',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'beerendorf',12,13)]),
+ beerendorf_werkstatt:room('beerendorf_werkstatt','Werkstatt · Beerendorf',11,8,[[1,1],[2,1],[7,1],[8,1],[2,4],[3,4]],[p(5,7,'beerendorf',3,6)]),
+ route2:room('route2','Route 2 · Alter Wald',16,18,[...forestTreeCells('route2'),[10,9],[11,9],[10,10]],[p(0,8,'beerendorf',14,7,'path'),p(11,10,'forest_elder_house',5,6)]),
+ waldrand:room('waldrand','Waldrand · Mu',16,18,forestTreeCells('waldrand'),[p(7,0,'brook',7,14,'path'),p(15,8,'beerendorf',1,7,'path')]),
  forest_elder_house:room('forest_elder_house','Waldhütte der alten Dame',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'route2',11,11)]),
- study:room('study','Forschungslabor des Professors',11,8,[[1,1],[2,1],[7,1],[8,1],[2,4],[3,4]],[p(5,7,'professor_clearing',6,5)])
+ study:room('study','Forschungslabor des Professors',11,8,[[1,1],[2,1],[7,1],[8,1],[2,4],[3,4]],[p(5,7,'professor_clearing',4,5)])
 };
 // Busch-Kollision: sichtbare Beerenbüsche blockieren wie Bäume, Portale und Ankunftsfelder bleiben frei.
 const arrivalCells=new Map();

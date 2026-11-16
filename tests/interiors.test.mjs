@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Engine} from '../src/engine.js';
 import {maps,npcs} from '../src/maps.js';
-for(const [x,y,target,flag] of [[5,7,'village_home','visitedVillageHome'],[20,7,'village_house_east',null],[5,11,'chapel',null],[19,11,'rival_house',null]]){
+for(const [x,y,target,flag] of [[4,6,'village_home','visitedVillageHome'],[17,6,'village_house_east',null],[4,12,'chapel',null],[17,12,'rival_house',null]]){
  test(`Dorfgebäude ${target}: Eingang, Rückweg und Speicherstand`,()=>{
   const e=new Engine();e.state.mapId='village';e.state.x=x;e.state.y=y+1;e.state.facing='up';
   assert.equal(e.step('up'),true);assert.equal(e.state.mapId,target);assert.deepEqual([e.state.x,e.state.y],[5,6]);
@@ -15,4 +15,4 @@ test('Ehemaliger Heilungs-NPC und Pokémon-PC im Dorfhaus entfernt',()=>{const e
 test('Professor und Rivale sprechen nach dem Ei anders, ohne Storyflags auszulösen',()=>{const e=new Engine();e.state.flags.egg_received=true;for(const n of [npcs.study.find(n=>n.id==='professor'),npcs.village.find(n=>n.id==='rival')])assert.match(e.dialogueFor(n).join(' '),/Ei/);assert.equal(e.state.flags.rift_closed,false)});
 test('Alle Innenraum-Portale landen auf freien Feldern',()=>{for(const m of Object.values(maps))for(const portal of m.portals){const d=maps[portal.target];assert.ok(d);assert.equal(d.walls.has(`${portal.tx},${portal.ty}`),false);assert.equal((npcs[d.id]||[]).some(n=>n.x===portal.tx&&n.y===portal.ty),false)}});
 
-for(const [x,y,target] of [[6,4,'study'],[11,4,'professor_house']])test(`Westliche Professorengebäude ${target}`,()=>{const e=new Engine();e.state.mapId='professor_clearing';e.state.x=x;e.state.y=y+1;assert.equal(e.step('up'),true);assert.equal(e.state.mapId,target);e.state.y=6;assert.equal(e.step('down'),true);assert.equal(e.state.mapId,'professor_clearing');});
+for(const [x,y,target] of [[4,4,'study'],[12,4,'professor_house']])test(`Westliche Professorengebäude ${target}`,()=>{const e=new Engine();e.state.mapId='professor_clearing';e.state.x=x;e.state.y=y+1;assert.equal(e.step('up'),true);assert.equal(e.state.mapId,target);e.state.y=6;assert.equal(e.step('down'),true);assert.equal(e.state.mapId,'professor_clearing');});

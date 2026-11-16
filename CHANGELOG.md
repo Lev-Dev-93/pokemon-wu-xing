@@ -954,3 +954,6 @@ Migration älterer Spielstände auf Schema 8.
 
 ## dev.310
 - Vollständige Validierung der Storyschritte und Kartenübergänge vor dem Start.
+
+## dev.311 – Neuorganisation der Karten
+Symmetrische Haeuser und Gaerten, neu zugeordnete Portale, neu gefuehrte Dorfwege und geordnete Waldbaumgruppen; neue Layout-Regressionstests.
