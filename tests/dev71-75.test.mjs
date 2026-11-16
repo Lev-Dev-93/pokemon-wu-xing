@@ -8,4 +8,4 @@ test('Gewichte müssen nicht genau 100 ergeben',()=>{const p=chooseWildPokemon((
 test('Ungültige Begegnungsdaten werden abgelehnt',()=>{assert.throws(()=>chooseWildPokemon(()=>0,[{speciesId:494,weight:1}]));assert.throws(()=>encounterTable('route1','dusk'));});
 test('Keine Wildkämpfe auf Brücke',()=>assert.equal(rollEncounter({mapId:'brook',x:3,y:6,hatched:true,hasUsablePokemon:true,rng:()=>0}),null));
 test('Trainer hat ein Zweierteam',()=>{const e=new Engine();e.state.mapId='route1';e.state.flags.route1_hatched=true;e.state.team=[{currentHp:10}];assert.equal(e.beginTrainerChallenge(),true);assert.equal(e.pendingTrainer.team.length,2);});
-test('Waldpfad hat zusätzliche Interaktionen',()=>{assert.ok(npcs.waldrand.some(n=>n.id==='route2_birdwatcher'));assert.ok(objects.waldrand.some(n=>n.id==='route2_moss'));});
+test('Waldrand ohne nicht-storyrelevante NPCs',()=>{assert.deepEqual(npcs.waldrand,[]);assert.deepEqual(objects.waldrand,[]);});

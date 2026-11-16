@@ -1,3 +1,53 @@
+## dev.117 – Stabilisierung und Testvorbereitung
+
+## dev.116 – Stabilisierung und Testvorbereitung
+
+## dev.115 – Stabilisierung und Testvorbereitung
+
+## dev.114 – Stabilisierung und Testvorbereitung
+
+## dev.113 – Stabilisierung und Testvorbereitung
+
+## dev.112 – Regressionsprüfung ohne Fundstellen, Items und Nebenquests
+
+## dev.111 – Bestehende Funktions-NPCs und Storymechanik abgesichert
+
+## dev.110 – Nicht storyrelevante NPCs und Untersuchungsobjekte entfernt
+
+## dev.109 – Startdorf Mu gestalterisch verbessert
+
+## dev.108 – Züchterhaus, Schlafzimmer und Hof gestalterisch verbessert
+
+## dev.107 – Gebäudeübergänge und Regressionstests
+
+## dev.106 – Dorfplatz und Innenraumdetails
+
+## dev.105 – Zweites Wohnhaus und Dorfbewohner
+
+## dev.104 – Begehbares Wohnhaus im Beerendorf
+
+## dev.103 – Werkstatt als eigenständiger Innenraum mit passender Einrichtung
+
+## dev.102 – Landschaftsgestaltung
+Alter Wald mit dichterer Vegetation und Kartentests.
+
+## dev.101 – Landschaftsgestaltung
+Beerendorf mit Beerenbeeten und Dorfdetails.
+
+## dev.100 – Landschaftsgestaltung
+Waldrand mit stärkerer Vegetation.
+
+## dev.99 – Landschaftsgestaltung
+Bach und Grasland mit zusätzlichen Ufer- und Wasserdetails.
+
+## dev.98 – Landschaftsgestaltung
+Deterministische Biome und Landschaftsdetails ohne Gameplay-Eingriff.
+
+## dev.97 – Routenfolge und Werkstatt-Zugang korrigiert
+- Route 1 → Bach → Waldrand → Beerendorf → Alter Wald.
+- Werkstatt-Eingang auf sichtbare, begehbare Tür (4,5) verlegt; Beerendorf hat eigene Kartengrafik.
+- Keine Herstellungsfunktion festgelegt.
+
 ## dev.96 – Neue Quest und Stabilisierung
 
 ## dev.95 – Alte Dame als Dialog-Platzhalter

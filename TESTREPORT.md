@@ -1,5 +1,6 @@
-# dev.96 Testbericht
+# Testbericht dev.117
 
-377 von 377 Tests bestanden, 0 fehlgeschlagen.
-JavaScript-Syntax geprüft.
-Browser-Praxistest steht aus.
+- 400 automatisierte Tests bestanden.
+- Syntaxprüfung aller src/*.js bestanden.
+- ZIP-Integrität geprüft.
+- Manueller Browsertest noch ausstehend.

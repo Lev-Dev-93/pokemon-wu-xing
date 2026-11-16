@@ -1,3 +1,33 @@
+## dev.117 – Stabilisierung und Testvorbereitung
+
+## dev.116 – Stabilisierung und Testvorbereitung
+
+## dev.115 – Stabilisierung und Testvorbereitung
+
+## dev.114 – Stabilisierung und Testvorbereitung
+
+## dev.113 – Stabilisierung und Testvorbereitung
+
+## dev.112 – Regressionsprüfung ohne Fundstellen, Items und Nebenquests
+
+## dev.111 – Bestehende Funktions-NPCs und Storymechanik abgesichert
+
+## dev.110 – Nicht storyrelevante NPCs und Untersuchungsobjekte entfernt
+
+## dev.109 – Startdorf Mu gestalterisch verbessert
+
+## dev.108 – Züchterhaus, Schlafzimmer und Hof gestalterisch verbessert
+
+## dev.107 – Gebäudeübergänge und Regressionstests
+
+## dev.106 – Dorfplatz und Innenraumdetails
+
+## dev.105 – Zweites Wohnhaus und Dorfbewohner
+
+## dev.104 – Begehbares Wohnhaus im Beerendorf
+
+## dev.103 – Werkstatt als eigenständiger Innenraum mit passender Einrichtung
+
 
 Aktueller Entwicklungsstand: dev.78. Pokémon nur Nationaldex #001–493; Attacken und Fähigkeiten perspektivisch aus allen Generationen.
 ## dev.58 – Korrektur der Giratina-Sequenz
@@ -110,7 +140,7 @@ Ein Händler im Startdorf verkauft Pokébälle (40 Pokédollar) und Tränke (60 
 - Das Starter-Ei bleibt ungeschlüpft; Route 1 folgt später.
 - Die Kampfdemonstration ist derzeit eine geskriptete Sequenz, kein vollwertiger NPC-Kampf.
 
-# Pokémon Wu Xing – 1.0.0-dev.17
+# Pokémon Wu Xing – 1.0.0-dev.102
 
 Statische Browser-Testversion für GitHub Pages. Lade **alle Dateien und Ordner aus diesem ZIP** in das Hauptverzeichnis deines Repositories; `index.html` liegt im Root.
 

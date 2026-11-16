@@ -15,7 +15,7 @@ test('Dorf-Portal und Spawn sind begehbar und NPC-frei',()=>{
  assert.equal(npcs.village.some(n=>n.x===10&&n.y===1),false);
 });
 test('Dorfbewohnerin, Kindheitsfreund und Professor sind ansprechbar und speichern Flags',()=>{
- for(const [id,flag] of [['villager','spokenToVillager'],['rival','spokenToRival'],['professor','spokenToProfessor']]){
+ for(const [id,flag] of [['rival','spokenToRival'],['professor','spokenToProfessor']]){
   const n=npcs.village.find(n=>n.id===id);const e=new Engine();e.state.mapId='village';e.state.x=n.x;e.state.y=n.y+1;e.state.facing='up';
   assert.equal(e.interact(),true);assert.equal(e.mode,'dialogue');
   while(e.mode==='dialogue')e.interact();assert.equal(e.state.flags[flag],true);

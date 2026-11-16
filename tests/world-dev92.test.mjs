@@ -1,4 +1,4 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {maps,npcs,objects} from '../src/maps.js';import {Engine,migrateLegacyMap} from '../src/engine.js';
-test('Routenfolge und Portale',()=>{assert.equal(maps.brook.portals.find(p=>p.y===15).target,'beerendorf');assert.equal(maps.beerendorf.portals.find(p=>p.y===15).target,'waldrand');assert.equal(maps.waldrand.portals.find(p=>p.y===17).target,'route2');});
-test('Werkstatt ohne festgelegte Produktion',()=>{assert.ok(maps.beerendorf_werkstatt);assert.ok(objects.beerendorf_werkstatt.some(x=>x.id==='workbench'));});
+test('Routenfolge und Portale',()=>{assert.equal(maps.brook.portals.find(p=>p.y===15).target,'waldrand');assert.equal(maps.beerendorf.portals.find(p=>p.y===15).target,'route2');assert.equal(maps.waldrand.portals.find(p=>p.y===17).target,'beerendorf');});
+test('Werkstatt ohne festgelegte Produktion',()=>{assert.ok(maps.beerendorf_werkstatt);assert.ok(!objects.beerendorf_werkstatt.some(x=>x.id==='pickup'));});
 test('Altspielstand wird zum Waldrand migriert',()=>{const e=new Engine();e.state.mapId='route2';e.state.x=7;e.state.y=5;for(const key of Object.keys(e.state.flags))e.state.flags[key]=true;const raw=JSON.stringify({schema:6,state:e.state});const n=migrateLegacyMap(JSON.parse(raw));assert.equal(n.mapId,'waldrand');assert.equal(n.flags.visitedWaldrand,true);});
