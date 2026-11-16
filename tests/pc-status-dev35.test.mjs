@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {Engine} from '../src/engine.js';
+import {objects} from '../src/maps.js';
+import {createPokemon} from '../src/team.js';
+import {startBattle,playTurn} from '../src/battle.js';
+const setup=()=>{const e=new Engine();e.state.mapId='village_home';e.state.flags.route1_hatched=true;e.state.x=8;e.state.y=3;e.state.facing='up';return e};
+test('Pokémon-PC ist als sichtbares Objekt im Dorfhaus vorhanden',()=>{assert.equal(objects.village_home.some(x=>x.id==='pokemon_pc'&&x.x===8&&x.y===2),true)});
+test('PC öffnet das Lager per Interaktion',()=>{const e=setup();assert.equal(e.interact(),true);assert.equal(e.lastEvent,'storageOpened')});
+test('PC bleibt vor dem Schlüpfen gesperrt',()=>{const e=setup();e.state.flags.route1_hatched=false;e.interact();assert.notEqual(e.lastEvent,'storageOpened')});
+test('Giftpuder verursacht Vergiftung',()=>{const a=createPokemon(1),b=createPokemon(10);a.moves=[92];b.moves=[33];const battle=startBattle(a,b);playTurn(battle,0,0,{rng:()=>0.01});assert.equal(battle.opponent.pokemon.status,'poison')});
+test('Donnerwelle verursacht Paralyse',()=>{const a=createPokemon(25),b=createPokemon(10);a.moves=[137];b.moves=[33];const battle=startBattle(a,b);playTurn(battle,0,0,{rng:()=>0.5});assert.equal(battle.opponent.pokemon.status,'paralysis')});

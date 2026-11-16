@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createPokemon} from '../src/team.js';
+import {startBattle,playTurn} from '../src/battle.js';
+const pair=(a,b)=>{const p=createPokemon(1),e=createPokemon(10);p.moves=[a];e.moves=[b];const battle=startBattle(p,e);battle.player.pokemon.stats.speed=100;battle.opponent.pokemon.stats.speed=10;return battle};
+test('Superschall verursacht Verwirrung',()=>{const b=pair(48,33);playTurn(b,0,0,{rng:()=>0.1});assert.ok(b.opponent.volatile.confusionTurns>0)});
+test('Verwirrung kann Selbstschaden verursachen ohne AP',()=>{const b=pair(33,33);b.player.volatile.confusionTurns=3;const pp=b.player.pp[0],hp=b.player.pokemon.currentHp;playTurn(b,0,0,{rng:()=>0.1});assert.equal(b.player.pp[0],pp);assert.ok(b.player.pokemon.currentHp<hp)});
+test('Verwirrung klingt nach Ablauf ab',()=>{const b=pair(33,33);b.player.volatile.confusionTurns=1;playTurn(b,0,0,{rng:()=>0.8});assert.equal(b.player.volatile.confusionTurns,0);assert.equal(b.player.pp[0],34)});
+test('Kopfnuss kann Gegner zurückschrecken lassen',()=>{const b=pair(29,33);const pp=b.opponent.pp[0];playTurn(b,0,0,{rng:()=>0.1});assert.equal(b.opponent.pp[0],pp)});
+test('Zurückschrecken gilt nicht über mehrere Züge',()=>{const b=pair(29,33);playTurn(b,0,0,{rng:()=>0.1});const pp=b.opponent.pp[0];playTurn(b,0,0,{rng:()=>0.9});assert.equal(b.opponent.pp[0],pp-1)});

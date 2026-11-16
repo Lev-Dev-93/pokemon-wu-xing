@@ -10,4 +10,4 @@ test('turn order obeys priority',()=>{const b=pair();b.player.pokemon.moves=[98]
 test('immunity prevents damage',()=>{const b=pair();b.player.pokemon.moves=[33];b.player.pp=[35];b.opponent.pokemon=createPokemon(92,{level:25});const hp=b.opponent.pokemon.currentHp;playTurn(b,0,0,{rng});assert.equal(b.opponent.pokemon.currentHp,hp)});
 test('fainted opponent ends battle',()=>{const b=pair();b.opponent.pokemon.currentHp=1;playTurn(b,0,0,{rng});assert.equal(b.finished,true);assert.equal(b.winner,'player');assert.throws(()=>playTurn(b,0,0,{rng}))});
 test('invalid random number rejected',()=>{const b=pair();assert.throws(()=>playTurn(b,0,0,{rng:()=>1}))});
-test('status effects are not silently simulated',()=>{const b=pair();b.player.pokemon.moves=[45];b.player.pp=[40];playTurn(b,0,0,{rng});assert.ok(b.log.some(s=>s.includes('noch nicht implementiert')))});
+test('Sandsturm aktiviert einen Wettereffekt',()=>{const b=pair();b.player.pokemon.moves=[201];b.player.pp=[10];playTurn(b,0,0,{rng});assert.equal(b.weather,'sand')});

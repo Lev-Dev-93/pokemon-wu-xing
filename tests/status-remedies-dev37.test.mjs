@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {Engine} from '../src/engine.js';
+import {createPokemon} from '../src/team.js';
+import {STATUS_REMEDIES,useStatusRemedy} from '../src/healing.js';
+import {SHOP_STOCK} from '../src/shop.js';
+test('alle fünf Statusheilmittel sind im Laden',()=>{assert.equal(STATUS_REMEDIES.length,5);for(const r of STATUS_REMEDIES)assert.equal(SHOP_STOCK.find(x=>x.id===r.id)?.price,30)});
+test('Statusheilmittel wirkt nur bei passendem Status und lebendem Pokémon',()=>{for(const r of STATUS_REMEDIES){const p=createPokemon(1);p.status=r.status;assert.equal(useStatusRemedy(p,r.id),true);assert.equal(p.status,'healthy');assert.equal(useStatusRemedy(p,r.id),false);p.status=r.status;p.currentHp=0;assert.equal(useStatusRemedy(p,r.id),false)}});
+test('Gegengift kaufen und anwenden, speichern',()=>{const e=new Engine();e.state.mapId='village';e.state.flags.route1_hatched=true;e.state.money=100;e.state.team=[createPokemon(1)];assert.equal(e.buyItem('antidote'),true);assert.equal(e.state.money,70);e.state.team[0].status='poison';assert.equal(e.useRemedyOn('antidote',0),true);assert.equal(e.state.team[0].status,'healthy');assert.equal(e.inventory.some(x=>x.id==='antidote'),false);assert.equal(JSON.parse(e.save()).state.team[0].status,'healthy')});
+test('falscher Status verbraucht keinen Gegenstand',()=>{const e=new Engine();e.state.team=[createPokemon(1)];e.addItem('awakening',1);assert.equal(e.useRemedyOn('awakening',0),false);assert.equal(e.inventory.find(x=>x.id==='awakening').quantity,1)});
+test('kein Verbrauch bei kampfunfähigem Pokémon oder im Dialog',()=>{const e=new Engine();e.state.team=[createPokemon(1)];e.state.team[0].status='burn';e.addItem('burn_heal',1);e.state.team[0].currentHp=0;assert.equal(e.useRemedyOn('burn_heal',0),false);e.state.team[0].currentHp=1;e.mode='dialogue';assert.equal(e.useRemedyOn('burn_heal',0),false);assert.equal(e.inventory[0].quantity,1)});

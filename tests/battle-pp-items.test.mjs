@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createPokemon} from '../src/team.js';
+import {startBattle} from '../src/battle.js';
+import {useBattlePpItem} from '../src/battle-items.js';
+const setup=()=>{const a=createPokemon(1,{level:10}),b=createPokemon(4,{level:10});const battle=startBattle(a,b);const team=[a,createPokemon(7,{level:10})];const inventory=[{id:'ether',quantity:2},{id:'max_ether',quantity:1},{id:'elixir',quantity:1},{id:'max_elixir',quantity:1}];const removeItem=(id,n)=>{const x=inventory.find(i=>i.id===id);if(!x||x.quantity<n)return false;x.quantity-=n;return true};return {battle,team,inventory,removeItem}};
+test('Äther regeneriert AP des aktiven Pokémon und synchronisiert Kämpfer',()=>{const s=setup();s.battle.player.pp[0]=0;const r=useBattlePpItem(s.battle,s.team,0,0,0,s.inventory,'ether',s);assert.equal(r.ok,true);assert.equal(s.battle.player.pp[0],10);assert.equal(s.battle.player.pokemon.pp[0],10);assert.equal(s.inventory[0].quantity,1)});
+test('Top-Äther füllt genau eine Attacke vollständig',()=>{const s=setup();s.battle.player.pp[0]=0;s.battle.player.pp[1]=0;const r=useBattlePpItem(s.battle,s.team,0,0,0,s.inventory,'max_ether',s);assert.equal(r.ok,true);assert.equal(s.battle.player.pp[0],s.battle.player.pokemon.pp[0]);assert.equal(s.battle.player.pp[1],0)});
+test('Elixier heilt mehrere Attacken des Reserve-Pokémon',()=>{const s=setup();s.team[1].pp=s.team[1].moves.map(()=>0);const r=useBattlePpItem(s.battle,s.team,0,1,0,s.inventory,'elixir',s);assert.equal(r.ok,true);assert.ok(s.team[1].pp.every(v=>v>0));assert.equal(s.inventory.find(i=>i.id==='elixir').quantity,0)});
+test('Top-Elixier heilt alle Attacken vollständig',()=>{const s=setup();s.battle.player.pp=s.battle.player.pp.map(()=>0);const r=useBattlePpItem(s.battle,s.team,0,0,0,s.inventory,'max_elixir',s);assert.equal(r.ok,true);assert.deepEqual(s.battle.player.pp,s.battle.player.pokemon.pp)});
+test('Volle AP verbrauchen keinen Gegenstand',()=>{const s=setup();const r=useBattlePpItem(s.battle,s.team,0,0,0,s.inventory,'ether',s);assert.equal(r.ok,false);assert.equal(s.inventory[0].quantity,2)});
+test('Ungültige Attacke und beendeter Kampf sind gesperrt',()=>{const s=setup();s.battle.player.pp[0]=0;assert.equal(useBattlePpItem(s.battle,s.team,0,0,99,s.inventory,'ether',s).ok,false);s.battle.finished=true;assert.equal(useBattlePpItem(s.battle,s.team,0,0,0,s.inventory,'ether',s).ok,false)});
+test('Nicht vorhandene Gegenstände werden nicht angewendet',()=>{const s=setup();s.battle.player.pp[0]=0;s.inventory[0].quantity=0;assert.equal(useBattlePpItem(s.battle,s.team,0,0,0,s.inventory,'ether',s).ok,false)});

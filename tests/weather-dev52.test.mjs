@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createPokemon} from '../src/team.js';
+import {startBattle,playTurn} from '../src/battle.js';
+function setup(id){const p=createPokemon(1,{level:45}),e=createPokemon(7,{level:45});p.moves=[id,33];e.moves=[106];const b=startBattle(p,e);b.player.pp=[10,10];b.opponent.pp=[10];return b}
+test('Solarstrahl lädt ohne Sonne zuerst auf und verbraucht nur einmal AP',()=>{const b=setup(76);const hp=b.opponent.pokemon.currentHp;playTurn(b,0,0,{rng:()=>0.01});assert.equal(b.opponent.pokemon.currentHp,hp);assert.equal(b.player.pp[0],9);assert.equal(b.player.volatile.solarChargeIndex,0);playTurn(b,0,0,{rng:()=>0.01});assert.ok(b.opponent.pokemon.currentHp<hp);assert.equal(b.player.pp[0],9);assert.equal(b.player.volatile.solarChargeIndex,null)});
+test('Solarstrahl wirkt bei Sonne sofort',()=>{const b=setup(76);b.weather='sun';b.weatherTurns=5;const hp=b.opponent.pokemon.currentHp;playTurn(b,0,0,{rng:()=>0.01});assert.ok(b.opponent.pokemon.currentHp<hp);assert.equal(b.player.volatile.solarChargeIndex,null)});
+test('Solarstrahl hat bei Regen geringere Stärke',()=>{const a=setup(76),b=setup(76);a.weather='sun';a.weatherTurns=5;b.weather='rain';b.weatherTurns=5;playTurn(a,0,0,{rng:()=>0.01});playTurn(b,0,0,{rng:()=>0.01});playTurn(b,0,0,{rng:()=>0.01});assert.ok(a.opponent.pokemon.stats.hp-a.opponent.pokemon.currentHp>b.opponent.pokemon.stats.hp-b.opponent.pokemon.currentHp)});
+test('Donner trifft bei Regen selbst bei hohem Zufallswurf',()=>{const b=setup(87);b.weather='rain';b.weatherTurns=5;const hp=b.opponent.pokemon.currentHp;playTurn(b,0,0,{rng:()=>0.99});assert.ok(b.opponent.pokemon.currentHp<hp)});
+test('Donner kann bei Sonne mit Zufallswurf 0.6 verfehlen',()=>{const b=setup(87);b.weather='sun';b.weatherTurns=5;const hp=b.opponent.pokemon.currentHp;playTurn(b,0,0,{rng:()=>0.6});assert.equal(b.opponent.pokemon.currentHp,hp)});
+test('Aufladen wird beim Pokémon-Wechsel abgebrochen',async()=>{const {switchTeamPokemon}=await import('../src/battle-switch.js');const b=setup(76);playTurn(b,0,0,{rng:()=>0.01});const team=[b.player.pokemon,createPokemon(4,{level:45})];const fighters=new Map();switchTeamPokemon(b,team,0,1,fighters);assert.equal(fighters.get(0).volatile.solarChargeIndex,null)});

@@ -1,5 +1,6 @@
+import {ppItem,restorePp} from './pp-items.js';
 import {canPurchase,shopItem} from './shop.js';
-import {POTION_ITEM, usePotion, healPartyAtStation} from './healing.js';
+import {POTION_ITEM, usePotion, healPartyAtStation, useStatusRemedy, remedyFor, REVIVE_ITEM, FULL_RESTORE_ITEM, useRevive, useFullRestore} from './healing.js';
 import {rollEncounter} from './wild-encounters.js';
 import {POKEBALL_ITEM} from './capture.js';
 import {validateTeam,addToTeam,reorderTeam,removeFromTeam,healTeam,createPokemon} from './team.js';
@@ -19,7 +20,7 @@ export class Engine{
  get items(){return objects[this.state.mapId]||[]}
  step(direction){if(this.mode!=='exploration'||!dirs[direction])return false;this.state.facing=direction;const [dx,dy]=dirs[direction],{x,y}=this.state,nx=x+dx,ny=y+dy;
  if(this.characters.some(n=>n.x===nx&&n.y===ny)||!canMove(this.map,x,y,nx,ny))return false;
- const destination=this.map.portals.find(q=>q.x===nx&&q.y===ny);if(destination?.target==='route1'&&!this.state.flags.professor_demo){this.message='Der Professor-Ausflug muss zuerst abgeschlossen werden.';return false;}
+ const destination=this.map.portals.find(q=>q.x===nx&&q.y===ny);if(this.state.mapId==='yard'&&destination?.target==='village'&&!this.state.flags.egg_received){this.message='Du kannst den Züchterhof erst verlassen, wenn du dein Ei erhalten hast.';return false;}if(destination?.target==='route1'&&!this.state.flags.professor_demo){this.message='Der Professor-Ausflug muss zuerst abgeschlossen werden.';return false;}
  this.state.x=nx;this.state.y=ny;this.state.elevation=tileHeight(this.map,nx,ny);this.state.steps++;this.lastEvent='step';
  const portal=this.map.portals.find(q=>q.x===nx&&q.y===ny);if(portal){if(portal.target==='route1'&&!this.state.flags.professor_demo){this.message='Der Professor-Ausflug muss zuerst abgeschlossen werden.';return false;}this.transition(portal);}else{this.message='';this.pendingWild=rollEncounter({mapId:this.state.mapId,x:nx,y:ny,hatched:this.state.flags.route1_hatched,hasUsablePokemon:this.state.team.some(p=>p.currentHp>0)});if(this.pendingWild)this.lastEvent='wildEncounter';}return true;}
  transition(portal){const dest=maps[portal.target];if(!dest||!inside(dest,portal.tx,portal.ty)||dest.walls.has(`${portal.tx},${portal.ty}`)|| (npcs[dest.id]||[]).some(n=>n.x===portal.tx&&n.y===portal.ty))throw Error('Ungültiger Portal-Spawn');
@@ -29,6 +30,7 @@ export class Engine{
  if(target.id==='route1_trainer'&&this.beginTrainerChallenge())return true;
  if(target.id==='merchant'){if(!this.state.flags.route1_hatched){this.message='Der kleine Laden öffnet für dich nach dem Schlüpfen deines Starters.';return true;}this.lastEvent='shopOpened';this.message='Willkommen im Dorfladen!';return true;}
  if(target.id==='resident'&&this.state.flags.route1_hatched){this.healAtStation();return true;}
+ if(target.id==='pokemon_pc'){if(!this.state.flags.route1_hatched){this.message='Der Pokémon-PC wird nach dem Schlüpfen deines Starters freigeschaltet.';return true;}this.lastEvent='storageOpened';this.message='Pokémon-PC geöffnet.';return true;}
  if(target.id==='supply_box'){this.collectSupplies();return true;}
  if(target.id==='rival'&&this.beginAbsolScene())return true;
  if(target.id==='professor'&&this.beginProfessorScene())return true;
@@ -57,6 +59,15 @@ export class Engine{
  healAtStation(){if(this.mode!=='exploration'||this.state.mapId!=='village_home'||!this.state.flags.route1_hatched)return false;const changed=healPartyAtStation(this.state.team);this.message=changed?'Dein Pokémon-Team wurde vollständig versorgt.':'Dein Pokémon-Team ist bereits gesund.';this.lastEvent='stationHealed';return true;}
  collectSupplies(){if(this.mode!=='exploration'||this.state.mapId!=='village_home'||!this.state.flags.route1_hatched){this.message='Die Vorräte werden erst nach dem Schlüpfen deines Starters ausgegeben.';return false;}if(this.state.flags.suppliesCollected){this.message='Du hast die Vorräte bereits abgeholt.';return false;}this.addItem(POTION_ITEM,3);this.setFlag('suppliesCollected',true);this.message='Du erhältst 3 Tränke für deine Reise.';this.lastEvent='suppliesCollected';return true;}
  usePotionOn(index){if(this.mode!=='exploration'||!Number.isInteger(index)||index<0||index>=this.state.team.length)return false;if(!this.inventory.some(i=>i.id===POTION_ITEM&&i.quantity>0))return false;if(!usePotion(this.state.team[index]))return false;this.removeItem(POTION_ITEM,1);this.message='Ein Trank wurde verwendet. 20 KP wurden maximal wiederhergestellt.';this.lastEvent='potionUsed';return true;}
+ useRecoveryOn(id,index){
+  if(this.mode!=='exploration'||!Number.isInteger(index)||index<0||index>=this.state.team.length||![REVIVE_ITEM,FULL_RESTORE_ITEM].includes(id))return false;
+  if(!this.inventory.some(i=>i.id===id&&i.quantity>0))return false;
+  const pokemon=this.state.team[index];const apply=id===REVIVE_ITEM?useRevive:useFullRestore;
+  if(!apply(pokemon))return false;
+  this.removeItem(id,1);this.message=id===REVIVE_ITEM?'Dein Pokémon wurde wiederbelebt.':'Dein Pokémon ist vollständig genesen.';this.lastEvent='recoveryUsed';return true;
+ }
+ usePpItemOn(id,index,moveIndex=0){if(this.mode!=='exploration'||!Number.isInteger(index)||index<0||index>=this.state.team.length||!ppItem(id)||!this.inventory.some(i=>i.id===id&&i.quantity>0))return false;if(!restorePp(this.state.team[index],id,moveIndex))return false;this.removeItem(id,1);this.message=`${ppItem(id).name} wurde verwendet.`;this.lastEvent='ppRestored';return true;}
+ useRemedyOn(id,index){if(this.mode!=='exploration'||!Number.isInteger(index)||index<0||index>=this.state.team.length||!remedyFor(id))return false;if(!this.inventory.some(i=>i.id===id&&i.quantity>0))return false;if(!useStatusRemedy(this.state.team[index],id))return false;this.removeItem(id,1);this.message=`${remedyFor(id).name} wurde verwendet.`;this.lastEvent='remedyUsed';return true;}
  get inventory(){return (this.state.inventory||[]).map(i=>({...i}));}
  catchPokemon(pokemon){if(!validateTeam([pokemon]))return false;if(this.state.team.length<6)return this.addPokemon(pokemon);if(this.state.storage.length>=500)return false;this.state.storage.push(structuredClone(pokemon));return true;}
  get prologueStage(){return storyStage(this.state.flags)}
@@ -91,10 +102,10 @@ export class Engine{
   this.completeStoryEvent('birthday_wish_pending');
   if(!this.completeStoryEvent('egg_received'))throw Error('Ungültige Story-Reihenfolge');
   this.state.eventLog.push({type:'starterWish',speciesId:species.id});
-  this.dialogue={id:'starter_wish',name:'Geburtstagswunsch – technische Vorschau',pages:[`Du wünschst dir ${species.name}.`, `Du erhältst ein Ei für ${species.name}. Es ist noch kein Teammitglied.`, 'Das unabhängige Dimensionsereignis folgt erst in einer späteren Version.'],index:0};
+  this.dialogue={id:'starter_wish',name:'Geburtstagswunsch – technische Vorschau',pages:[`Du wünschst dir ${species.name}.`, `Du erhältst ein Ei für ${species.name}. Es ist noch kein Teammitglied.`, 'Plötzlich beginnt der Boden zu beben! Du musst zum Dorfplatz!'],index:0};
   this.mode='dialogue';this.message='';this.lastEvent='starterSelected';return true;
  }
- get journal(){const f=this.state.flags;return {heading:'Zuhause – Erkundung',description:'Technische Testaufgaben (noch keine kanonische Storymission).',tasks:[{label:'Mit der Züchterin sprechen',done:!!f.spokenToBreederA},{label:'Mit dem Züchter sprechen',done:!!f.spokenToBreederB},{label:'Den Züchterhof betreten',done:!!f.visitedYard},{label:'Geburtstagsvorschau ansehen',done:!!f.birthday_wish_pending},{label:'Das Startdorf besuchen',done:!!f.visitedVillage},{label:'Mit den Dorfbewohnern sprechen',done:!!f.spokenToVillager},{label:'Den Kindheitsfreund treffen',done:!!f.spokenToRival},{label:'Den Professor kennenlernen',done:!!f.spokenToProfessor},{label:'Ein Dorfhaus betreten',done:!!f.visitedVillageHome},{label:'Das Arbeitszimmer besichtigen',done:!!f.visitedStudy},{label:'Mit dem Hausbewohner sprechen',done:!!f.spokenToResident},{label:'Starter-Ei erhalten',done:!!f.egg_received},{label:'Dimensionsereignis erlebt',done:!!f.rift_closed},{label:'Absol ist Partner des Kindheitsfreundes',done:!!f.rival_absol},{label:'Professor-Ausflug und schillerndes Raupy',done:!!f.professor_demo},{label:'Route 1 erreicht',done:!!f.visitedRoute1},{label:'Starter-Ei geschlüpft',done:!!f.route1_hatched},{label:'Reisevorräte abgeholt',done:!!f.suppliesCollected},{label:'Trainer auf Route 1 besiegt',done:!!f.route1TrainerDefeated}]};}
+ get journal(){const f=this.state.flags;return {heading:'Zuhause – Erkundung',description:'Technische Testaufgaben (noch keine kanonische Storymission).',tasks:[{label:'Mit der Züchterin sprechen',done:!!f.spokenToBreederA},{label:'Mit dem Züchter sprechen',done:!!f.spokenToBreederB},{label:'Den Züchterhof betreten',done:!!f.visitedYard},{label:'Geburtstagsvorschau ansehen',done:!!f.birthday_wish_pending},{label:'Das Startdorf besuchen',done:!!f.visitedVillage},{label:'Mit den Dorfbewohnern sprechen',done:!!f.spokenToVillager},{label:'Den Kindheitsfreund treffen',done:!!f.spokenToRival},{label:'Den Professor kennenlernen',done:!!f.spokenToProfessor},{label:'Ein Dorfhaus betreten',done:!!f.visitedVillageHome},{label:'Das Arbeitszimmer besichtigen',done:!!f.visitedStudy},{label:'Mit dem Hausbewohner sprechen',done:!!f.spokenToResident},{label:'Starter-Ei erhalten',done:!!f.egg_received},{label:'Dimensionsereignis erlebt',done:!!f.rift_closed},{label:'Absol ist Partner des Kindheitsfreundes',done:!!f.rival_absol},{label:'Professor-Ausflug und schillerndes Raupy',done:!!f.professor_demo},{label:'Route 1 erreicht',done:!!f.visitedRoute1},{label:'Starter-Ei geschlüpft',done:!!f.route1_hatched},{label:'Trainer auf Route 1 besiegt',done:!!f.route1TrainerDefeated}]};}
  save(){return JSON.stringify({schema:6,state:this.state});}
  load(raw){const data=JSON.parse(raw);if(![1,2,3,4,5,6].includes(data.schema))throw Error('Unbekannte Speicherstand-Version');const s=structuredClone(data.state);
  if(s.mapId==='upper'){s.mapId='ground';s.x=10;s.y=2;s.elevation=0;}

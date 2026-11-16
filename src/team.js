@@ -1,3 +1,4 @@
+import {currentPp,maxPp} from './pp-items.js';
 import {movesAtLevel,getMove,experienceForLevel} from './moves.js';
 import {POKEMON_DATA} from './pokemon-data.js';
 export const TEAM_LIMIT=6;
@@ -21,7 +22,7 @@ export function validatePokemon(p){
  let stats;try{stats=calculateStats(p.speciesId,p.level,p.ivs,p.evs)}catch{return false}
  if(!p.stats||statsNames.some(k=>p.stats[k]!==stats[k])||!validInt(p.currentHp,0,stats.hp))return false;
  const a=POKEMON_DATA[p.speciesId].abilities.find(a=>a.id===p.abilityId);
- return !!a&&p.hiddenAbility===a.hidden&&typeof p.shiny==='boolean'&&typeof p.status==='string'&&['healthy','poison','burn','paralysis','sleep','freeze'].includes(p.status)&&Array.isArray(p.moves)&&p.moves.length<=4&&p.moves.every(m=>validInt(m,1,10000)&&!!getMove(m));
+ return !!a&&p.hiddenAbility===a.hidden&&typeof p.shiny==='boolean'&&typeof p.status==='string'&&['healthy','poison','burn','paralysis','sleep','freeze'].includes(p.status)&&Array.isArray(p.moves)&&p.moves.length<=4&&p.moves.every(m=>validInt(m,1,10000)&&!!getMove(m))&&(p.pp===undefined||(Array.isArray(p.pp)&&p.pp.length===p.moves.length&&p.pp.every((v,i)=>validInt(v,0,getMove(p.moves[i]).pp))));
 }
 export function validateTeam(team){return Array.isArray(team)&&team.length<=TEAM_LIMIT&&team.every(validatePokemon)}
 export function addToTeam(team,pokemon){if(!validateTeam(team)||!validatePokemon(pokemon)||team.length>=TEAM_LIMIT)return false;team.push(structuredClone(pokemon));return true}

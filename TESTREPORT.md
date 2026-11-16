@@ -1,14 +1,20 @@
-## dev.32 – Sichtbare NPCs und Reisevorräte; Flucht aus Trainerkämpfen
+## dev.57 – Stabilisierung
 
-- Kartenrenderer zeichnet nun alle NPCs aus den Kartendaten, darunter Händler und Trainer.
-- Reisevorräte werden als Truhe dargestellt.
-- Gewöhnliche Trainerkämpfe können ohne Belohnung aufgegeben werden.
+- 304/304 automatisierte Node-Tests bestanden.
+- Vier neue Regressionstests: Kampfwertstufen, flüchtige Effekte, KP/AP/Status-Persistenz und Cache-Normalisierung beim Wechsel.
+- JavaScript-Syntaxprüfung aller src/*.js bestanden.
+- ZIP-Integrität geprüft.
+- Praktischer Browsertest ausstehend; keine Behauptung über Browserfunktionalität.
 
-## dev.29 – Dorfladen (technischer Zwischenstand)
+## dev.56
 
-Ein Händler im Startdorf verkauft Pokébälle (40 Pokédollar) und Tränke (60 Pokédollar) zu ausdrücklich vorläufigen Testpreisen. Der Laden ist nach dem Schlüpfen des Starters zugänglich. Käufe aktualisieren Guthaben, Inventar, Ereignisprotokoll und Autosave.
+300/300 automatisierte Tests bestanden (`node --test tests/*.test.mjs`).
+JavaScript-Syntaxprüfung (`node --check src/*.js`) erfolgreich.
+Praktischer Browsertest ausstehend.
 
-dev.28: 127/127 Node-Tests bestanden. JavaScript-Syntaxprüfung bestanden. Browsertest ausstehend.
+## dev.56 – Automatisierte Prüfungen
 
-### dev.31
-Automatisierte Tests: siehe `node --test`. Praktischer Browsertest weiterhin ausstehend.
+- `npm test`: 294 Tests bestanden, 0 fehlgeschlagen.
+- 8 neue Tests für Trockenheit, Wolke Sieben, Klimaschutz und Wetterablauf.
+- `node --check src/*.js`: alle JavaScript-Dateien syntaktisch gültig.
+- Praktischer Browsertest weiterhin ausstehend.

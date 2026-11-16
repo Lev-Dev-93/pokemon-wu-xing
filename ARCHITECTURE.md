@@ -1,3 +1,10 @@
+## dev.57 – Stabilisierung
+
+Regression: Beim Pokémon-Wechsel werden temporäre Kampfwertstufen und flüchtige Effekte (einschließlich Feuerfänger-Bonus) zurückgesetzt; KP, AP und dauerhafte Statusprobleme bleiben erhalten. Vier gezielte Integrationstests ergänzt. Browsertest ausstehend.
+
+
+### dev.56 Wetterunterdrückung
+`activeWeather(battle)` prüft lebende Kämpfer auf Fähigkeit 13 (Wolke Sieben) oder 76 (Klimaschutz). Wetter bleibt gespeichert und läuft zeitlich weiter, seine Effekte werden unterdrückt.
 # Architektur dev.9
 
 `src/team.js`: reine Regeln für Team, Statusberechnung und Lagerung. `src/pokemon-data.js`: offline-Basiswerte und Fähigkeiten, aus den bereitgestellten CSVs. `src/engine.js`: validierter persistenter Zustand; `src/main.js`: Anzeige. Keine künstliche Starter-Schlüpfung. Save-Schema 6.

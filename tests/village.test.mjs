@@ -4,7 +4,7 @@ import {Engine} from '../src/engine.js';
 import {maps,npcs} from '../src/maps.js';
 
 test('Züchterhof führt ins Dorf und zurück ohne Softlock',()=>{
- const e=new Engine();e.state.mapId='yard';e.state.x=7;e.state.y=10;e.state.elevation=0;
+ const e=new Engine();e.state.flags.egg_received=true;e.state.mapId='yard';e.state.x=7;e.state.y=10;e.state.elevation=0;
  assert.equal(e.step('down'),true);assert.equal(e.state.mapId,'village');assert.deepEqual([e.state.x,e.state.y],[10,1]);
  assert.equal(e.state.flags.visitedVillage,true);assert.equal(e.step('up'),true);
  assert.equal(e.state.mapId,'yard');assert.deepEqual([e.state.x,e.state.y],[7,10]);

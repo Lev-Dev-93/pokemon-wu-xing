@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {Engine} from '../src/engine.js';import {SHOP_STOCK,canPurchase} from '../src/shop.js';
 function setup(){const e=new Engine();e.state.mapId='village';for(const flag of ['spokenToBreederA','spokenToBreederB','birthday_wish_pending','egg_received','rift_closed','rival_absol','professor_demo','route1_hatched'])e.state.flags[flag]=true;e.state.money=80;return e}
-test('Sortiment: Pokéball und Trank mit gültigen Testpreisen',()=>{assert.equal(SHOP_STOCK.length,2);assert.ok(SHOP_STOCK.every(x=>x.price>0))});
+test('Sortiment: Pokéball und Trank mit gültigen Testpreisen',()=>{assert.equal(SHOP_STOCK.length,13);assert.ok(SHOP_STOCK.every(x=>x.price>0))});
 test('Kauf belastet Guthaben und erhöht Beutelmenge',()=>{const e=setup();const id=SHOP_STOCK[0].id;const before=e.inventory.find(x=>x.id===id)?.quantity||0;assert.equal(e.buyItem(id),true);assert.equal(e.state.money,80-SHOP_STOCK[0].price);assert.equal(e.inventory.find(x=>x.id===id).quantity,before+1);assert.equal(e.state.eventLog.at(-1).type,'shopPurchase')});
 test('Kein Kauf bei zu wenig Geld oder unbekannter Ware',()=>{const e=setup();assert.equal(e.buyItem('unbekannt'),false);assert.equal(e.buyItem(SHOP_STOCK[1].id,2),false);assert.equal(e.state.money,80)});
 test('Kauf nur nach Schlüpfen und im Dorf',()=>{const e=setup();e.state.flags.route1_hatched=false;assert.equal(e.buyItem(SHOP_STOCK[0].id),false);e.state.flags.route1_hatched=true;e.state.mapId='route1';assert.equal(e.buyItem(SHOP_STOCK[0].id),false)});

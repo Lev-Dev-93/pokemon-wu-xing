@@ -1,3 +1,58 @@
+## dev.57 – Stabilisierung
+
+Regression: Beim Pokémon-Wechsel werden temporäre Kampfwertstufen und flüchtige Effekte (einschließlich Feuerfänger-Bonus) zurückgesetzt; KP, AP und dauerhafte Statusprobleme bleiben erhalten. Vier gezielte Integrationstests ergänzt. Browsertest ausstehend.
+
+**dev.56:** Trockenheit (Regenheilung/Sonnenschaden) und Wetterunterdrückung durch Wolke Sieben/Klimaschutz.
+**dev.54:** Regengenuss, Eishaut und Solarkraft sind im Kampf aktiv (Wetterheilung, Sonnenschaden, Spezial-Angriffsbonus).
+**dev.53:** Donner und Solarstrahl reagieren auf das Wetter; Solarstrahl lädt außerhalb von Sonne eine Runde auf.
+**dev.53:** Sonnenschein, Regen, Sandsturm und Hagel: 5 Runden, Schaden und Wetterheilung.
+
+**dev.50:** Egelsamen, Wasserring und Verwurzler mit rundenweiser KP-Veränderung.
+
+**dev.50:** Ausdauer mit 1-KP-Überleben, Priorität, gemeinsamer Wiederholungsfolge und Mehrfachtreffer-Unterstützung.
+
+**dev.48:** Schutzschild und Scanner mit Priorität, Blockierung und abnehmender Erfolgschance bei Wiederholung.
+
+**dev.47:** Sekundäre Kampfwert-Senkungen bei Schadensattacken (z. B. Eissturm, Knirscher, Psychokinese, Lehmbrühe).
+
+## dev.44 – Genauigkeit und Ausweichwert
+
+Genauigkeits- und Ausweichstufen (−6 bis +6), Trefferberechnung und weitere Statusattacken (Sandwirbel, Doppelteam, Komprimator, Rauchwolke, Psykraft, Blitz, Lockduft, Trugträne, Schärfer).
+
+## dev.43 – Verwirrung und Zurückschrecken
+
+- Superschall und Konfustrahl lösen Verwirrung aus (2–4 Angriffsversuche); Psystrahl mit 10 % Chance.
+- Verwirrte Pokémon können sich selbst verletzen, ohne AP zu verbrauchen.
+- Kopfnuss, Biss und Stampfer können im selben Zug Zurückschrecken auslösen.
+- Neue automatisierte Tests für Verwirrung und Zurückschrecken.
+
+## dev.42 – AP-Heilmittel im Kampf
+
+Im Wild- oder Trainerkampf die Schaltfläche „AP-Heilmittel“ auswählen, dann Gegenstand, Team-Pokémon und gegebenenfalls Attacke wählen. Nach erfolgreicher Anwendung folgt ein Gegnerzug. Die AP werden dauerhaft gespeichert. Der praktische Browsertest steht noch aus.
+
+## dev.39 – Beleber und Top-Genesung
+
+Neue Beutelgegenstände: Beleber (halbe KP bei Kampfunfähigkeit) und Top-Genesung (volle KP und Statusheilung für kampffähige Pokémon). Beide im Dorfladen erhältlich. Ungültige Anwendung verbraucht nichts; Nutzung außerhalb des Kampfes und automatische Speicherung. Vorläufige Preise 120 bzw. 180 Pokédollar.
+
+## dev.38 – Statusheilmittel im Kampf
+
+Fünf Statusheilmittel können im Wild- und Trainerkampf auf das aktive Pokémon angewendet werden. Eine erfolgreiche Anwendung verbraucht den Gegenstand und einen Zug; anschließend greift der Gegner an. Ungültige Anwendungen verbrauchen nichts.
+
+## dev.37 – Statusheilmittel im Beutel und Dorfladen
+
+Gegengift, Feuerheiler, Para-Heiler, Aufwecker und Eisheiler sind im Dorfladen zu je 30 Pokédollar verfügbar. Sie können außerhalb des Kampfes im Beutel auf ein passendes, kampffähiges Team-Pokémon angewendet werden. Ungültige Anwendungen verbrauchen keinen Gegenstand; erfolgreiche Anwendungen werden gespeichert. Preise sind vorläufig.
+
+## dev.36 – Pokémon-PC und Statusprobleme
+
+Sichtbarer, ansprechbarer Pokémon-PC im Dorfhaus; Interaktion öffnet das Lager. Giftpuder, Schlafpuder, Donnerwelle, Giftwolke und erste Zusatzstatus-Effekte; Statusimmunitäten und Aufwachen. Browsertest ausstehend.
+
+## dev.34 – Prolog-Ablauf und vereinfachtes Dorfhaus
+
+- Der Züchterhof bleibt bis zum Erhalt des Starter-Eis gesperrt.
+- Unmittelbar nach der Starterauswahl setzt das Erdbeben ein; der Spieler läuft automatisch zum Dorfplatz, wo die Giratina-Szene beginnt.
+- Die nicht sichtbaren Reisevorräte wurden aus dem Dorfhaus entfernt. Bestehende Spielstände bleiben kompatibel.
+- Händler und junger Trainer bleiben erhalten.
+
 ## dev.32 – Sichtbare NPCs und Reisevorräte; Flucht aus Trainerkämpfen
 
 - Kartenrenderer zeichnet nun alle NPCs aus den Kartendaten, darunter Händler und Trainer.
@@ -93,3 +148,21 @@ Der erste Trainer auf Route 1 zahlt nach einem Sieg einmalig 80 Pokédollar. Das
 
 ### dev.31
 Im Wild- und Trainerkampf können Tränke über „Trank verwenden“ eingesetzt werden. Der Gegner greift anschließend an.
+
+### dev.34
+Erste neun Statusattacken verändern Angriff, Verteidigung, Spezial-Angriff oder Initiative während eines Kampfes.
+
+## dev.40
+Im Kampf sind Beleber und Top-Genesung über „Beleber / Top-Genesung“ auf auswählbare Team-Pokémon anwendbar. Die Anwendung kostet einen Zug.
+
+
+## dev.41 – AP-Heilmittel
+Äther, Top-Äther, Elixier und Top-Elixier im Dorfladen und im Beutel. AP bleiben nach Kämpfen und beim Pokémon-Wechsel erhalten; Heilstation füllt AP auf. Preise sind vorläufig.
+
+
+### dev.47
+Mehrfachtreffer-Attacken treffen 2 bis 5 Mal (Doppelkick und Duonadel stets zweimal); die Trefferzahl wird im Kampfprotokoll angezeigt.
+
+
+### dev.56
+Typabsorption: H2O-Absorber, Voltabsorber und Feuerfänger bei treffenden gegnerischen Schadensattacken. Feuerfänger verstärkt nach Aktivierung eigene Feuerattacken.

@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createPokemon} from '../src/team.js';
+import {startBattle} from '../src/battle.js';
+import {useBattleRecovery} from '../src/battle-items.js';
+function setup(){const team=[createPokemon(1,{level:7}),createPokemon(4,{level:7})];const battle=startBattle(team[0],createPokemon(10,{level:5}));team[1].currentHp=0;const inventory=[{id:'revive',quantity:2},{id:'full_restore',quantity:2}];const removeItem=(id,n)=>{const x=inventory.find(i=>i.id===id);if(!x||x.quantity<n)return false;x.quantity-=n;return true};return {team,battle,inventory,removeItem}}
+test('Beleber kann kampfunfähiges Reserve-Pokémon wiederbeleben',()=>{const x=setup();const r=useBattleRecovery(x.battle,x.team,0,1,x.inventory,'revive',x);assert.equal(r.ok,true);assert.equal(x.team[1].currentHp,Math.max(1,Math.floor(x.team[1].stats.hp/2)));assert.equal(x.inventory[0].quantity,1)});
+test('Beleber auf kampffähiges Pokémon verbraucht nichts',()=>{const x=setup();assert.equal(useBattleRecovery(x.battle,x.team,0,0,x.inventory,'revive',x).ok,false);assert.equal(x.inventory[0].quantity,2)});
+test('Top-Genesung heilt aktives Pokémon und Status',()=>{const x=setup();x.battle.player.pokemon.currentHp=1;x.battle.player.pokemon.status='burn';assert.equal(useBattleRecovery(x.battle,x.team,0,0,x.inventory,'full_restore',x).ok,true);assert.equal(x.battle.player.pokemon.currentHp,x.battle.player.pokemon.stats.hp);assert.equal(x.battle.player.pokemon.status,'healthy');assert.equal(x.inventory[1].quantity,1)});
+test('Top-Genesung bei vollem gesundem Pokémon verbraucht nichts',()=>{const x=setup();assert.equal(useBattleRecovery(x.battle,x.team,0,0,x.inventory,'full_restore',x).ok,false);assert.equal(x.inventory[1].quantity,2)});
+test('Abgeschlossener Kampf sperrt Beleber',()=>{const x=setup();x.battle.finished=true;assert.equal(useBattleRecovery(x.battle,x.team,0,1,x.inventory,'revive',x).ok,false);assert.equal(x.inventory[0].quantity,2)});
+test('Beleber aktualisiert gespeicherten Reserve-Kämpfer',()=>{const x=setup();const fighters=new Map([[1,{pokemon:structuredClone(x.team[1]),pp:[10],stages:{}}]]);assert.equal(useBattleRecovery(x.battle,x.team,0,1,x.inventory,'revive',{removeItem:x.removeItem,fighters}).ok,true);assert.equal(fighters.get(1).pokemon.currentHp,x.team[1].currentHp)});
+test('Fehlende Gegenstände und ungültige Ziele werden abgelehnt',()=>{const x=setup();x.inventory[0].quantity=0;assert.equal(useBattleRecovery(x.battle,x.team,0,1,x.inventory,'revive',x).ok,false);assert.equal(useBattleRecovery(x.battle,x.team,0,9,x.inventory,'revive',x).ok,false)});

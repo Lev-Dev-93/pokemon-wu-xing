@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createPokemon} from '../src/team.js';
+import {startBattle,playEnemyOnlyTurn,playTurn} from '../src/battle.js';
+const pair=()=>{const a=createPokemon(1),b=createPokemon(10);a.moves=[33];b.moves=[33];return startBattle(a,b)};
+test('Gift verursacht auch nach Gegner-Einzelzug Schaden',()=>{const b=pair();b.player.pokemon.status='poison';const hp=b.player.pokemon.currentHp;playEnemyOnlyTurn(b,0,{rng:()=>0.5});assert.ok(b.player.pokemon.currentHp<hp)});
+test('Verbrennung trifft auch Gegner nach Einzelzug',()=>{const b=pair();b.opponent.pokemon.status='burn';const hp=b.opponent.pokemon.currentHp;playEnemyOnlyTurn(b,0,{rng:()=>0.5});assert.ok(b.opponent.pokemon.currentHp<hp)});
+test('Schlaf verhindert Attacke ohne AP-Verbrauch',()=>{const b=pair();b.player.pokemon.status='sleep';b.player.volatile.sleepTurns=2;const pp=b.player.pp[0];playTurn(b,0,0,{rng:()=>0.5});assert.equal(b.player.pp[0],pp);assert.equal(b.player.volatile.sleepTurns,1)});
+test('Paralyse verhindert Attacke ohne AP-Verbrauch',()=>{const b=pair();b.player.pokemon.status='paralysis';const pp=b.player.pp[0];playTurn(b,0,0,{rng:()=>0});assert.equal(b.player.pp[0],pp)});
+test('Statusschaden kann nach Einzelzug Kampf beenden',()=>{const b=pair();b.player.pokemon.status='poison';b.player.pokemon.currentHp=1;playEnemyOnlyTurn(b,0,{rng:()=>0.5});assert.equal(b.finished,true);assert.equal(b.winner,'opponent')});

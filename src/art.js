@@ -64,7 +64,17 @@ R(c,10*T+4,(H-1)*T+8,24,18,'#cbb58a');
 }
 function drawRoute1(c,map){for(let y=2;y<map.h;y++){for(let x=6;x<=9;x++)path(c,x*T,y*T,x+y*map.w)}for(const [x,y] of [[1,2],[3,8],[12,3],[14,10],[2,15],[13,16]]){pot(c,x*T,y*T);flower(c,(x+1)*T,y*T)}for(const [x,y] of [[2,4],[3,4],[12,6],[13,6],[4,12],[5,12],[11,14],[12,14]]){R(c,x*T,y*T,32,32,'#3c704a');R(c,x*T+6,y*T+3,20,25,'#5e985a')}R(c,7*T,0,32,9,'#e2c99c')}
 function drawInterior(c,id){carpet(c,3*T,3*T,5*T,3*T,id==='study'?'#607d87':'#9b775b');window(c,5*T,0);shelf(c,2*T,4*T);shelf(c,3*T,4*T);desk(c,7*T,2*T);pot(c,9*T,5*T);door(c,5*T,7*T);if(id==='village_home'){sofa(c,T,T);table(c,4*T,4*T)}else{desk(c,T,T);shelf(c,8*T,T)}}
-function drawNpc(c,x,y,kind){const colors={villager:'#c17f69',rival:'#6c7cb1',professor:'#e9e8db'};hero(c,x*T,y*T,'down',0);R(c,x*T+9,y*T+17,18,11,colors[kind]||'#8aa58c');if(kind==='professor')R(c,x*T+11,y*T+17,14,9,'#f5f3df')}
+function drawNpc(c,x,y,kind){
+ const palette={merchant:['#d7aa43','#4e7256'],route1_trainer:['#df624f','#376caa'],resident:['#9a70b0','#e2bd80'],breeder_a:['#b87558','#668a65'],breeder_b:['#718ca8','#9a7757'],villager:['#c17f69','#6b965c'],rival:['#6c7cb1','#c0a17d'],professor:['#e9e8db','#e9e8db']};
+ const [shirt,hat]=palette[kind]||['#8aa58c','#a17c61'];const X=x*T,Y=y*T;
+ R(c,X+7,Y+27,19,4,'#51463c');R(c,X+9,Y+17,6,11,'#4b4854');R(c,X+19,Y+17,6,11,'#4b4854');
+ R(c,X+7,Y+13,19,11,shirt);R(c,X+5,Y+15,4,9,'#d6a17e');R(c,X+25,Y+15,4,9,'#d6a17e');
+ R(c,X+10,Y+5,14,12,'#efbd93');R(c,X+9,Y+3,16,6,hat);R(c,X+13,Y+11,2,2,'#342c32');R(c,X+20,Y+11,2,2,'#342c32');
+ if(kind==='merchant'){R(c,X+4,Y+2,24,4,'#dcb54b');R(c,X+10,Y,12,4,'#dcb54b');R(c,X+13,Y+18,7,5,'#f7db8c')}
+ if(kind==='route1_trainer'){R(c,X+6,Y+3,20,4,'#e35648');R(c,X+22,Y+4,8,3,'#e35648');R(c,X+14,Y+17,6,6,'#fff4de')}
+ if(kind==='professor'){R(c,X+8,Y+17,4,12,'#f7f4e9');R(c,X+23,Y+17,4,12,'#f7f4e9')}
+}
+function drawTag(c,x,y,label){if(typeof c.fillText!=='function'||typeof c.measureText!=='function')return;c.save();c.font='bold 10px sans-serif';const w=Math.ceil(c.measureText(label).width)+10;const px=Math.max(0,Math.round(x*T+16-w/2)),py=Math.max(0,y*T-14);R(c,px,py,w,13,'#252d2b');R(c,px+1,py+1,w-2,11,'#f4e6b5');c.fillStyle='#252d2b';c.fillText(label,px+5,py+10);c.restore()}
 export function drawScene(c,map,state){c.imageSmoothingEnabled=false;for(let y=0;y<map.h;y++)for(let x=0;x<map.w;x++){const px=x*T,py=y*T,n=x+y*map.w;if(map.id==='yard'){if(x===7&&y>=2||y===10&&x>=4&&x<=10)path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='route1'){if(x>=6&&x<=9)path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='village'){if((x>=9&&x<=11)||(y===7&&x>=5&&x<=18)||(y>=4&&y<=11&&x>=12&&x<=13))path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='ground')stone(c,px,py,n);else wood(c,px,py,n);if(!['yard','village','route1'].includes(map.id)&&y===0)wallpaper(c,px,py,n)}
 if(map.id==='bedroom')drawBedroom(c);if(map.id==='ground')drawGround(c);if(map.id==='yard')drawYard(c,map);if(map.id==='village')drawVillage(c,map);if(map.id==='route1')drawRoute1(c,map);if(map.id==='village_home'||map.id==='study')drawInterior(c,map.id);
 // Collision layer is always visually indicated, without changing the engine's walls.
@@ -72,7 +82,7 @@ for(const cell of map.walls){const [x,y]=cell.split(',').map(Number);if(map.id==
 if(map.id==='yard'){// raised garden tiles must stay visible above the ground
 R(c,8*32,8*32,3*32,2,'#e7c99b')}
 if(map.id==='ground'){hero(c,6*32,2*32,'down',0);hero(c,3*32,3*32,'left',0)}
-for(const item of objects[map.id]||[]){if(item.id==='supply_box'){R(c,item.x*T+3,item.y*T+9,26,20,'#8d6135');R(c,item.x*T+3,item.y*T+9,26,5,'#e0b967');R(c,item.x*T+13,item.y*T+10,6,17,'#e8d19a')}else if(item.id==='village_sign'||item.id==='professor_sign'){R(c,item.x*T+7,item.y*T+6,18,20,'#a77a4c');R(c,item.x*T+5,item.y*T+3,22,13,'#e6c990')}}
-for(const npc of npcs[map.id]||[])drawNpc(c,npc.x,npc.y,npc.id);
+for(const item of objects[map.id]||[]){if(item.id==='pokemon_pc'){R(c,item.x*T+4,item.y*T+3,24,23,'#343c55');R(c,item.x*T+7,item.y*T+6,18,13,'#69c9d2');R(c,item.x*T+11,item.y*T+22,10,5,'#c6cbd2');R(c,item.x*T+7,item.y*T+27,18,3,'#555c6d');drawTag(c,item.x,item.y,'PC')}else if(item.id==='supply_box'){R(c,item.x*T+3,item.y*T+9,26,20,'#8d6135');R(c,item.x*T+3,item.y*T+9,26,5,'#e0b967');R(c,item.x*T+13,item.y*T+10,6,17,'#e8d19a');drawTag(c,item.x,item.y,'TRÄNKE')}else if(item.id==='village_sign'||item.id==='professor_sign'){R(c,item.x*T+7,item.y*T+6,18,20,'#a77a4c');R(c,item.x*T+5,item.y*T+3,22,13,'#e6c990')}}
+for(const npc of npcs[map.id]||[]){drawNpc(c,npc.x,npc.y,npc.id);if(npc.id==='merchant')drawTag(c,npc.x,npc.y,'LADEN');if(npc.id==='route1_trainer')drawTag(c,npc.x,npc.y,'TRAINER');}
 hero(c,state.x*32,state.y*32,state.facing,state.steps);
 }

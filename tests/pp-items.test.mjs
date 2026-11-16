@@ -1,0 +1,16 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createPokemon,validatePokemon} from '../src/team.js';
+import {currentPp,maxPp,restorePp,PP_ITEMS} from '../src/pp-items.js';
+import {Engine} from '../src/engine.js';
+import {startBattle,availableMoves} from '../src/battle.js';
+import {healPartyAtStation} from '../src/healing.js';
+const mon=()=>createPokemon(1,{level:10});
+test('Vier AP-Heilmittel im Sortiment',()=>{assert.equal(PP_ITEMS.length,4);assert.ok(PP_ITEMS.every(x=>x.price>0))});
+test('Äther regeneriert bis zu 10 AP für eine Attacke',()=>{const p=mon();p.pp=maxPp(p).map(v=>v-12);const before=currentPp(p);assert.equal(restorePp(p,'ether',0),true);assert.equal(p.pp[0],before[0]+10);assert.deepEqual(p.pp.slice(1),before.slice(1))});
+test('Top-Äther füllt eine Attacke vollständig',()=>{const p=mon();p.pp=maxPp(p).map(()=>0);assert.equal(restorePp(p,'max_ether',0),true);assert.equal(p.pp[0],maxPp(p)[0])});
+test('Elixier füllt jede Attacke um höchstens zehn AP',()=>{const p=mon();p.pp=maxPp(p).map(()=>0);assert.equal(restorePp(p,'elixir'),true);assert.deepEqual(p.pp,maxPp(p).map(v=>Math.min(10,v)))});
+test('Top-Elixier füllt alle AP, doppelte Anwendung ohne Wirkung',()=>{const p=mon();p.pp=maxPp(p).map(()=>0);assert.equal(restorePp(p,'max_elixir'),true);assert.deepEqual(p.pp,maxPp(p));assert.equal(restorePp(p,'max_elixir'),false)});
+test('AP werden beim Kampfstart übernommen und beim Heilen aufgefüllt',()=>{const p=mon();p.pp=maxPp(p).map(v=>v-1);assert.equal(validatePokemon(p),true);const b=startBattle(p,mon());assert.equal(availableMoves(b.player)[0].pp,p.pp[0]);healPartyAtStation([p]);assert.deepEqual(p.pp,maxPp(p))});
+test('AP-Heilmittel aus dem Beutel verbraucht und gespeichert',()=>{const e=new Engine();e.state.team=[mon()];e.state.team[0].pp=maxPp(e.state.team[0]).map(()=>0);e.addItem('max_elixir',1);assert.equal(e.usePpItemOn('max_elixir',0),true);assert.equal(e.inventory.some(i=>i.id==='max_elixir'),false);const restored=new Engine();restored.load(e.save());assert.deepEqual(restored.state.team[0].pp,maxPp(restored.state.team[0]))});
+test('Ungültige AP-Anwendung verbraucht nichts',()=>{const e=new Engine();e.state.team=[mon()];e.addItem('ether',1);assert.equal(e.usePpItemOn('ether',0),false);assert.equal(e.inventory.find(i=>i.id==='ether').quantity,1);assert.equal(e.usePpItemOn('ether',3),false)});
