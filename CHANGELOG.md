@@ -1164,3 +1164,48 @@ Symmetrische Haeuser und Gaerten, neu zugeordnete Portale, neu gefuehrte Dorfweg
 
 ## dev.359
 - Beutel: ungültige Zielteams bei Gegenstandsauswahl ignorieren.
+
+## 1.0.0-dev.374 – Entwicklungsblock 370–374 (16.11.2026)
+- dev.370: hohes Gras auf der Professorenlichtung, ausschließlich dekorative begehbare Felder abseits der Wege.
+- dev.371: deterministische automatische Wegplanung aus dem Forschungslabor zur Lichtung.
+- dev.372: automatische Spielerbewegung mit sichtbarer Professorenbegleitung; Eingaben während der Bewegung gesperrt.
+- dev.373: überarbeitete geskriptete Raupy-Vorführung mit schillerndem Raupy, Professoren-Pokémon, Attackenerklärung und Fang; keinerlei Spieler-Kampfsteuerung.
+- dev.374: Integrationstests und Anpassung der bestehenden Professoren-Regressionstests.
+- Die genaue Pokémon-Art des Professors bleibt ausdrücklich offen, da sie in der bereitgestellten Story-Masterfassung nicht festgelegt ist.
+- Kein Browser-E2E ausgeführt. Grafische Überarbeitung von Hof/Innenräumen aus dem breiteren Phasenplan ist noch nicht abgeschlossen.
+
+## 1.0.0-dev.375–379 – Atmosphäre Mu
+- dev.375: Forschungslichtung: Feldnotizen und Kleeblätter, Tutorialgras geschützt.
+- dev.376: Route 1: Blumen und Schmetterlinge auf freien Grasflächen.
+- dev.377: Bach: zusätzliche Wasserreflexe und Uferkiesel.
+- dev.378: Beerendorf: Beerenblüten und Erntedekoration.
+- dev.379: eigenständiges Render-Modul `src/mu-atmosphere.js`, fünf neue Tests, vollständiger Regressionstest.
+- Kartenkollision, Portale, Wege, Story und Pokémon-Systeme unverändert.
+
+
+## 1.0.0-dev.380–384 – Storypräsentation
+- dev.380: Geburtstagsdialoge mit Pixelporträts und Sprechererkennung.
+- dev.381: Eigenes Farbschema und Porträt für das Dimensionsereignis.
+- dev.382: Absol-Porträt und Szenenidentität.
+- dev.383: Professorenporträt für die geskriptete Raupy-Vorführung.
+- dev.384: Dialogfortschritt, responsive Oberfläche und fünf Regressionstests.
+- Bestehende Storytexte, Flags, Karten und Kampflogik unverändert.
+
+## 1.0.0-dev.385–389 – Kampfdarstellung
+- dev.385: KP-Farbbänder (hoch/mittel/niedrig) und zugängliche KP-Fortschrittsanzeige.
+- dev.386: Typmarkierung der Attackenauswahl mit deutschen Typbezeichnungen.
+- dev.387: Treffereffekte nach tatsächlich agierender Seite; Statuseffekte lösen keinen falschen Treffer aus.
+- dev.388: Neue Kampffeld-Horizontdarstellung und Kampfplattformen; Animationen berücksichtigen reduzierte Bewegung.
+- dev.389: Phasenmarkierung (Auswahl/Animation/Ergebnis), fünf neue Tests und vollständige Regression.
+- Keine Änderungen an Kampfrechenregeln, Fangen, Erfahrung oder Storyablauf.
+
+## 1.0.0-dev.390–394
+Menügestaltung, Team-KP-Farbstufen, Pokédex für vorhandene Arten, gespeicherte Anzeigeeinstellungen und Zugänglichkeit. Details: RELEASE_DEV394.md.
+
+## dev.395–399 – Alter Wald und Integration (16.11.2026)
+- dev.395: Deterministische Farn-, Laub- und Pilzdekoration am Waldrand.
+- dev.396: Moos, Farne und Laub im Alten Wald, ohne Weg- oder Kollisionsänderung.
+- dev.397: Holzmaserung und Kräuterbündel in der Waldhütte.
+- dev.398: Story-Schutzprüfung: Waldkampf bleibt ohne bestätigte Gegnerdaten deaktiviert.
+- dev.399: Neue Renderintegration und fünf gezielte automatisierte Regressionstests.
+- Keine neuen kanonischen Dialoge oder Ereignisse ergänzt. Visuelle Browserabnahme steht aus.

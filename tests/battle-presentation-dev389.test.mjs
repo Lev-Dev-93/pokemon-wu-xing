@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {hpBand,moveTypeLabel,attackVisual,battleAnnouncement} from '../src/battle-presentation.js';
+const main=readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
+const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+test('dev385: KP-Bänder berücksichtigen beide Schwellen',()=>{assert.equal(hpBand(100,100),'high');assert.equal(hpBand(50,100),'medium');assert.equal(hpBand(20,100),'low');assert.equal(hpBand(0,0),'low')});
+test('dev386: Attackentypen erhalten deutsche Bezeichnungen',()=>{assert.equal(moveTypeLabel(10),'Feuer');assert.equal(moveTypeLabel(11),'Wasser');assert.equal(moveTypeLabel(12),'Pflanze');assert.equal(moveTypeLabel(999),'Unbekannt');assert.match(main,/dataset\.moveType/)});
+test('dev387: Trefferanimation trifft nur die Gegenseite',()=>{assert.equal(attackVisual('player'),'enemy');assert.equal(attackVisual('opponent'),'player');assert.equal(attackVisual('status'),null);assert.match(main,/attackVisual\(event\.actor\)/)});
+test('dev388: Kampffeld bietet Plattformen und HUD',()=>{assert.match(html,/battle-arena-horizon/);assert.match(html,/battle-platform/);assert.match(html,/data-hp-band/);assert.match(html,/prefers-reduced-motion/)});
+test('dev389: Kampfarten und Zustände werden unterscheidbar dargestellt',()=>{assert.equal(battleAnnouncement('wild'),'Wildbegegnung');assert.equal(battleAnnouncement('trainer'),'Trainerkampf');assert.match(main,/dataset\.battlePhase/);assert.match(html,/1\.0\.0-dev\.(389|39[0-9])/)});

@@ -1,7 +1,6 @@
-# Testbericht dev.369
+# Testbericht – dev.399
 
-- Automatisierte Node-Tests: **688/688 bestanden**.
-- JavaScript-Syntaxprüfung: bestanden.
-- ZIP-Integritätsprüfung: bestanden.
-- Visueller Browsertest: **nicht durchgeführt**.
-- Integration: Welt, Portale, Erreichbarkeit und Storywege.
+- Automatisierte Node-Tests: **718 bestanden, 0 fehlgeschlagen**.
+- Neue Prüfungen: Walddekorationssicherheit, Determinismus, Waldhüttenzugang, Storykampf-Sperre, Renderintegration.
+- Browser-End-to-End: **nicht durchgeführt**.
+- Visuelle Abnahme: **nicht durchgeführt**.

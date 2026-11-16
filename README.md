@@ -1,3 +1,9 @@
+# Aktueller Stand: 1.0.0-dev.399
+
+Siehe `RELEASE_DEV399.md` und `TESTREPORT.md`.
+
+> Aktuelle Version: **1.0.0-dev.389** – Kampfdarstellung und Integration. Siehe RELEASE_DEV389.md.
+
 ## dev.117 – Stabilisierung und Testvorbereitung
 
 ## dev.116 – Stabilisierung und Testvorbereitung

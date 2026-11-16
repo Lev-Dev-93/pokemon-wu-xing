@@ -1,3 +1,5 @@
+import {drawMuAtmosphere} from './mu-atmosphere.js';
+import {drawForestAtmosphere} from './forest-atmosphere.js';
 import {facingAccent} from './visual-details.js';
 import {objectHighlight} from './visual-details.js';
 import {waterGlint} from './visual-details.js';
@@ -94,6 +96,12 @@ function drawVillage(c,map){
  R(c,10*T+4,0,24,9,'#b5a07c');
 }
 function drawProfessorClearing(c,map){
+ // Hohes Gras der Lehrvorführung, rein visuell und abseits der Wege.
+ for(const [gx,gy] of [[6,10],[7,10],[8,10],[6,11],[7,11],[8,11]]){
+  const X=gx*T,Y=gy*T;R(c,X+1,Y+9,30,21,'#386f48');
+  for(let k=0;k<5;k++){const xx=X+3+k*6;R(c,xx,Y+8+(k%2)*4,3,17,'#65a963');R(c,xx+2,Y+5+(k%3)*3,2,12,'#8bc77b');}
+ }
+
  // Laborplatz: Wegpflaster ohne Übermalen von Gebäuden oder Türfeldern.
  for(let y=4;y<=7;y++)for(let x=5;x<=11;x++){
   if(!isProfessorClearingPath(x,y)||map.walls.has(`${x},${y}`)||map.portals.some(p=>p.x===x&&p.y===y))continue;
@@ -223,6 +231,8 @@ if(map.id==='route2'){
 if(map.id==='yard'){// raised garden tiles must stay visible above the ground
 R(c,8*32,8*32,3*32,2,'#e7c99b')}
 if(map.id==='ground'){hero(c,6*32,2*32,'down',0);hero(c,3*32,3*32,'left',0)}
+drawMuAtmosphere(c,map);
+drawForestAtmosphere(c,map);
 for(const item of objects[map.id]||[]){if(item.id==='pokemon_pc'){R(c,item.x*T+4,item.y*T+3,24,23,'#343c55');R(c,item.x*T+7,item.y*T+6,18,13,'#69c9d2');R(c,item.x*T+11,item.y*T+22,10,5,'#c6cbd2');R(c,item.x*T+7,item.y*T+27,18,3,'#555c6d');objectHighlight(c,item.x*T,item.y*T,'pc');drawTag(c,item.x,item.y,'PC')}else if(item.id==='supply_box'){R(c,item.x*T+3,item.y*T+9,26,20,'#8d6135');R(c,item.x*T+3,item.y*T+9,26,5,'#e0b967');R(c,item.x*T+13,item.y*T+10,6,17,'#e8d19a');objectHighlight(c,item.x*T,item.y*T,'box');drawTag(c,item.x,item.y,'TRÄNKE')}else if(item.id==='village_sign'||item.id==='professor_sign'){R(c,item.x*T+7,item.y*T+6,18,20,'#a77a4c');R(c,item.x*T+5,item.y*T+3,22,13,'#e6c990')}}
 for(const npc of npcs[map.id]||[]){npcShadow(c,npc.x,npc.y);drawNpc(c,npc.x,npc.y,npc.id);if(npc.id==='merchant')drawTag(c,npc.x,npc.y,'LADEN');if(npc.id==='route1_trainer')drawTag(c,npc.x,npc.y,'TRAINER');}
 heroShadow(c,state.x*32,state.y*32);hero(c,state.x*32,state.y*32,state.facing,state.steps);facingAccent(c,state.x*32,state.y*32,state.facing);

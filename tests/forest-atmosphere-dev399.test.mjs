@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {maps,canMove} from '../src/maps.js';
+import {FOREST_SCENE_IDS,forestAtmospherePlan,auditForestAtmosphere,drawForestAtmosphere} from '../src/forest-atmosphere.js';
+import {FOREST_STORY_BATTLE,forestBattleCanStart} from '../src/forest-story-battle.js';
+test('dev395: forest-edge details stay outside paths, portals and obstacles',()=>{assert.equal(auditForestAtmosphere(maps.waldrand).length,0);assert.ok(forestAtmospherePlan(maps.waldrand).length>0)});
+test('dev396: deep-forest atmosphere is stable and never modifies collisions',()=>{const m=maps.route2,before=[...m.walls].sort();assert.deepEqual(forestAtmospherePlan(m),forestAtmospherePlan(m));assert.deepEqual([...m.walls].sort(),before);assert.deepEqual(auditForestAtmosphere(m),[])});
+test('dev397: elder-house herb details preserve both doorways',()=>{const m=maps.forest_elder_house;assert.equal(auditForestAtmosphere(m).length,0);assert.ok(forestAtmospherePlan(m).length>0);assert.ok(m.portals.every(p=>!m.walls.has(`${p.x},${p.y}`)))});
+test('dev398: no unapproved forest story battle is triggered',()=>{assert.equal(FOREST_STORY_BATTLE.status,'unconfigured');assert.equal(forestBattleCanStart({mapId:'forest_elder_house',flags:{route1_hatched:true},team:[{currentHp:10}]},null,false),false)});
+test('dev399: all forest scenes render safely and retain existing portal geometry',()=>{const commands=[];const ctx={fillRect(...a){commands.push(a)},set fillStyle(v){this._fillStyle=v}};for(const id of FOREST_SCENE_IDS){const m=maps[id],portals=JSON.stringify(m.portals);drawForestAtmosphere(ctx,m);assert.equal(JSON.stringify(m.portals),portals);assert.equal(auditForestAtmosphere(m).length,0)}assert.ok(commands.length>0)});

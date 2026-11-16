@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {hpPresentation,dexEntries,dexProgress,readDisplayOptions,writeDisplayOptions} from '../src/menu-presentation.js';
+test('dev.390: KP-Anzeige begrenzt Prozentwerte und zeigt Warnstufen',()=>{assert.equal(hpPresentation(5,100).band,'critical');assert.equal(hpPresentation(50,100).band,'warning');assert.equal(hpPresentation(150,100).percent,100)});
+test('dev.391: Pokédex sortiert und entfernt Dubletten aus Team und Lager',()=>{assert.deepEqual(dexEntries([{speciesId:25},{speciesId:1}],[{speciesId:25},{speciesId:4}]).map(p=>p.id),[1,4,25])});
+test('dev.392: Pokédex zeigt nur tatsächlichen Besitz',()=>{assert.deepEqual(dexProgress([],[{speciesId:999}]),{owned:0,total:493})});
+test('dev.393: Anzeigeeinstellungen bleiben gespeichert',()=>{const values=new Map();const storage={getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v)};assert.equal(writeDisplayOptions(storage,{'large-text':true,'high-contrast':false}),true);assert.deepEqual(readDisplayOptions(storage),{'large-text':true,'high-contrast':false})});
+test('dev.394: Ungültige Anzeigeeinstellungen werden sicher zurückgesetzt',()=>{assert.deepEqual(readDisplayOptions({getItem:()=>'{'}),{'large-text':false,'high-contrast':false})});
