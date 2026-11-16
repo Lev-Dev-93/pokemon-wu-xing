@@ -1,3 +1,25 @@
+# Pokémon Wu Xing – dev.119
+
+## Startdorf Mu
+- Sieben betretbare Gebäude: Forschungslabor des Professors (`study`), Professorenhaus, Markt, kleine Kapelle, Rivalenhaus und zwei Wohnhäuser.
+- Labor und Professorenhaus bilden ein eigenes Viertel im Norden; die übrigen Gebäude liegen um den gepflasterten Dorfplatz.
+- Dorfbrunnen auf zwei nicht begehbaren Kacheln.
+- Der Professor ist im Labor, der Händler im Markt; der Rivale bleibt für die Story am Dorfplatz.
+
+## Zuchtfarm
+- Der bisherige Heilungs-NPC im Dorfhaus ist entfernt.
+- Die Adoptivmutter (`breeder_a`) heilt nach dem Schlüpfen des Starter-Pokémon.
+- Der Pokémon-PC steht im Erdgeschoss (`ground`) und ermöglicht dort Lagerzugriff nach dem Schlüpfen.
+
+Keine neuen Sammelgegenstände, Nebenaufgaben oder nicht storyrelevanten NPCs.
+
+## dev.118 – Vollbild, Kampf im Spielfenster, Bach und Waldgestaltung
+
+- Fullscreen API mit Umschaltknopf.
+- Kampf ersetzt die Weltansicht im selben Rahmen.
+- Wasser des Bachs wird nicht mehr durch Kollisionsgrafiken verdeckt.
+- Mehr Bäume am Waldrand und zusammenhängende mehrkachelige Baumgruppen im Alten Wald.
+
 ## dev.117 – Stabilisierung und Testvorbereitung
 
 ## dev.116 – Stabilisierung und Testvorbereitung

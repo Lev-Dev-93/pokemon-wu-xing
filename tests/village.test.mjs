@@ -10,13 +10,13 @@ test('Züchterhof führt ins Dorf und zurück ohne Softlock',()=>{
  assert.equal(e.state.mapId,'yard');assert.deepEqual([e.state.x,e.state.y],[7,10]);
 });
 test('Dorf-Portal und Spawn sind begehbar und NPC-frei',()=>{
- const m=maps.village;assert.equal(m.portals.length,4);
+ const m=maps.village;assert.equal(m.portals.length,9);
  assert.equal(m.walls.has('10,1'),false);assert.equal(m.walls.has('10,0'),false);
  assert.equal(npcs.village.some(n=>n.x===10&&n.y===1),false);
 });
 test('Dorfbewohnerin, Kindheitsfreund und Professor sind ansprechbar und speichern Flags',()=>{
  for(const [id,flag] of [['rival','spokenToRival'],['professor','spokenToProfessor']]){
-  const n=npcs.village.find(n=>n.id===id);const e=new Engine();e.state.mapId='village';e.state.x=n.x;e.state.y=n.y+1;e.state.facing='up';
+  const n=(id==='professor'?npcs.study:npcs.village).find(n=>n.id===id);const e=new Engine();e.state.mapId=id==='professor'?'study':'village';e.state.x=n.x;e.state.y=n.y+1;e.state.facing='up';
   assert.equal(e.interact(),true);assert.equal(e.mode,'dialogue');
   while(e.mode==='dialogue')e.interact();assert.equal(e.state.flags[flag],true);
   const restored=new Engine();restored.load(e.save());assert.equal(restored.state.flags[flag],true);

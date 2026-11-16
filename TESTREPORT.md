@@ -1,6 +1,3 @@
-# Testbericht dev.117
+# dev.119 – Testbericht
 
-- 400 automatisierte Tests bestanden.
-- Syntaxprüfung aller src/*.js bestanden.
-- ZIP-Integrität geprüft.
-- Manueller Browsertest noch ausstehend.
+414 von 414 automatisierten Tests bestanden. Alle JavaScript-Dateien syntaktisch geprüft. `auditWorld`, `auditWalkablePortals` und Erreichbarkeitsprüfung ohne Fehler. Browserprüfung ausstehend.
