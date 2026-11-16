@@ -36,11 +36,33 @@ function door(c,x,y){R(c,x+1,y,30,32,'#6a4c3a');R(c,x+4,y+2,24,27,'#35404a');R(c
 function flower(c,x,y){R(c,x+15,y+18,2,9,'#4b8c4b');for(const [dx,dy] of [[11,14],[18,14],[15,10],[15,18]])R(c,x+dx,y+dy,5,5,'#e7d4df');R(c,x+15,y+14,4,4,'#f2c85c')}
 function fence(c,x,y){R(c,x+2,y+8,28,5,'#d3aa72');R(c,x+2,y+20,28,5,'#a7794d');for(let i=0;i<3;i++){R(c,x+3+i*11,y+3,7,28,'#b78a5b');R(c,x+4+i*11,y+3,2,24,'#e4bd84')}}
 function roof(c,x,y){R(c,x,y,32,32,'#9e5947');for(let j=0;j<4;j++){R(c,x,y+j*8,32,2,'#754338');R(c,x+(j%2)*11+4,y+j*8+3,11,1,'#c47b5a')}}
+function facadeDetail(c,x,y,w,h,seed=0){
+ // Purely visual: windows and cornices stay inside the existing building footprint.
+ const left=x*T,top=y*T,right=(x+w)*T,bottom=(y+h)*T;
+ R(c,left+2,top+2,w*T-4,3,'#d6a77c');
+ for(let i=0;i<w;i++){
+  const xx=left+i*T;
+  R(c,xx+4,top+7,24,2,'#db9471');
+  R(c,xx+5,top+14,8,2,'#80483e');
+  if(h>1&&i>0&&i<w-1&&i%2===(seed%2)){
+   R(c,xx+7,bottom-25,18,17,'#654c3d');R(c,xx+9,bottom-23,14,13,'#80b5b5');
+   R(c,xx+15,bottom-23,2,13,'#f1dcab');R(c,xx+9,bottom-17,14,2,'#f1dcab');
+   R(c,xx+5,bottom-8,22,3,'#b17e57');
+  }
+ }
+}
+function interiorDetail(c,id){
+ // Wall trim and furnishing accents never add collision cells.
+ for(let x=0;x<12;x++){R(c,x*T,26,32,2,'#d5b78c');R(c,x*T,29,32,2,'#795a48')}
+ for(const [x,y] of [[1,2],[9,3]]){R(c,x*T+10,y*T+8,12,14,'#755b43');R(c,x*T+12,y*T+10,8,10,'#d5c294');R(c,x*T+14,y*T+12,4,6,'#7a9b79')}
+ if(id==='study'){R(c,6*T+6,2*T+8,20,3,'#8ca7ac');R(c,6*T+8,2*T+12,16,2,'#b6d1ce')}
+}
 function wallBlock(c,x,y){R(c,x,y,32,32,'#79644f');R(c,x+2,y+2,28,26,'#a18a6a');R(c,x+3,y+4,26,2,'#d4b795');R(c,x+2,y+27,28,4,'#624e41')}
 function hero(c,x,y,facing,steps){const walk=steps%2===0?0:2;R(c,x+10,y+26,6,4-walk,'#3b3b48');R(c,x+19,y+26-walk,6,4+walk,'#3b3b48');R(c,x+9,y+16,18,12,'#426e85');R(c,x+10,y+18,3,9,'#e0a77e');R(c,x+24,y+18,3,9,'#e0a77e');R(c,x+10,y+7,16,12,'#eebf96');R(c,x+8,y+4,20,8,'#513a33');R(c,x+11,y+2,14,4,'#715043');R(c,x+13,y+17,10,3,'#d5a980');if(facing==='down'){R(c,x+13,y+13,2,2,'#322d30');R(c,x+21,y+13,2,2,'#322d30')}if(facing==='left')R(c,x+10,y+13,2,2,'#322d30');if(facing==='right')R(c,x+24,y+13,2,2,'#322d30');if(facing==='up'){R(c,x+12,y+9,13,8,'#614b3f');R(c,x+14,y+18,9,8,'#a97c5e')}}
-function drawBedroom(c){bed(c,32,32);desk(c,224,32);dresser(c,128,0);carpet(c,96,128,64,64);pot(c,258,104);window(c,5*32,0);shelf(c,7,4*32);door(c,5*32,7*32)}
-function drawUpper(c){carpet(c,4*32,3*32,4*32,3*32,'#8b7769');sofa(c,32,32);dresser(c,9*32,32);window(c,5*32,0);pot(c,10*32,3*32);shelf(c,32,5*32);door(c,5*32,32);stairs(c,10*32,7*32)}
+function drawBedroom(c){interiorDetail(c,'bedroom');bed(c,32,32);desk(c,224,32);dresser(c,128,0);carpet(c,96,128,64,64);pot(c,258,104);window(c,5*32,0);shelf(c,7,4*32);door(c,5*32,7*32)}
+function drawUpper(c){interiorDetail(c,'upper');carpet(c,4*32,3*32,4*32,3*32,'#8b7769');sofa(c,32,32);dresser(c,9*32,32);window(c,5*32,0);pot(c,10*32,3*32);shelf(c,32,5*32);door(c,5*32,32);stairs(c,10*32,7*32)}
 function drawGround(c){
+ interiorDetail(c,'ground');
  // Küche links: Herd, Spüle, Schränke und Esstisch. Wohnzimmer rechts: Sofa, Teppich und Bücher.
  R(c,0,0,6*T,7*T,'#b79b78');R(c,6*T,0,6*T,7*T,'#c3ad8c');
  for(let x=0;x<6;x++)R(c,x*T,0,T,6,'#896748');
@@ -84,6 +106,7 @@ function drawVillage(c,map){
  const buildings=outdoorBuildings.village;
  for(const {x,y,w,h,color,label} of buildings){
   for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++){wallBlock(c,xx*T,yy*T);if(yy===y)roof(c,xx*T,yy*T)}
+  facadeDetail(c,x,y,w,h,x+y);
   R(c,x*T+5,(y+h-1)*T+6,w*T-10,16,color);
   if(typeof c.fillText==='function'){c.save();c.fillStyle='#fff2d1';c.font='bold 9px sans-serif';c.fillText(label,x*T+8,(y+h-1)*T+18);c.restore()}
  }
@@ -110,6 +133,7 @@ function drawProfessorClearing(c,map){
 
  for(const {x,y,w,h,color,label} of outdoorBuildings.professor_clearing){
   for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++){wallBlock(c,xx*T,yy*T);if(yy===y)roof(c,xx*T,yy*T)}
+  facadeDetail(c,x,y,w,h,x+y);
   R(c,x*T+5,(y+h-1)*T+6,w*T-10,16,color);
   if(typeof c.fillText==='function'){c.save();c.fillStyle='#fff2d1';c.font='bold 9px sans-serif';c.fillText(label,x*T+8,(y+h-1)*T+18);c.restore();}
  }
@@ -127,12 +151,12 @@ function drawBeerendorf(c,map){
  R(c,10*T+5,10*T+6,22,20,'#a5a8a1');R(c,10*T+8,10*T+8,16,8,'#72b8c2');R(c,0,7*T+10,9,12,'#e2c99c');R(c,(map.w-1)*T+23,7*T+10,9,12,'#e2c99c');
 }
 function drawRoute1(c,map){for(let y=0;y<map.h;y++)for(let x=0;x<map.w;x++)if(isTravelPath(map.id,x,y)&&!map.walls.has(`${x},${y}`))path(c,x*T,y*T,x+y*map.w);for(const [x,y] of [[1,2],[3,8],[12,3],[14,10],[2,15],[13,16]]){if(map.walls.has(`${x},${y}`)||terrainKind(map.id,x,y)==='path'||isWalkway(map,x,y))continue;pot(c,x*T,y*T);if(!map.walls.has(`${x+1},${y}`)&&terrainKind(map.id,x+1,y)!=='path'&&!isWalkway(map,x+1,y))flower(c,(x+1)*T,y*T)}for(const [x,y] of [[2,3],[3,3],[12,3],[13,3],[2,13],[3,13],[12,13],[13,13]]){if(!map.walls.has(`${x},${y}`))continue;R(c,x*T,y*T,32,32,'#3c704a');R(c,x*T+6,y*T+3,20,25,'#5e985a')}if(map.id==='route1'){R(c,0,8*T+10,9,12,'#e2c99c');R(c,15*T+23,6*T+10,9,12,'#e2c99c')}}
-function drawInterior(c,id){carpet(c,3*T,3*T,5*T,3*T,id==='study'?'#607d87':'#9b775b');window(c,5*T,0);shelf(c,2*T,4*T);shelf(c,3*T,4*T);desk(c,7*T,2*T);pot(c,9*T,5*T);door(c,5*T,7*T);if(id==='village_home'){sofa(c,T,T);table(c,4*T,4*T)}else{desk(c,T,T);shelf(c,8*T,T)}}
-function drawNpc(c,x,y,kind){
+function drawInterior(c,id){interiorDetail(c,id);carpet(c,3*T,3*T,5*T,3*T,id==='study'?'#607d87':'#9b775b');window(c,5*T,0);shelf(c,2*T,4*T);shelf(c,3*T,4*T);desk(c,7*T,2*T);pot(c,9*T,5*T);door(c,5*T,7*T);if(id==='village_home'){sofa(c,T,T);table(c,4*T,4*T)}else{desk(c,T,T);shelf(c,8*T,T)}}
+function drawNpc(c,x,y,kind,frame=0){
  const palette={brook_ranger:['#587f63','#8d6742'],brook_artist:['#ae8c6b','#9d677a'],merchant:['#d7aa43','#4e7256'],route1_trainer:['#df624f','#376caa'],route1_guide:['#6fa88e','#5b6e54'],route1_naturalist:['#86a16e','#b3a179'],route2_guide:['#ba9466','#607e5d'],route2_botanist:['#71a67a','#d4c293'],route2_hiker:['#b68e62','#685f4e'],route1_guide:['#6fa88e','#5b6e54'],route1_naturalist:['#86a16e','#b3a179'],route2_guide:['#ba9466','#607e5d'],route2_botanist:['#71a67a','#d4c293'],route2_hiker:['#b68e62','#685f4e'],route1_guide:['#6fa88e','#5b6e54'],route1_naturalist:['#86a16e','#b3a179'],route2_guide:['#ba9466','#607e5d'],route2_botanist:['#71a67a','#d4c293'],route2_hiker:['#b68e62','#685f4e'],herbal_witch:['#765486','#637c49'],resident:['#9a70b0','#e2bd80'],breeder_a:['#b87558','#668a65'],breeder_b:['#718ca8','#9a7757'],villager:['#c17f69','#6b965c'],rival:['#6c7cb1','#c0a17d'],professor:['#e9e8db','#e9e8db']};
- const [shirt,hat]=palette[kind]||['#8aa58c','#a17c61'];const X=x*T,Y=y*T;
- R(c,X+7,Y+27,19,4,'#51463c');R(c,X+9,Y+17,6,11,'#4b4854');R(c,X+19,Y+17,6,11,'#4b4854');
- R(c,X+7,Y+13,19,11,shirt);R(c,X+5,Y+15,4,9,'#d6a17e');R(c,X+25,Y+15,4,9,'#d6a17e');
+ const [shirt,hat]=palette[kind]||['#8aa58c','#a17c61'];const X=x*T,Y=y*T;const pose=(frame%4===1?1:frame%4===3?-1:0);
+ R(c,X+7,Y+27,19,4,'#51463c');R(c,X+9,Y+17,6,11+Math.max(0,pose),'#4b4854');R(c,X+19,Y+17,6,11+Math.max(0,-pose),'#4b4854');
+ R(c,X+7,Y+13,19,11,shirt);R(c,X+5,Y+15+pose,4,9,'#d6a17e');R(c,X+25,Y+15-pose,4,9,'#d6a17e');
  R(c,X+10,Y+5,14,12,'#efbd93');R(c,X+9,Y+3,16,6,hat);R(c,X+13,Y+11,2,2,'#342c32');R(c,X+20,Y+11,2,2,'#342c32');
  if(kind==='merchant'){R(c,X+4,Y+2,24,4,'#dcb54b');R(c,X+10,Y,12,4,'#dcb54b');R(c,X+13,Y+18,7,5,'#f7db8c')}
  if(kind==='route1_trainer'){R(c,X+6,Y+3,20,4,'#e35648');R(c,X+22,Y+4,8,3,'#e35648');R(c,X+14,Y+17,6,6,'#fff4de')}
@@ -234,6 +258,6 @@ if(map.id==='ground'){hero(c,6*32,2*32,'down',0);hero(c,3*32,3*32,'left',0)}
 drawMuAtmosphere(c,map);
 drawForestAtmosphere(c,map);
 for(const item of objects[map.id]||[]){if(item.id==='pokemon_pc'){R(c,item.x*T+4,item.y*T+3,24,23,'#343c55');R(c,item.x*T+7,item.y*T+6,18,13,'#69c9d2');R(c,item.x*T+11,item.y*T+22,10,5,'#c6cbd2');R(c,item.x*T+7,item.y*T+27,18,3,'#555c6d');objectHighlight(c,item.x*T,item.y*T,'pc');drawTag(c,item.x,item.y,'PC')}else if(item.id==='supply_box'){R(c,item.x*T+3,item.y*T+9,26,20,'#8d6135');R(c,item.x*T+3,item.y*T+9,26,5,'#e0b967');R(c,item.x*T+13,item.y*T+10,6,17,'#e8d19a');objectHighlight(c,item.x*T,item.y*T,'box');drawTag(c,item.x,item.y,'TRÄNKE')}else if(item.id==='village_sign'||item.id==='professor_sign'){R(c,item.x*T+7,item.y*T+6,18,20,'#a77a4c');R(c,item.x*T+5,item.y*T+3,22,13,'#e6c990')}}
-for(const npc of npcs[map.id]||[]){npcShadow(c,npc.x,npc.y);drawNpc(c,npc.x,npc.y,npc.id);if(npc.id==='merchant')drawTag(c,npc.x,npc.y,'LADEN');if(npc.id==='route1_trainer')drawTag(c,npc.x,npc.y,'TRAINER');}
+for(const npc of npcs[map.id]||[]){npcShadow(c,npc.x,npc.y);drawNpc(c,npc.x,npc.y,npc.id,Math.floor((state.steps||0)/2));if(npc.id==='merchant')drawTag(c,npc.x,npc.y,'LADEN');if(npc.id==='route1_trainer')drawTag(c,npc.x,npc.y,'TRAINER');}
 heroShadow(c,state.x*32,state.y*32);hero(c,state.x*32,state.y*32,state.facing,state.steps);facingAccent(c,state.x*32,state.y*32,state.facing);
 }

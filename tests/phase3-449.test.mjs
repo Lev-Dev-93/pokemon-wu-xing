@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {normalizeDex,registerDexSpecies,dexHistoryProgress,dexHistoryEntries} from '../src/pokedex-history.js';
+import {weatherPhase} from '../src/world-weather.js';
+import {attackEffect,battleAccessibilityText} from '../src/battle-effects.js';
+import {saveHealth,exportSaveFile} from '../src/save-health.js';
+import {Engine} from '../src/engine.js';
+test('legacy team and storage populate caught history',()=>{assert.deepEqual(normalizeDex(null,[{speciesId:1}],[{speciesId:4}]),{seen:[1,4],caught:[1,4]})});
+test('seen and caught are distinct and stable',()=>{const seen=registerDexSpecies(null,10);const caught=registerDexSpecies(seen,10,'caught');assert.deepEqual(dexHistoryProgress(caught),{seen:1,caught:1,total:493});assert.equal(dexHistoryEntries(seen,'seen').length,1);assert.equal(dexHistoryEntries(caught,'seen').length,0)});
+test('invalid dex IDs are rejected',()=>{assert.deepEqual(normalizeDex({seen:[0,494,2,2],caught:[-1,3]}),{seen:[2,3],caught:[3]})});
+test('engine persists encounter registry',()=>{const e=new Engine();e.registerEncounter(25);const raw=e.save();const f=new Engine();f.load(raw);assert.equal(f.state.pokedex.seen.includes(25),true);assert.equal(f.state.pokedex.caught.includes(25),false)});
+test('weather animation deterministic and disabled in interiors',()=>{assert.deepEqual(weatherPhase('ground',100),{kind:'none',frame:0});assert.equal(weatherPhase('route2',1000).kind,'canopy');assert.equal(weatherPhase('route2',1000,true).frame,0)});
+test('battle effect descriptors are pure',()=>{assert.equal(attackEffect(11).effect,'energy');assert.equal(attackEffect(1).effect,'impact');assert.match(battleAccessibilityText('player','Tackle',3,20),/3 von 20/)});
+test('save diagnostic and export',()=>{const raw=new Engine().save();assert.equal(saveHealth(raw).ok,true);assert.equal(JSON.parse(exportSaveFile(raw)).schema,8);assert.equal(saveHealth('{').ok,false)});

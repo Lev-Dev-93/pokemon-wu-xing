@@ -1,3 +1,12 @@
+## 1.0.0-dev.449 – Phase-3-Integrationsstand
+- Persistente Pokédex-Historie mit Gesehen-/Gefangen-Status, einschließlich alter Speicherstände.
+- Sichtung bei Wild- und Trainerbegegnungen, Fangregistrierung bei erfolgreicher Aufnahme.
+- Pokédex-Filter und Fortschrittsanzeige.
+- Zusätzliche rein grafische Umgebungseffekte.
+- Kampfeffekt-/Barrierefreiheit-Helfer als vorbereitete, noch nicht angebundene Module.
+- JSON-Spielstandexport und Speicherdiagnose.
+- Regressionstests ergänzt.
+
 ## dev.369 – Integration und Qualitätssicherung
 
 - Integrationsprüfung fasst Welt-, Portal-, Story- und Erreichbarkeitsaudits zusammen.
@@ -1209,3 +1218,8 @@ Menügestaltung, Team-KP-Farbstufen, Pokédex für vorhandene Arten, gespeichert
 - dev.398: Story-Schutzprüfung: Waldkampf bleibt ohne bestätigte Gegnerdaten deaktiviert.
 - dev.399: Neue Renderintegration und fünf gezielte automatisierte Regressionstests.
 - Keine neuen kanonischen Dialoge oder Ereignisse ergänzt. Visuelle Browserabnahme steht aus.
+
+## Phase 3 – Zwischenstand dev.409
+- dev.400–404: Eigenständige Umgebungsanimation für Außenkarten und reproduzierbare Dekorationspositionen.
+- dev.405–409: Animationsphasen, Bewegungsreduktion, sichere Integration und fünf neue Tests.
+- Noch kein abgeschlossener Gesamtblock dev.400–449.
