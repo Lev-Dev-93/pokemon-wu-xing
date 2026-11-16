@@ -1234,3 +1234,11 @@ NPC-Animationszyklus, prozedurale Kampf-Pixelsilhouetten und Cutscene-Overlays. 
 
 ## dev.462
 - Pokémon-Porträts in Team und Detailansicht; sichtbare Canvas-Kampfgrafik und Fallback.
+
+## dev.463 – Beginn Phase 4
+- 1-Pixel-Licht-/Schattenakzente und Augenreflexe für neun kuratierte Pokémon; unterscheidbare Rückansichten.
+- Neue Regressionstests und Plan für separat platzierbare Kartenobjekte.
+
+## dev.499 – Phase 4 gebündelter Entwicklungsblock
+- Pixelgrafikdetails, Idle-Animationen, eigenständige Objekt-Blueprints und Validierung, neue Tests.
+- Noch nicht abgeschlossen: Live-Karteneditor, vollumfängliche Pokémon-Neuzeichnung und Browserabnahme.

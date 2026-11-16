@@ -1,0 +1,59 @@
+// Phase 4: immutable, data-driven building and furniture placement definitions.
+// These are editable blueprints; existing map layouts remain unchanged until a
+// validated migration explicitly applies a blueprint.
+const clone = value => JSON.parse(JSON.stringify(value));
+export const DEFAULT_LAYOUT = Object.freeze({
+  village: [
+    {id:'village-west-home',kind:'building',art:'mu-home',x:3,y:3,w:3,h:2,door:{x:4,y:5,target:'village_home',tx:5,ty:6}},
+    {id:'village-east-home',kind:'building',art:'mu-home',x:16,y:3,w:3,h:2,door:{x:17,y:5,target:'village_house_east',tx:5,ty:6}},
+    {id:'village-chapel',kind:'building',art:'mu-chapel',x:3,y:10,w:3,h:2,door:{x:4,y:12,target:'chapel',tx:5,ty:6}},
+    {id:'village-rival-home',kind:'building',art:'mu-home',x:16,y:10,w:3,h:2,door:{x:17,y:12,target:'rival_house',tx:5,ty:6}}
+  ],
+  bedroom:[{id:'player-bed',kind:'furniture',art:'bed',x:1,y:1,w:1,h:2},{id:'player-desk',kind:'furniture',art:'desk',x:7,y:1,w:2,h:1}],
+  ground:[{id:'family-table',kind:'furniture',art:'table',x:3,y:4,w:2,h:1},{id:'pokemon-pc',kind:'furniture',art:'pc',x:8,y:1,w:2,h:1}]
+});
+export function layoutCopy(layout=DEFAULT_LAYOUT){return clone(layout)}
+export function footprint(object){return Array.from({length:object.w*object.h},(_,i)=>({x:object.x+i%object.w,y:object.y+Math.floor(i/object.w)}))}
+export function validateLayout(layout,bounds={},reserved={}){
+ const errors=[],ids=new Set();
+ for(const [mapId,items] of Object.entries(layout)){
+  if(!Array.isArray(items)){errors.push(`${mapId}: items must be an array`);continue}
+  const occupied=new Set();
+  for(const o of items){
+   if(!o||typeof o.id!=='string'||!o.id||!['building','furniture'].includes(o.kind)||typeof o.art!=='string'||!o.art||![o.x,o.y,o.w,o.h].every(Number.isInteger)||o.w<1||o.h<1){errors.push(`${mapId}: invalid object`);continue}
+   if(ids.has(o.id))errors.push(`duplicate id: ${o.id}`);ids.add(o.id);
+   const bound=bounds[mapId];
+   for(const {x,y} of footprint(o)){
+    const key=`${x},${y}`;
+    if(x<0||y<0||(bound&&(x>=bound.w||y>=bound.h)))errors.push(`${o.id}: outside map`);
+    if(occupied.has(key))errors.push(`${o.id}: overlap ${key}`);
+    if((reserved[mapId]||[]).includes(key))errors.push(`${o.id}: reserved ${key}`);
+    occupied.add(key)
+   }
+   if(o.door){const d=o.door;if(o.kind!=='building'||![d.x,d.y,d.tx,d.ty].every(Number.isInteger)||!d.target)errors.push(`${o.id}: invalid door`);else if(d.x<o.x||d.x>=o.x+o.w||d.y!==o.y+o.h)errors.push(`${o.id}: door must be directly south of building`)}
+  }
+ }
+ return {ok:errors.length===0,errors}
+}
+export function moveObject(layout,mapId,id,x,y,bounds={},reserved={}){
+ const next=layoutCopy(layout);const object=next[mapId]?.find(item=>item.id===id);
+ if(!object||![x,y].every(Number.isInteger))return {ok:false,errors:['unknown object or invalid position']};
+ const dx=x-object.x,dy=y-object.y;object.x=x;object.y=y;
+ if(object.door){object.door.x+=dx;object.door.y+=dy}
+ const check=validateLayout(next,bounds,reserved);
+ return check.ok?{ok:true,layout:next,object}:{ok:false,errors:check.errors}
+}
+export function addObject(layout,mapId,object,bounds={},reserved={}){
+ const next=layoutCopy(layout);(next[mapId]??=[]).push(clone(object));
+ const check=validateLayout(next,bounds,reserved);
+ return check.ok?{ok:true,layout:next}:{ok:false,errors:check.errors}
+}
+export function collisionCells(layout,mapId){return (layout[mapId]||[]).flatMap(footprint).map(({x,y})=>`${x},${y}`)}
+export function portalDefinitions(layout,mapId){return (layout[mapId]||[]).filter(o=>o.door).map(o=>({id:o.id,...o.door}))}
+export function migrateLayout(previous,updated,position){
+ // Explicit relocation mapping, no silent teleportation or save overwrite.
+ const oldIds=new Map(Object.entries(previous).flatMap(([mapId,items])=>items.map(o=>[o.id,{mapId,...o}])));
+ const moves=[];
+ for(const [mapId,items] of Object.entries(updated))for(const item of items){const old=oldIds.get(item.id);if(old&&(old.x!==item.x||old.y!==item.y||old.mapId!==mapId))moves.push({id:item.id,from:{mapId:old.mapId,x:old.x,y:old.y},to:{mapId,x:item.x,y:item.y}})}
+ return {moves,playerPosition:clone(position),requiresPlayerRelocation:!!(position&&collisionCells(updated,position.mapId).includes(`${position.x},${position.y}`))};
+}

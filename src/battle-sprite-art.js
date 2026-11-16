@@ -17,7 +17,41 @@ const ART={
 };
 export const HANDCRAFTED_SPECIES=Object.freeze(Object.keys(ART).map(Number));
 export function spriteDescriptor(speciesId,back=false){const id=Number(speciesId);if(!Number.isInteger(id)||id<1)return null;return {id,back,palette:ART[id]?.palette??PALETTES[id%PALETTES.length],shape:id%5,mark:id%7,handcrafted:!!ART[id]};}
-export function drawBattleSprite(canvas,speciesId,back=false){const d=spriteDescriptor(speciesId,back);if(!d)return false;const c=canvas.getContext('2d');if(!c)return false;canvas.width=48;canvas.height=48;c.imageSmoothingEnabled=false;c.clearRect(0,0,48,48);const r=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(x,y,w,h)};c.clearRect(0,0,48,48);r(8,43,33,2,'#3b594b55');const art=ART[d.id];if(art){const height=art.rows.length;const width=Math.max(...art.rows.map(s=>s.length));const x0=Math.floor((24-width)/2),y0=Math.max(0,Math.floor((22-height)/2));for(let y=0;y<height;y++){const row=art.rows[y];for(let x=0;x<row.length;x++){const n=Number(row[x]);if(row[x]==='.'||!Number.isInteger(n))continue;const xx=back?23-(x+x0):x+x0;r(xx*2,(y+y0)*2,2,2,art.palette[n]);}}if(back){r(19,15,10,4,art.palette[1]);r(21,24,6,5,art.palette[2]);}return true;}
+export function drawBattleSprite(canvas,speciesId,back=false){const d=spriteDescriptor(speciesId,back);if(!d)return false;const c=canvas.getContext('2d');if(!c)return false;canvas.width=48;canvas.height=48;c.imageSmoothingEnabled=false;c.clearRect(0,0,48,48);const r=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(x,y,w,h)};c.clearRect(0,0,48,48);r(8,43,33,2,'#3b594b55');const art=ART[d.id];if(art){const height=art.rows.length;const width=Math.max(...art.rows.map(s=>s.length));const x0=Math.floor((24-width)/2),y0=Math.max(0,Math.floor((22-height)/2));for(let y=0;y<height;y++){const row=art.rows[y];for(let x=0;x<row.length;x++){const n=Number(row[x]);if(row[x]==='.'||!Number.isInteger(n))continue;const xx=back?23-(x+x0):x+x0;r(xx*2,(y+y0)*2,2,2,art.palette[n]);}}// Phase 4: finer one-pixel edge accents and differentiated rear markings.
+// The 24px silhouettes stay recognizable; 48px canvas now uses individual
+// pixels for light/shadow accents instead of only 2x2 blocks.
+const occupied=(x,y)=>y>=0&&y<height&&x>=0&&x<art.rows[y].length&&art.rows[y][x]!=='.';
+for(let y=0;y<height;y++){for(let x=0;x<art.rows[y].length;x++){
+if(!occupied(x,y))continue;
+const ch=art.rows[y][x],n=Number(ch);if(!Number.isInteger(n))continue;
+const px=(back?23-(x+x0):x+x0)*2,py=(y+y0)*2;
+// Small directional rim lights make the forms readable at native scale.
+if(!occupied(x,y-1)&&n===0)r(px,py,2,1,art.palette[2]);
+if(!occupied(x-1,y)&&n===0)r(back?px+1:px,py+1,1,1,art.palette[2]);
+if(!occupied(x,y+1)&&n===0)r(px,py+1,2,1,art.palette[1]);
+}}
+// Phase 4 polish: subtle form-specific texture, highlights and separation.
+// All additions are inside the original 48x48 canvas and preserve silhouettes.
+const accent=art.palette[3]||art.palette[2];
+if(d.id===1){r(20,10,8,2,accent);r(16,13,2,5,art.palette[1]);r(30,13,2,5,art.palette[1]);}
+if(d.id===4){r(30,38,3,3,art.palette[3]);r(32,35,2,3,art.palette[2]);}
+if(d.id===7){r(16,24,16,2,art.palette[2]);r(18,29,12,2,art.palette[1]);}
+if(d.id===25){r(15,7,2,5,art.palette[1]);r(32,7,2,5,art.palette[1]);}
+if(d.id===133){r(12,13,3,3,art.palette[2]);r(33,13,3,3,art.palette[2]);}
+if(d.id===359){r(14,22,3,5,art.palette[2]);r(31,22,3,5,art.palette[2]);}
+if(back){
+// Rear-facing artwork has no frontal eyes; a subtle species-colored
+// shoulder/back pattern distinguishes it from the front view.
+r(19,15,10,3,art.palette[1]);r(21,23,6,5,art.palette[2]);
+r(23,20,2,2,art.palette[1]);
+}else{
+// Small eye glints are intentionally finer than the base silhouette.
+for(let y=0;y<height;y++)for(let x=0;x<art.rows[y].length;x++){
+if(art.rows[y][x]!=='2')continue;
+const px=(x+x0)*2,py=(y+y0)*2;
+r(px,py,1,1,'#fff6df');
+}
+}return true;}
 const [main,shade,light]=d.palette;
 if(d.shape===0){r(9,14,8,15,shade);r(31,14,8,15,shade)}
 if(d.shape===1){r(12,7,8,16,main);r(29,7,8,16,main)}

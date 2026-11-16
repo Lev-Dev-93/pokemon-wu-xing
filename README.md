@@ -307,3 +307,6 @@ End-to-End-Regressionsprüfungen für Fußwege und Speicherstände.
 
 ### dev.212: Einwechsel-Fähigkeiten
 Wetterfähigkeiten, Bedroher und Innere Kraft sind im Kampfmodul ergänzt. Weitere Fähigkeiten und Spezialattacken bleiben offen.
+
+
+**dev.463:** Phase 4 gestartet. Details: PHASE4_PLAN.md.
