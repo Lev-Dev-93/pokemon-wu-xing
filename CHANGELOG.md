@@ -1,3 +1,42 @@
+## dev.83
+UI für Entwicklungssteine und verfügbare Freundschaftsentwicklungen; Regressionstests.
+
+## dev.82
+Tag-/Nacht-Bedingungen für Freundschaftsentwicklungen.
+
+## dev.81
+Freundschaftsentwicklungen mit Grenzwertprüfung.
+
+## dev.80
+Freundschaftswert für Pokémon mit rückwärtskompatiblen Spielständen; Zuwachs durch Bewegung.
+
+## dev.79
+Entwicklungssteine mit expliziten Itembedingungen und Verbrauch.
+
+## dev.78
+- Integrationstests für Uhrzeit-Anbindung und Rückwärtskompatibilität von Speicherständen.
+
+## dev.77
+- Wildkampf zeigt das tatsächliche Gebiet und Tag/Nacht an, statt jeden Kampf fälschlich als Route 1 zu bezeichnen.
+
+## dev.76
+- Tageszeit (06–19 Uhr Tag, sonst Nacht) aktiviert und in die Wildbegegnungen integriert; Uhrzeit bleibt außerhalb des Speicherstands.
+
+
+## dev.75
+Regressionstests und Dokumentations-/Release-Stabilisierung.
+
+## dev.74
+Waldpfad erweitert um zusätzliche Beobachter und untersuchbare Hinweise.
+
+## dev.73
+Kampferfahrung je besiegtem Trainer-Pokémon; Fortschritts- und AP-Synchronisierung.
+
+## dev.72
+Trainerteam mit zwei Pokémon und Kampf-Fortsetzung vor Auszahlung.
+
+## dev.71
+Gebiets- und Tageszeit-Begegnungstabellen mit gewichteter Auswahl und Validierung.
 ## 1.0.0-dev.61
 - Entwicklung und Attackenlernen mit Regressionstests; AP-Synchronisierung zwischen Kampf und Team korrigiert.
 
@@ -258,3 +297,18 @@ Waldpfad: weitere NPCs, eigene Begegnungstabelle, Level 4–6, Journal-Eintrag. 
 - Routenpositionen werden gegen Storyfreigaben geprüft.
 - Fortsetzen/Laden im Dorf startet die Giratina-Szene direkt, statt den Lauf erneut abzuspielen.
 - Regressionstests für fehlerhafte Speicherstände und Kartenpositionen.
+
+## dev.66
+- Neue Karte Bachübergang zwischen Route 1 und Waldpfad; Brücke mit begehbarer Querung, Bach als Kollision, Tagebuchflag.
+
+## dev.67
+- Pixel-Art-Verfeinerung: Uferbewuchs, Schilf, Blumen, Holzplanken und Brückengeländer.
+
+## dev.68
+- Rundweg, Sperre vor dem Schlüpfen und Portalketten mit Regressionstests abgesichert.
+
+## dev.69
+- Zwei ansprechbare NPCs und zwei untersuchbare Objekte am Bach; ohne neue kanonische Storyereignisse.
+
+## dev.70
+- Abschließende Regressionstests für Portale, Brücke, NPC-Positionen und begehbare Wege.

@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {encounterTable,chooseWildPokemon,rollEncounter} from '../src/wild-encounters.js';
+import {Engine} from '../src/engine.js';
+import {npcs,objects} from '../src/maps.js';
+test('Gebiete besitzen Tag- und Nachttabellen',()=>{for(const id of ['route1','route2']){assert.ok(encounterTable(id,'day'));assert.ok(encounterTable(id,'night'));}assert.equal(encounterTable('brook'),null);});
+test('Gewichte müssen nicht genau 100 ergeben',()=>{const p=chooseWildPokemon(()=>0,[{speciesId:10,weight:2},{speciesId:13,weight:3}]);assert.equal(p.speciesId,10);});
+test('Ungültige Begegnungsdaten werden abgelehnt',()=>{assert.throws(()=>chooseWildPokemon(()=>0,[{speciesId:494,weight:1}]));assert.throws(()=>encounterTable('route1','dusk'));});
+test('Keine Wildkämpfe auf Brücke',()=>assert.equal(rollEncounter({mapId:'brook',x:3,y:6,hatched:true,hasUsablePokemon:true,rng:()=>0}),null));
+test('Trainer hat ein Zweierteam',()=>{const e=new Engine();e.state.mapId='route1';e.state.flags.route1_hatched=true;e.state.team=[{currentHp:10}];assert.equal(e.beginTrainerChallenge(),true);assert.equal(e.pendingTrainer.team.length,2);});
+test('Waldpfad hat zusätzliche Interaktionen',()=>{assert.ok(npcs.route2.some(n=>n.id==='route2_birdwatcher'));assert.ok(objects.route2.some(n=>n.id==='route2_moss'));});

@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {maps,npcs,objects} from '../src/maps.js';import {Engine} from '../src/engine.js';
+test('brook spawns never collide with NPCs or water',()=>{for(const map of [maps.route1,maps.brook,maps.route2])for(const p of map.portals){const dest=maps[p.target];assert.ok(dest);assert.ok(!dest.walls.has(`${p.tx},${p.ty}`));assert.ok(!(npcs[dest.id]||[]).some(n=>n.x===p.tx&&n.y===p.ty))}});
+test('bridge and stream preserve continuous central path',()=>{for(let y=0;y<maps.brook.h;y++)assert.equal(maps.brook.walls.has(`7,${y}`),false)});
+test('brook NPCs and objects have distinct reachable positions',()=>{const all=[...npcs.brook,...objects.brook];assert.equal(new Set(all.map(n=>`${n.x},${n.y}`)).size,all.length);for(const n of all)assert.ok(!maps.brook.walls.has(`${n.x},${n.y}`))});

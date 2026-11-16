@@ -1,3 +1,4 @@
+import {EVOLUTION_STONES} from './progression.js';
 import {PP_ITEMS} from './pp-items.js';
 import {POKEBALL_ITEM} from './capture.js';
 import {POTION_ITEM,STATUS_REMEDIES,REVIVE_ITEM,FULL_RESTORE_ITEM} from './healing.js';
@@ -7,6 +8,7 @@ export const SHOP_STOCK=Object.freeze([
  Object.freeze({id:POTION_ITEM,name:'Trank',price:60}),
  Object.freeze({id:REVIVE_ITEM,name:'Beleber',price:120}),
  Object.freeze({id:FULL_RESTORE_ITEM,name:'Top-Genesung',price:180}),
+ ...EVOLUTION_STONES.map(({id,name})=>Object.freeze({id,name,price:600})),
  ...PP_ITEMS.map(({id,name,price})=>Object.freeze({id,name,price})),
  ...STATUS_REMEDIES.map(({id,name,price})=>Object.freeze({id,name,price}))
 ]);

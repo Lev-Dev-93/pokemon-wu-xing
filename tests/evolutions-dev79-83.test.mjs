@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {createPokemon,validatePokemon} from '../src/team.js';
+import {stoneEvolutionOptions,evolveWithStone,friendshipEvolutionOptions,evolveWithFriendship} from '../src/progression.js';
+import {Engine} from '../src/engine.js';
+test('stone options match evolution source and reject wrong stones',()=>{const p=createPokemon(25);assert.ok(stoneEvolutionOptions(p,'thunder-stone').some(e=>e.to===26));assert.equal(stoneEvolutionOptions(p,'fire-stone').length,0);assert.throws(()=>evolveWithStone(p,'fire-stone',26));});
+test('stone evolution preserves HP loss and species validity',()=>{const p=createPokemon(25);p.currentHp-=3;evolveWithStone(p,'thunder-stone',26);assert.equal(p.speciesId,26);assert.equal(p.currentHp,p.stats.hp-3);assert.ok(validatePokemon(p));});
+test('friendship evolution checks threshold and time',()=>{const p=createPokemon(133);p.friendship=160;assert.ok(friendshipEvolutionOptions(p,'day').some(e=>e.to===196));assert.ok(!friendshipEvolutionOptions(p,'day').some(e=>e.to===197));assert.ok(friendshipEvolutionOptions(p,'night').some(e=>e.to===197));assert.throws(()=>evolveWithFriendship(p,197,'day'));});
+test('friendship evolution preserves valid pokemon',()=>{const p=createPokemon(172);p.friendship=220;evolveWithFriendship(p,25);assert.ok(validatePokemon(p));});
+test('legacy pokemon without friendship stays valid',()=>{const p=createPokemon(172);delete p.friendship;assert.ok(validatePokemon(p));assert.equal(friendshipEvolutionOptions(p).length,0);});
+test('stone cannot be consumed outside exploration or without stock',()=>{const e=new Engine();e.state.team=[createPokemon(25)];assert.equal(e.useEvolutionStoneOn('thunder-stone',0,26),false);e.addItem('thunder-stone');assert.equal(e.useEvolutionStoneOn('thunder-stone',0,26),true);assert.equal(e.state.team[0].speciesId,26);assert.equal(e.inventory.length,0);});

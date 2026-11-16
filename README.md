@@ -1,3 +1,5 @@
+
+Aktueller Entwicklungsstand: dev.78. Pokémon nur Nationaldex #001–493; Attacken und Fähigkeiten perspektivisch aus allen Generationen.
 ## dev.58 – Korrektur der Giratina-Sequenz
 
 Der Starter-Ei-Dialog wird vollständig gezeigt, bevor der einmalige automatische Lauf zum Dorfplatz beginnt. Der praktische Browsertest steht noch aus.
@@ -190,3 +192,21 @@ Auf dem Waldpfad gibt es eine eigene vorläufige Begegnungstabelle und weitere D
 
 ### dev.65 – Stabilisierung
 Speicherstand-Validierung und Wiederaufnahme der Giratina-Szene im Dorf verbessert.
+
+### dev.66
+Neue Karte Bachübergang zwischen Route 1 und Waldpfad; Brücke mit begehbarer Querung, Bach als Kollision, Tagebuchflag.
+
+### dev.67
+Pixel-Art-Verfeinerung: Uferbewuchs, Schilf, Blumen, Holzplanken und Brückengeländer.
+
+### dev.68
+Rundweg, Sperre vor dem Schlüpfen und Portalketten mit Regressionstests abgesichert.
+
+### dev.69
+Zwei ansprechbare NPCs und zwei untersuchbare Objekte am Bach; ohne neue kanonische Storyereignisse.
+
+### dev.70
+Abschließende Regressionstests für Portale, Brücke, NPC-Positionen und begehbare Wege.
+
+### dev.83
+Team- und Beutelmenü zeigen verfügbare Entwicklungen.

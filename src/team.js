@@ -15,10 +15,11 @@ export function createPokemon(speciesId,{level=5,ivs=Array(6).fill(31),evs=Array
  const abilities=entry.abilities;const chosen=abilityId===null?(abilities.find(a=>a.hidden)||abilities[0]):abilities.find(a=>a.id===abilityId);
  if(!chosen)throw Error('Ungültige Fähigkeit');
  if(typeof shiny!=='boolean')throw Error('Ungültiger Shiny-Status');
- return {speciesId:Number(speciesId),level,experience:experienceForLevel(Number(speciesId),level),ivs:[...ivs],evs:[...evs],abilityId:chosen.id,hiddenAbility:chosen.hidden,shiny,stats,currentHp:stats.hp,status:'healthy',moves:movesAtLevel(Number(speciesId),level)};
+ return {speciesId:Number(speciesId),level,experience:experienceForLevel(Number(speciesId),level),ivs:[...ivs],evs:[...evs],abilityId:chosen.id,hiddenAbility:chosen.hidden,shiny,stats,currentHp:stats.hp,status:'healthy',friendship:70,moves:movesAtLevel(Number(speciesId),level)};
 }
 export function validatePokemon(p){
  if(!p||typeof p!=='object'||!validInt(p.speciesId,1,493)||!POKEMON_DATA[p.speciesId]||!validInt(p.level,1,MAX_LEVEL)||!validInt(p.experience,0,100000000)||!Array.isArray(p.ivs)||!Array.isArray(p.evs))return false;
+ if(p.friendship!==undefined&&!validInt(p.friendship,0,255))return false;
  let stats;try{stats=calculateStats(p.speciesId,p.level,p.ivs,p.evs)}catch{return false}
  if(!p.stats||statsNames.some(k=>p.stats[k]!==stats[k])||!validInt(p.currentHp,0,stats.hp))return false;
  const a=POKEMON_DATA[p.speciesId].abilities.find(a=>a.id===p.abilityId);
