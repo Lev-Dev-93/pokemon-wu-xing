@@ -434,9 +434,11 @@ document.addEventListener('fullscreenchange',()=>{
 });
 
 // Phase 5: developer-only placement panel; never appears in normal play.
-if(devMode){
+{
  const panel=document.createElement('details');panel.id='layout-editor';panel.style.cssText='max-width:760px;margin:12px auto;padding:12px;border:2px solid #5d846a;border-radius:8px;background:#e5efdf;color:#243c2c';
- const summary=document.createElement('summary');summary.textContent='Karteneditor (Entwicklermodus)';panel.append(summary);
+ const summary=document.createElement('summary');summary.textContent='Karteneditor (Entwicklermodus)';panel.append(summary);panel.hidden=true;
+ const editorButton=document.querySelector('#open-layout-editor');
+ editorButton.addEventListener('click',()=>{panel.hidden=false;panel.open=true;editorButton.setAttribute('aria-expanded','true');panel.scrollIntoView({behavior:'smooth',block:'start'});});
  const controls=document.createElement('div');controls.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:8px';panel.append(controls);
  const field=(label,value)=>{const wrap=document.createElement('label');wrap.textContent=label+' ';const input=document.createElement('input');input.value=value;input.style.width='95px';wrap.append(input);controls.append(wrap);return input};
  const mapField=field('Karte','village'),idField=field('Objekt-ID','village-west-home'),xField=field('X','3'),yField=field('Y','3'),artField=field('Grafik','mu-home');
