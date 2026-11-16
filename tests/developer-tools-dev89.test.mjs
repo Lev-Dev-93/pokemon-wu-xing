@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {developerModeEnabled,grantDevelopmentSupplies} from '../src/developer-tools.js';
+test('developer mode requires explicit URL flag',()=>{assert.equal(developerModeEnabled(''),false);assert.equal(developerModeEnabled('?devtools=0'),false);assert.equal(developerModeEnabled('?devtools=1'),true)});
+test('developer supplies do not alter story flags',()=>{const state={money:0,eventLog:[],flags:{egg_received:true},inventory:[]};const engine={state,addItem(id,quantity){state.inventory.push({id,quantity})}};grantDevelopmentSupplies(engine);assert.equal(state.money,5000);assert.equal(state.inventory.length,9);assert.deepEqual(state.flags,{egg_received:true});assert.equal(state.eventLog[0].type,'developerSupplies')});
+test('developer supplies reject invalid amounts',()=>assert.throws(()=>grantDevelopmentSupplies({state:{money:0},addItem(){}},{money:-1})));

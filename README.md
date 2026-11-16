@@ -210,3 +210,27 @@ Abschließende Regressionstests für Portale, Brücke, NPC-Positionen und begehb
 
 ### dev.83
 Team- und Beutelmenü zeigen verfügbare Entwicklungen.
+
+### dev.84 – Questsystem
+Technische Quests für bestehende Ereignisse; keine neuen kanonischen Storyereignisse.
+
+### dev.85 – Questsystem
+Technische Quests für bestehende Ereignisse; keine neuen kanonischen Storyereignisse.
+
+### dev.86 – Questsystem
+Technische Quests für bestehende Ereignisse; keine neuen kanonischen Storyereignisse.
+
+### dev.87 – Questsystem
+Technische Quests für bestehende Ereignisse; keine neuen kanonischen Storyereignisse.
+
+### dev.88 – Questsystem stabilisiert
+Keine neuen kanonischen Storyereignisse.
+
+### dev.89
+Entwicklertestmodus über ?devtools=1; Testgeld und Entwicklungssteine im Einstellungsmenü, normale Spieloberfläche unverändert.
+
+### dev.90
+Questbeschreibungen und alle Questgruppen im Menü und Reisetagebuch sichtbar.
+
+### dev.91
+Tag/Nacht-Anzeige direkt neben dem Gebietsnamen; Regressionstests für Tageszeitgrenzen.

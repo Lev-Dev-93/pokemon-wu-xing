@@ -1,3 +1,13 @@
+## dev.96 – Neue Quest und Stabilisierung
+
+## dev.95 – Alte Dame als Dialog-Platzhalter
+
+## dev.94 – Route 2 Alter Wald
+
+## dev.93 – Beerendorf mit offener Werkstatt
+
+## dev.92 – Routenfolge und Altspielstand-Migration
+
 ## dev.83
 UI für Entwicklungssteine und verfügbare Freundschaftsentwicklungen; Regressionstests.
 
@@ -312,3 +322,30 @@ Waldpfad: weitere NPCs, eigene Begegnungstabelle, Level 4–6, Journal-Eintrag. 
 
 ## dev.70
 - Abschließende Regressionstests für Portale, Brücke, NPC-Positionen und begehbare Wege.
+
+## dev.84
+Questdefinitionen und statusbasierte Voraussetzungen. 
+
+## dev.85
+Story- und NPC-Flags aktualisieren den Questfortschritt. 
+
+## dev.86
+Reisetagebuch zeigt aktive, erledigte und gesperrte Quests. 
+
+## dev.87
+Questlog wird in Speicherschema 7 validiert und aus Altständen rekonstruiert. 
+
+## dev.87
+Questlog wird beim Speichern und Laden validiert, ältere Spielstände werden migriert (Speicherschema 6 bleibt kompatibel).
+
+## dev.88
+Questzustand beim Neustart initialisiert, weitere Regressionstests.
+
+## dev.89
+- Entwicklertestmodus über ?devtools=1; Testgeld und Entwicklungssteine im Einstellungsmenü, normale Spieloberfläche unverändert.
+
+## dev.90
+- Questbeschreibungen und alle Questgruppen im Menü und Reisetagebuch sichtbar.
+
+## dev.91
+- Tag/Nacht-Anzeige direkt neben dem Gebietsnamen; Regressionstests für Tageszeitgrenzen.

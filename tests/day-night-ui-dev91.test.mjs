@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {timeOfDayAt} from '../src/day-night.js';test('day/night boundary matches visible world indicator',()=>{assert.equal(timeOfDayAt(5),'night');assert.equal(timeOfDayAt(6),'day');assert.equal(timeOfDayAt(19),'day');assert.equal(timeOfDayAt(20),'night')});

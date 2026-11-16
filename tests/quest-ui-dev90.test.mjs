@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {questSummary} from '../src/quests.js';import {start} from '../src/maps.js';test('quest descriptions and groups exist for journal UI',()=>{const s=questSummary(start.flags);assert.ok(s.active[0].description.length>0);assert.ok(s.locked.length>0)});

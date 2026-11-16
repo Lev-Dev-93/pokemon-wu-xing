@@ -4,6 +4,7 @@ export const ROUTE1_ENCOUNTERS=Object.freeze([{speciesId:10,weight:35},{speciesI
 export const ROUTE2_ENCOUNTERS=Object.freeze([{speciesId:10,weight:20},{speciesId:13,weight:20},{speciesId:16,weight:20},{speciesId:43,weight:20},{speciesId:69,weight:20}]);
 export const AREA_ENCOUNTERS=Object.freeze({
  route1:Object.freeze({day:ROUTE1_ENCOUNTERS,night:Object.freeze([{speciesId:10,weight:20},{speciesId:13,weight:20},{speciesId:16,weight:15},{speciesId:19,weight:25},{speciesId:41,weight:20}])}),
+ waldrand:Object.freeze({day:ROUTE2_ENCOUNTERS,night:ROUTE2_ENCOUNTERS}),
  route2:Object.freeze({day:ROUTE2_ENCOUNTERS,night:Object.freeze([{speciesId:10,weight:15},{speciesId:13,weight:15},{speciesId:43,weight:20},{speciesId:69,weight:20},{speciesId:92,weight:30}])})
 });
 export function encounterTable(mapId,timeOfDay='day'){if(!['day','night'].includes(timeOfDay))throw Error('Ungültige Tageszeit');return AREA_ENCOUNTERS[mapId]?.[timeOfDay]??null;}

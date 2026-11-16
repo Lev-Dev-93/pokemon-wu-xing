@@ -1,2 +1,5 @@
-# dev.83 Testbericht
-Automatisierte Node-Tests bestanden; JavaScript-Syntax geprüft. Praktischer Browsertest steht aus.
+# dev.96 Testbericht
+
+377 von 377 Tests bestanden, 0 fehlgeschlagen.
+JavaScript-Syntax geprüft.
+Browser-Praxistest steht aus.
