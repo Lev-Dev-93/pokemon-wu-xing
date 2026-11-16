@@ -1231,3 +1231,6 @@ NPC-Animationszyklus, prozedurale Kampf-Pixelsilhouetten und Cutscene-Overlays. 
 - Neun eigenständige handgezeichnete Pixelmasken für frühe und storyrelevante Pokémon statt einheitlicher prozeduraler Silhouetten.
 - Rückansichten und deterministischer Fallback für nicht abgedeckte Arten.
 - Drei neue automatisierte Grafiktests, insgesamt 744/744 erfolgreich.
+
+## dev.462
+- Pokémon-Porträts in Team und Detailansicht; sichtbare Canvas-Kampfgrafik und Fallback.
