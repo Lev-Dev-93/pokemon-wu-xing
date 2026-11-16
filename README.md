@@ -310,3 +310,11 @@ Wetterfähigkeiten, Bedroher und Innere Kraft sind im Kampfmodul ergänzt. Weite
 
 
 **dev.463:** Phase 4 gestartet. Details: PHASE4_PLAN.md.
+
+
+## Phase 5: Karteneditor
+Mit `?devtools=1` die Entwickleransicht öffnen, im Karteneditor `village`, `bedroom` oder `ground` auswählen. Änderungen erst prüfen, dann Layout speichern. Layoutdaten sind getrennt vom Spielstand. Details: PHASE5_REPORT.md.
+
+
+### Layouteditor
+Im Entwicklermodus können Gebäude in Startdorf, Forschungsplatz und Beerendorf sowie Möbel in 13 Innenräumen platziert werden. Layoutänderungen sind separat speicherbar. Bereits in den Hintergründen gezeichnete Möbel bleiben vorerst unverändert.

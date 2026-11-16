@@ -1,3 +1,6 @@
+import {keyboardMove} from './editor-keyboard.js';
+import {gridCellFromPointer,objectAtCell,paintLayoutGrid} from './visual-layout-editor.js';
+import {currentLayout,editLayout,resetLayout,saveLayout,loadLayout,layoutInfo,undoLayout,redoLayout,exportLayout,importLayout,historyInfo,previewImport,restoreBackup,backupInfo} from './layout-runtime.js';
 import {drawBattleSprite} from './battle-sprite-art.js';
 import {drawCutsceneFrame} from './cutscene-visuals.js';
 import {attackEffect,battleAccessibilityText} from './battle-effects.js';
@@ -45,6 +48,7 @@ import {professorVisualPhase} from './professor-scene.js';
 import {professorWalkPlan,TUTORIAL_PROFESSOR_TARGET} from './professor-tutorial.js';
 import {drawProfessorOverlay} from './professor-art.js';
 const savedDisplayOptions=readDisplayOptions(localStorage);for(const [option,enabled] of Object.entries(savedDisplayOptions)){document.body.classList.toggle(option,enabled)}
+const layoutLoadResult=loadLayout(localStorage);
 const engine=new Engine();const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
 const info=document.querySelector('#info'),notice=document.querySelector('#notice'),details=document.querySelector('#debug');
 const dialogBox=document.querySelector('#dialogue'),speaker=document.querySelector('#speaker'),dialogText=document.querySelector('#dialogue-text');
@@ -428,3 +432,55 @@ document.addEventListener('fullscreenchange',()=>{
  fullscreenButton.textContent=active?'⛶ Vollbild beenden':'⛶ Vollbild';
  fullscreenButton.setAttribute('aria-pressed',String(active));
 });
+
+// Phase 5: developer-only placement panel; never appears in normal play.
+if(devMode){
+ const panel=document.createElement('details');panel.id='layout-editor';panel.style.cssText='max-width:760px;margin:12px auto;padding:12px;border:2px solid #5d846a;border-radius:8px;background:#e5efdf;color:#243c2c';
+ const summary=document.createElement('summary');summary.textContent='Karteneditor (Entwicklermodus)';panel.append(summary);
+ const controls=document.createElement('div');controls.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:8px';panel.append(controls);
+ const field=(label,value)=>{const wrap=document.createElement('label');wrap.textContent=label+' ';const input=document.createElement('input');input.value=value;input.style.width='95px';wrap.append(input);controls.append(wrap);return input};
+ const mapField=field('Karte','village'),idField=field('Objekt-ID','village-west-home'),xField=field('X','3'),yField=field('Y','3'),artField=field('Grafik','mu-home');
+ const status=document.createElement('p');status.setAttribute('role','status');panel.append(status);
+ const preview=document.createElement('pre');preview.style.cssText='max-height:180px;overflow:auto;font-size:11px';panel.append(preview);
+ const refresh=()=>{preview.textContent=JSON.stringify(currentLayout()[mapField.value]||[],null,2)+'\nHistorie: '+JSON.stringify(historyInfo())};
+ const button=(label,fn)=>{const b=document.createElement('button');b.textContent=label;b.type='button';b.addEventListener('click',()=>{const r=fn();status.textContent=r?.ok===false?r.errors.join(' · '):'Änderung übernommen';refresh();draw()});controls.append(b)};
+ const apply=(action)=>editLayout(action,mapField.value,idField.value,Number(xField.value),Number(yField.value),artField.value,{mapId:engine.state.mapId,x:engine.state.x,y:engine.state.y});
+ button('Verschieben',()=>apply('move'));button('Hinzufügen',()=>apply('add'));button('Entfernen',()=>apply('remove'));
+ const position=()=>({mapId:engine.state.mapId,x:engine.state.x,y:engine.state.y});
+ button('Rückgängig',()=>undoLayout(position()));button('Wiederholen',()=>redoLayout(position()));
+ button('Layout speichern',()=>({ok:saveLayout(localStorage)}));button('Sicherung wiederherstellen',()=>restoreBackup(localStorage,position()));button('Standard wiederherstellen',()=>resetLayout(position()));
+ button('JSON exportieren',()=>{const blob=new Blob([exportLayout()],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='monsterreise-layout.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);return {ok:true}});
+ const importLabel=document.createElement('label');importLabel.textContent='Layout-JSON importieren ';const importInput=document.createElement('input');importInput.type='file';importInput.accept='.json,application/json';importLabel.append(importInput);controls.append(importLabel);
+ importInput.addEventListener('change',async()=>{const file=importInput.files?.[0];if(!file)return;if(file.size>300000){status.textContent='Datei zu groß';return}try{const json=await file.text();const preview=previewImport(json,position());if(!preview.ok){status.textContent=preview.errors.join(' · ');return}if(!confirm('Layout für '+preview.changedMaps.length+' Karten und '+preview.objectCount+' Objekte importieren? Änderungen sind noch nicht gespeichert.')){status.textContent='Import abgebrochen';return}const r=importLayout(json,position());status.textContent=r.ok?'Layout importiert (noch nicht gespeichert)':r.errors.join(' · ');refresh();draw()}catch(e){status.textContent=String(e.message)}finally{importInput.value=''}});
+ 
+ // Phase 8: visual drag-and-drop grid, isolated from the gameplay canvas.
+ const gridHelp=document.createElement('p');gridHelp.textContent='Grafischer Editor: Objekt anklicken und ziehen; alternativ Raster mit Tab fokussieren und ausgewähltes Objekt mit Pfeiltasten bewegen. Änderungen erst mit „Layout speichern“ dauerhaft sichern.';panel.append(gridHelp);
+ const gridCanvas=document.createElement('canvas');gridCanvas.id='layout-grid';gridCanvas.setAttribute('aria-label','Kartenraster: Objekt mit Maus wählen oder per Tab fokussieren und mit Pfeiltasten verschieben');gridCanvas.tabIndex=0;gridCanvas.style.cssText='display:block;max-width:100%;height:auto;touch-action:none;cursor:crosshair;border:2px solid #426b52;background:#f3f1dd';panel.append(gridCanvas);
+ let dragging=null;
+ const paintGrid=()=>{const dimensions=layoutInfo().bounds[mapField.value];if(!dimensions){gridCanvas.width=0;gridCanvas.height=0;status.textContent='Karte wird vom Editor nicht unterstützt';return}paintLayoutGrid(gridCanvas,currentLayout()[mapField.value]||[],dimensions.w,dimensions.h,idField.value,engine.state.mapId===mapField.value?engine.state:null)};
+ const pointerCell=e=>{const dimensions=layoutInfo().bounds[mapField.value];return dimensions?gridCellFromPointer(e.clientX,e.clientY,gridCanvas.getBoundingClientRect(),gridCanvas.width,gridCanvas.height,dimensions.w,dimensions.h):null};
+ gridCanvas.addEventListener('pointerdown',e=>{const cell=pointerCell(e);if(!cell)return;const selected=objectAtCell(currentLayout()[mapField.value]||[],cell.x,cell.y);if(!selected)return;dragging={id:selected.id,offsetX:cell.x-selected.x,offsetY:cell.y-selected.y};idField.value=selected.id;xField.value=selected.x;yField.value=selected.y;artField.value=selected.art;gridCanvas.setPointerCapture(e.pointerId);paintGrid()});
+ gridCanvas.addEventListener('pointerup',e=>{if(!dragging)return;const cell=pointerCell(e),selection=dragging;dragging=null;if(!cell)return;const x=cell.x-selection.offsetX,y=cell.y-selection.offsetY;const result=editLayout('move',mapField.value,selection.id,x,y,artField.value,position());status.textContent=result.ok?'Objekt verschoben (noch nicht gespeichert)':result.errors.join(' · ');if(result.ok){xField.value=x;yField.value=y}refresh();draw()});
+ gridCanvas.addEventListener('pointercancel',()=>{dragging=null});
+ gridCanvas.addEventListener('keydown',e=>{
+  const dimensions=layoutInfo().bounds[mapField.value];if(!dimensions)return;
+  const items=currentLayout()[mapField.value]||[];
+  if(e.key==='Escape'){dragging=null;status.textContent='Auswahl abgebrochen';return}
+  if(e.key==='Tab')return;
+  const selected=items.find(item=>item.id===idField.value);
+  if(e.key==='Enter'&&!selected&&items.length){idField.value=items[0].id;paintGrid();e.preventDefault();return}
+  if(!selected)return;
+  const destination=keyboardMove(e.key,selected,dimensions.w,dimensions.h);
+  if(!e.key.startsWith('Arrow'))return;
+  e.preventDefault();
+  if(!destination){status.textContent='Kartenrand erreicht';return}
+  const result=editLayout('move',mapField.value,selected.id,destination.x,destination.y,selected.art,position());
+  status.textContent=result.ok?'Objekt per Tastatur verschoben (noch nicht gespeichert)':result.errors.join(' · ');
+  if(result.ok){xField.value=destination.x;yField.value=destination.y}
+  refresh();draw();paintGrid();
+ });
+ const observer=new MutationObserver(()=>paintGrid());observer.observe(preview,{childList:true,characterData:true,subtree:true});
+ mapField.addEventListener('change',paintGrid);panel.addEventListener('toggle',()=>{if(panel.open)paintGrid()});
+ mapField.addEventListener('change',refresh);refresh();paintGrid();document.querySelector('main').append(panel);
+ if(!layoutLoadResult.ok)status.textContent='Gespeichertes Layout konnte nicht geladen werden: '+layoutLoadResult.errors.join(', ');
+}

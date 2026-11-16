@@ -1,3 +1,23 @@
+## dev.599 – Phase 9: Tastaturbedienbarer Karteneditor
+- Kartenraster per Tab fokussierbar, ausgewählte Objekte per Pfeiltasten verschiebbar.
+- Randprüfung vor der bestehenden Layoutvalidierung.
+- Escape bricht eine laufende Auswahl ab.
+- Zwei neue automatisierte Tastaturtests.
+
+## dev.519 – Phase 5: weitere Innenräume und sichere Portale
+- Elf Innenräume erhalten editierbare Dekorationsobjekte.
+- Rückkehrportale werden zuverlässig zurückgesetzt und aktualisiert.
+- Bestehende Layout-Speicherstände werden erweitert.
+- Schutz für Story-Gebäude und Tür-Kollisionen.
+
+## dev.501 – Erweiterung Phase 5
+- Forschungsplatz und Beerendorf an den Layouteditor angebunden.
+- Rückkehrportale und Spielerpositionsschutz verbessert.
+
+## dev.500 – Phase 5 Integration
+- Laufzeit-Anbindung von Kartenobjekten an Kollision, Portale und Darstellung; Entwicklereditor und Layoutspeicherung.
+- Einschränkungen in PHASE5_REPORT.md.
+
 ## 1.0.0-dev.449 – Phase-3-Integrationsstand
 - Persistente Pokédex-Historie mit Gesehen-/Gefangen-Status, einschließlich alter Speicherstände.
 - Sichtung bei Wild- und Trainerbegegnungen, Fangregistrierung bei erfolgreicher Aufnahme.
@@ -1242,3 +1262,14 @@ NPC-Animationszyklus, prozedurale Kampf-Pixelsilhouetten und Cutscene-Overlays. 
 ## dev.499 – Phase 4 gebündelter Entwicklungsblock
 - Pixelgrafikdetails, Idle-Animationen, eigenständige Objekt-Blueprints und Validierung, neue Tests.
 - Noch nicht abgeschlossen: Live-Karteneditor, vollumfängliche Pokémon-Neuzeichnung und Browserabnahme.
+
+## dev.539 – Phase 6
+- Undo/Redo, JSON-Import/Export, Validierung und Spielerpositionsschutz im Karteneditor.
+
+## dev.559 – Phase 7
+- Sichere Layout-Importvorschau, Größenlimits und Bestätigung.
+- Sicherung und Wiederherstellung vorheriger Layouts.
+
+## dev.579 – Phase 8
+- Visueller Drag-and-Drop-Rastereditor mit Pointer-Eingabe und Objektauswahl.
+- Zwei neue automatisierte Tests für Koordinaten und Objektauswahl.

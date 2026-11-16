@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {DEFAULT_LAYOUT,layoutCopy,moveObject,validateLayout,portalDefinitions} from '../src/world-layout.js';
+import {maps,outdoorBuildings} from '../src/maps.js';
+import {applyLayout,currentLayout,resetLayout,editLayout} from '../src/layout-runtime.js';
+
+test('Phase 5 supports three outdoor maps and two interior maps',()=>{for(const id of ['village','professor_clearing','beerendorf','bedroom','ground'])assert.ok(Array.isArray(currentLayout()[id]));});
+test('relocated professor laboratory moves its entrance and return point',()=>{const previous=currentLayout();const next=moveObject(previous,'professor_clearing','research-lab',3,3);assert.equal(next.ok,true);const result=applyLayout(next.layout);assert.equal(result.ok,true,JSON.stringify(result.errors));assert.ok(maps.professor_clearing.portals.some(p=>p.x===5&&p.y===5&&p.target==='study'));assert.ok(maps.study.portals.some(p=>p.target==='professor_clearing'&&p.tx===5&&p.ty===6));assert.ok(outdoorBuildings.professor_clearing.some(b=>b.x===3&&b.y===3));assert.equal(applyLayout(previous).ok,true);});
+test('relocated berry shop updates interior return coordinates',()=>{const previous=currentLayout();const next=moveObject(previous,'beerendorf','berry-shop',3,10);assert.equal(next.ok,true);const result=applyLayout(next.layout);assert.equal(result.ok,true,JSON.stringify(result.errors));assert.ok(maps.beerendorf_haus2.portals.some(p=>p.target==='beerendorf'&&p.tx===4&&p.ty===13));assert.equal(applyLayout(previous).ok,true);});
+test('rejects objects outside map and overlapping buildings',()=>{const previous=currentLayout();assert.equal(editLayout('move','beerendorf','berry-shop',20,20).ok,false);assert.equal(editLayout('move','beerendorf','berry-shop',11,2).ok,false);assert.deepEqual(currentLayout(),previous);});
+test('player cannot be enclosed in a moved building',()=>{const previous=currentLayout();const result=editLayout('move','village','village-west-home',7,3,'mu-home',{mapId:'village',x:8,y:3});assert.equal(result.ok,false);assert.deepEqual(currentLayout(),previous);});
+test('layout can return to defaults without stale portals',()=>{assert.equal(resetLayout().ok,true);assert.ok(maps.study.portals.some(p=>p.target==='professor_clearing'&&p.tx===4&&p.ty===5));assert.ok(maps.beerendorf_haus2.portals.some(p=>p.target==='beerendorf'&&p.tx===3&&p.ty===14));});

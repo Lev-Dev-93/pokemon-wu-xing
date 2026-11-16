@@ -9,8 +9,29 @@ export const DEFAULT_LAYOUT = Object.freeze({
     {id:'village-chapel',kind:'building',art:'mu-chapel',x:3,y:10,w:3,h:2,door:{x:4,y:12,target:'chapel',tx:5,ty:6}},
     {id:'village-rival-home',kind:'building',art:'mu-home',x:16,y:10,w:3,h:2,door:{x:17,y:12,target:'rival_house',tx:5,ty:6}}
   ],
-  bedroom:[{id:'player-bed',kind:'furniture',art:'bed',x:1,y:1,w:1,h:2},{id:'player-desk',kind:'furniture',art:'desk',x:7,y:1,w:2,h:1}],
-  ground:[{id:'family-table',kind:'furniture',art:'table',x:3,y:4,w:2,h:1},{id:'pokemon-pc',kind:'furniture',art:'pc',x:8,y:1,w:2,h:1}]
+  professor_clearing:[
+    {id:'research-lab',kind:'building',art:'mu-lab',x:2,y:2,w:4,h:2,door:{x:4,y:4,target:'study',tx:5,ty:6}},
+    {id:'professor-home',kind:'building',art:'mu-home',x:10,y:2,w:4,h:2,door:{x:12,y:4,target:'professor_house',tx:5,ty:6}}
+  ],
+  beerendorf:[
+    {id:'berry-workshop',kind:'building',art:'mu-workshop',x:2,y:2,w:3,h:2,door:{x:3,y:4,target:'beerendorf_werkstatt',tx:5,ty:6}},
+    {id:'berry-herbalist',kind:'building',art:'mu-home',x:11,y:2,w:3,h:2,door:{x:12,y:4,target:'beerendorf_haus',tx:5,ty:6}},
+    {id:'berry-shop',kind:'building',art:'mu-shop',x:2,y:11,w:3,h:2,door:{x:3,y:13,target:'beerendorf_haus2',tx:5,ty:6}},
+    {id:'berry-residence',kind:'building',art:'mu-home',x:11,y:11,w:3,h:2,door:{x:12,y:13,target:'beerendorf_wohnhaus',tx:5,ty:6}}
+  ],
+  village_home:[{id:'village_home-pot',kind:'furniture',art:'pot',x:9,y:5,w:1,h:1}],
+  village_house_east:[{id:'village_house_east-pot',kind:'furniture',art:'pot',x:9,y:5,w:1,h:1}],
+  professor_house:[{id:'professor_house-pot',kind:'furniture',art:'pot',x:9,y:5,w:1,h:1}],
+  chapel:[{id:'chapel-pot',kind:'furniture',art:'pot',x:9,y:5,w:1,h:1}],
+  rival_house:[{id:'rival_house-pot',kind:'furniture',art:'pot',x:9,y:5,w:1,h:1}],
+  study:[{id:'study-pot',kind:'furniture',art:'pot',x:9,y:5,w:1,h:1}],
+  beerendorf_haus2:[{id:'beerendorf_haus2-pot',kind:'furniture',art:'pot',x:9,y:5,w:1,h:1}],
+  beerendorf_haus:[{id:'beerendorf_haus-pot',kind:'furniture',art:'pot',x:9,y:5,w:1,h:1}],
+  beerendorf_wohnhaus:[{id:'beerendorf_wohnhaus-pot',kind:'furniture',art:'pot',x:9,y:5,w:1,h:1}],
+  beerendorf_werkstatt:[{id:'beerendorf_werkstatt-pot',kind:'furniture',art:'pot',x:9,y:5,w:1,h:1}],
+  forest_elder_house:[{id:'forest_elder_house-pot',kind:'furniture',art:'pot',x:9,y:5,w:1,h:1}],
+  bedroom:[{id:'player-bed',kind:'furniture',art:'bed',x:1,y:1,w:2,h:2},{id:'player-desk',kind:'furniture',art:'desk',x:7,y:1,w:2,h:1}],
+  ground:[{id:'family-table',kind:'furniture',art:'table',x:2,y:5,w:2,h:1},{id:'pokemon-pc',kind:'furniture',art:'pc',x:8,y:1,w:2,h:1}]
 });
 export function layoutCopy(layout=DEFAULT_LAYOUT){return clone(layout)}
 export function footprint(object){return Array.from({length:object.w*object.h},(_,i)=>({x:object.x+i%object.w,y:object.y+Math.floor(i/object.w)}))}
@@ -57,3 +78,6 @@ export function migrateLayout(previous,updated,position){
  for(const [mapId,items] of Object.entries(updated))for(const item of items){const old=oldIds.get(item.id);if(old&&(old.x!==item.x||old.y!==item.y||old.mapId!==mapId))moves.push({id:item.id,from:{mapId:old.mapId,x:old.x,y:old.y},to:{mapId,x:item.x,y:item.y}})}
  return {moves,playerPosition:clone(position),requiresPlayerRelocation:!!(position&&collisionCells(updated,position.mapId).includes(`${position.x},${position.y}`))};
 }
+
+export function removeObject(layout,mapId,id){const next=layoutCopy(layout);if(!next[mapId]?.some(o=>o.id===id))return {ok:false,errors:['unknown object']};next[mapId]=next[mapId].filter(o=>o.id!==id);return {ok:true,layout:next}}
+export function replaceLayout(layout,bounds={},reserved={}){const result=validateLayout(layout,bounds,reserved);return result.ok?{ok:true,layout:layoutCopy(layout)}:{ok:false,errors:result.errors}}

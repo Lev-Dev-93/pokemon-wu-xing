@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {DEFAULT_LAYOUT,layoutCopy,moveObject} from '../src/world-layout.js';
+import {maps} from '../src/maps.js';
+import {currentLayout,applyLayout,resetLayout,editLayout,loadLayout} from '../src/layout-runtime.js';
+const rooms=['village_home','village_house_east','professor_house','chapel','rival_house','study','beerendorf_haus2','beerendorf_haus','beerendorf_wohnhaus','beerendorf_werkstatt','forest_elder_house'];
+test('all eleven additional interiors have editable furniture',()=>{for(const id of rooms)assert.ok(currentLayout()[id]?.some(o=>o.kind==='furniture'),id)});
+test('moving furniture changes collision and reset restores',()=>{const before=currentLayout();const id='village_home',item=before[id][0];const next=moveObject(before,id,item.id,6,4);assert.equal(next.ok,true);assert.equal(applyLayout(next.layout).ok,true);assert.ok(maps[id].walls.has('6,4'));assert.equal(applyLayout(before).ok,true);});
+test('relocating laboratory and restoring resets exit portals',()=>{const before=currentLayout();const moved=moveObject(before,'professor_clearing','research-lab',3,3);assert.equal(moved.ok,true);assert.equal(applyLayout(moved.layout).ok,true);assert.ok(maps.study.portals.some(p=>p.target==='professor_clearing'&&p.tx===5&&p.ty===6));assert.equal(applyLayout(before).ok,true);assert.ok(maps.study.portals.some(p=>p.target==='professor_clearing'&&p.tx===4&&p.ty===5));});
+test('protected story building cannot be deleted',()=>{assert.equal(editLayout('remove','village','village-west-home').ok,false)});
+test('legacy layout storage loads with new interior defaults',()=>{const old=layoutCopy(DEFAULT_LAYOUT);for(const id of rooms)delete old[id];const storage={getItem:()=>JSON.stringify({schema:1,layout:old})};assert.equal(loadLayout(storage).ok,true);for(const id of rooms)assert.ok(currentLayout()[id].length);resetLayout();});

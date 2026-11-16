@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {currentLayout,exportLayout,inspectImportedLayout,previewImport,importLayout,saveLayout,restoreBackup,backupInfo,editLayout} from '../src/layout-runtime.js';
+const storage=new Map();const mock={getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v)};
+test('Phase 7: valid export passes dry-run',()=>{const result=previewImport(exportLayout());assert.equal(result.ok,true);assert.equal(result.changedMaps.length,0)});
+test('Phase 7: rejects extreme footprint without allocating',()=>{const data=JSON.parse(exportLayout());data.layout.bedroom[0].w=100000000;assert.equal(inspectImportedLayout(JSON.stringify(data)).ok,false)});
+test('Phase 7: rejects unknown door targets',()=>{const data=JSON.parse(exportLayout());data.layout.village[0].door.target='nonexistent_map';assert.equal(inspectImportedLayout(JSON.stringify(data)).ok,false)});
+test('Phase 7: rejects too many items',()=>{const data=JSON.parse(exportLayout());data.layout.bedroom=Array.from({length:101},(_,i)=>({id:'item'+i,kind:'furniture',art:'pot',x:0,y:0,w:1,h:1}));assert.equal(inspectImportedLayout(JSON.stringify(data)).ok,false)});
+test('Phase 7: rejects unknown map',()=>{const data=JSON.parse(exportLayout());data.layout.__proto_test__=[];assert.equal(inspectImportedLayout(JSON.stringify(data)).ok,false)});
+test('Phase 7: save creates backup and restores previous state',()=>{assert.equal(saveLayout(mock),true);const original=exportLayout();const change=editLayout('move','bedroom','player-desk',6,1);assert.equal(change.ok,true);assert.equal(saveLayout(mock),true);assert.equal(backupInfo(mock).available,true);const restored=restoreBackup(mock);assert.equal(restored.ok,true);assert.equal(exportLayout(),original)});
