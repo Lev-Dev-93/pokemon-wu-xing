@@ -40,6 +40,6 @@ test('Markt bleibt funktional, Professor im Labor und Rivale auf dem Platz',()=>
  assert.ok(npcs.study.some(n=>n.id==='professor'));
  assert.ok(npcs.village.some(n=>n.id==='rival'));
  const e=new Engine();e.state.mapId='village';e.state.flags.route1_hatched=true;
- e.state.x=17;e.state.y=10;e.state.facing='up';
+ e.state.x=15;e.state.y=12;e.state.facing='up';
  assert.equal(e.interact(),true);assert.equal(e.lastEvent,'shopOpened');
 });

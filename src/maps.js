@@ -1,6 +1,6 @@
 // Gemeinsame Weltgrundrisse: Darstellung und Kollision verwenden dieselben Rechtecke.
 export const outdoorBuildings={
- village:[{x:2,y:2,w:4,h:2,color:'#557c8b',label:'LABOR'},{x:7,y:2,w:3,h:2,color:'#977357',label:'PROF.'},{x:2,y:6,w:3,h:2,color:'#9c705c',label:'HAUS'},{x:17,y:6,w:3,h:2,color:'#a67b64',label:'HAUS'},{x:2,y:10,w:3,h:2,color:'#8b89a3',label:'KAPELLE'},{x:16,y:10,w:3,h:2,color:'#9a6e55',label:'RIVALE'}],
+ village:[{x:2,y:2,w:4,h:2,color:'#557c8b',label:'LABOR'},{x:12,y:2,w:3,h:2,color:'#977357',label:'PROF.'},{x:2,y:6,w:3,h:2,color:'#9c705c',label:'HAUS'},{x:17,y:6,w:3,h:2,color:'#a67b64',label:'HAUS'},{x:2,y:10,w:3,h:2,color:'#8b89a3',label:'KAPELLE'},{x:16,y:10,w:3,h:2,color:'#9a6e55',label:'RIVALE'}],
  beerendorf:[{x:2,y:3,w:2,h:2},{x:12,y:3,w:2,h:2},{x:2,y:11,w:2,h:2},{x:12,y:11,w:2,h:2}]
 };
 // Wege werden nur auf begehbaren Feldern gezeichnet; Gebäude bleiben frei.
@@ -26,10 +26,10 @@ export const maps={
  yard:room('yard','Züchterhof',16,12,[[2,3],[3,3],[4,3],...Array.from({length:6},(_,i)=>[9+i,3]),...Array.from({length:6},(_,i)=>[9+i,7]).filter(([x])=>x!==10),...Array.from({length:3},(_,i)=>[9,4+i]),...Array.from({length:3},(_,i)=>[14,4+i]),...[ [2,8],[3,8],[4,8],[2,9],[3,9],[4,9] ]], [p(7,1,'ground',5,7),p(7,11,'village',10,1,'path')],{'8,8':1,'9,8':1,'10,8':1,'8,9':1,'9,9':1,'10,9':1},[[7,8],[7,9]]),
  village:room('village','Startdorf · Mu',22,16,
   [...buildingCells('village'),[10,9],[11,9],[16,8],[18,8]],
-  [p(10,0,'yard',7,10,'path'),p(6,3,'study',5,6),p(10,3,'professor_house',5,6),p(5,7,'village_home',5,6),p(20,7,'village_house_east',5,6),p(5,11,'chapel',5,6),p(19,11,'rival_house',5,6),p(10,15,'route1',7,1,'path')]),
+  [p(10,0,'yard',7,10,'path'),p(6,3,'study',5,6),p(13,4,'professor_house',5,6),p(5,7,'village_home',5,6),p(20,7,'village_house_east',5,6),p(5,11,'chapel',5,6),p(19,11,'rival_house',5,6),p(10,15,'route1',7,1,'path')]),
  village_home:room('village_home','Wohnhaus · Mu',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',5,8)]),
  village_house_east:room('village_house_east','Wohnhaus am Dorfplatz',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',20,8)]),
- professor_house:room('professor_house','Haus des Professors',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',10,4)]),
+ professor_house:room('professor_house','Haus des Professors',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',13,5)]),
  chapel:room('chapel','Kleine Kapelle · Mu',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',5,12)]),
  rival_house:room('rival_house','Haus des Rivalen',11,8,[[1,1],[2,1],[7,1],[8,1]],[p(5,7,'village',19,12)]),
  route1:room('route1','Route 1 · Mu',16,18,[[2,4],[3,4],[12,6],[13,6],[4,12],[5,12],[11,14],[12,14]], [p(7,0,'village',10,14,'path'),p(7,17,'brook',7,1,'path')]),
@@ -48,12 +48,12 @@ export const npcs={route2:[],beerendorf:[],beerendorf_haus:[{id:'herbal_witch',x
  forest_elder_house:[{id:'forest_elder',x:6,y:3,name:'Alte Dame',dialogue:['Der Alte Wald bewahrt Geschichten, die älter sind als unsere Dörfer.','Ich erinnere mich an Celebi. Doch nicht jede Erinnerung erzählt die ganze Wahrheit.','Tiefer im Wald liegen alte Ruinen. Dort findest du vielleicht weitere Spuren.','Bevor du weitergehst, solltest du dich gut auf den Weg vorbereiten.']}],
  route1:[{id:'route1_trainer',x:10,y:8,name:'Junger Trainer',dialogue:['Hallo! Lass uns unsere Pokémon in einem Übungskampf messen.']}],
  ground:[{id:'breeder_a',x:6,y:2,name:'Adoptivmutter',dialogue:['Guten Morgen! Schön, dass du da bist.','Heute ist ein besonderer Tag. Wir sprechen später in Ruhe darüber.']},{id:'breeder_b',x:3,y:3,name:'Züchter',dialogue:['Auf dem Hof gibt es immer etwas zu tun.','Sieh dich ruhig um.']}],
- village:[{id:'merchant',x:17,y:9,name:'Markthändler',dialogue:['Hier bekommst du Reisebedarf.']},{id:'rival',x:14,y:7,name:'Kindheitsfreund',dialogue:['Gut, dich zu sehen! Ich bin heute auch unterwegs.','Hier im Dorf gibt es immer etwas zu entdecken.']}],
+ village:[{id:'merchant',x:15,y:11,name:'Markthändler',dialogue:['Hier bekommst du Reisebedarf.']},{id:'rival',x:14,y:7,name:'Kindheitsfreund',dialogue:['Gut, dich zu sehen! Ich bin heute auch unterwegs.','Hier im Dorf gibt es immer etwas zu entdecken.']}],
 
  study:[{id:'professor',x:7,y:4,name:'Professor',dialogue:['Ich beschäftige mich mit Pokémon und der Geschichte unserer Region.','Für einen gemeinsamen Ausflug ist es noch zu früh.']}]
 };
 export const objects={route2:[],forest_elder_house:[],beerendorf:[],beerendorf_haus2:[],beerendorf_haus:[],beerendorf_wohnhaus:[],beerendorf_werkstatt:[],brook:[],waldrand:[],route1:[],bedroom:[{id:'bed',x:1,y:1,name:'Bett',dialogue:['Dein vertrautes Bett. Hier hast du viele Nächte verbracht.']}],ground:[{id:'pokemon_pc',x:8,y:2,name:'Pokémon-PC',dialogue:['Verwalte hier dein Pokémon-Team und dein Lager.']}],village:[],village_home:[],study:[],yard:[]};
-export const start={mapId:'bedroom',x:5,y:5,facing:'down',elevation:0,returns:{},steps:0,flags:{introSeen:false,birthday_wish_pending:false,egg_received:false,rift_closed:false,rival_absol:false,professor_demo:false,route1_hatched:false,spokenToBreederA:false,spokenToBreederB:false,visitedYard:false,visitedVillage:false,spokenToVillager:false,spokenToRival:false,spokenToProfessor:false,visitedVillageHome:false,visitedStudy:false,visitedRoute1:false,visitedRoute2:false,visitedBeerendorf:false,visitedWaldrand:false,visitedBrook:false,spokenToResident:false,suppliesCollected:false,route1TrainerDefeated:false},inventory:[],money:0,eventLog:[],starterWishSpeciesId:null,starterEgg:null,team:[],storage:[]};
+export const start={mapId:'bedroom',x:5,y:5,facing:'down',elevation:0,returns:{},steps:0,flags:{introSeen:false,birthday_wish_pending:false,egg_received:false,rift_closed:false,rival_absol:false,parents_briefed:false,professor_demo:false,route1_hatched:false,spokenToBreederA:false,spokenToBreederB:false,visitedYard:false,visitedVillage:false,spokenToVillager:false,spokenToRival:false,spokenToProfessor:false,visitedVillageHome:false,visitedStudy:false,visitedRoute1:false,visitedRoute2:false,visitedBeerendorf:false,visitedWaldrand:false,visitedBrook:false,spokenToResident:false,suppliesCollected:false,route1TrainerDefeated:false},inventory:[],money:0,eventLog:[],starterWishSpeciesId:null,starterEgg:null,team:[],storage:[]};
 export const tileHeight=(map,x,y)=>map.heights[`${x},${y}`]??0;
 export const inside=(map,x,y)=>x>=0&&y>=0&&x<map.w&&y<map.h;
 export function canMove(map,x,y,nx,ny){if(!inside(map,nx,ny)||map.walls.has(`${nx},${ny}`))return false;const a=tileHeight(map,x,y),b=tileHeight(map,nx,ny);return a===b||map.stairs.some(([sx,sy])=>(sx===x&&sy===y)||(sx===nx&&sy===ny));}

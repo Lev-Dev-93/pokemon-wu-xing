@@ -287,3 +287,10 @@ Marktstand: zusätzlich Einkauf von fünf Exemplaren in einem Schritt.
 
 ### dev.142
 Bedienbarkeit und Tests für Inventar, Itemziele, AP und Entwicklungssteine.
+
+
+## dev.177 – Prolog und Dorfgeometrie
+Automatische Storywege und korrigierte Gebäudeplatzierung. Siehe CHANGELOG.md.
+
+### dev.182
+End-to-End-Regressionsprüfungen für Fußwege und Speicherstände.

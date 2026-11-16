@@ -1,3 +1,6 @@
+## dev.177
+- Regressionstests für Kartenlayout, automatische Prologfolge und Story-Fortschritt.
+
 ## dev.172
 - Zugangs- und Regressionsprüfungen für Waldhütte, Storygrenzen und Kampfsperre.
 
@@ -586,3 +589,6 @@ Menü startet in Teamübersicht, Tastaturfokus und Dialogschutz.
 
 ## dev.162
 - Weltlayout-Regressionsprüfungen und Dokumentation.
+
+## dev.182
+- End-to-End-Regressionsprüfungen für Fußwege und Speicherstände.

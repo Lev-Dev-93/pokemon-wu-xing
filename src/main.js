@@ -1,3 +1,5 @@
+import {prologuePhase} from './story-sequence.js';
+import {findStoryWalk,STORY_WALK_TARGETS} from './story-autowalk.js';
 import {pendingRiftRecovery} from './story-guards.js';
 import {BAG_CATEGORIES,bagEntries,bagTargets,applyBagItem} from './bag.js';
 import {battleOutcome} from './battle-flow.js';
@@ -29,13 +31,15 @@ const engine=new Engine();const canvas=document.querySelector('#game'),ctx=canva
 const info=document.querySelector('#info'),notice=document.querySelector('#notice'),details=document.querySelector('#debug');
 const dialogBox=document.querySelector('#dialogue'),speaker=document.querySelector('#speaker'),dialogText=document.querySelector('#dialogue-text');
 const directions={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right'};
-const menu=document.querySelector('#game-menu'),menuContent=document.querySelector('#menu-content');let menuOpen=false;let battle=null;let rewardDone=false;let pendingRewards=[];let battleFlash=0;let battleBusy=false;let battleGeneration=0;let battleView=null;let battleKind='test';let wildTeamIndex=-1;let escapeAttempts=0;let battleFighters=new Map();const battlePanel=document.querySelector('#battle-panel');const keys=new Set();let last=0;let scriptedRun=false;const saveKey='pokemon-wu-xing-dev',autoKey='pokemon-wu-xing-autosave',legacyKey='monsterreise-dev1';const starterPanel=document.querySelector('#starter-panel'),starterSearch=document.querySelector('#starter-search'),starterList=document.querySelector('#starter-list'),starterStatus=document.querySelector('#starter-status');
+const menu=document.querySelector('#game-menu'),menuContent=document.querySelector('#menu-content');let menuOpen=false;let battle=null;let rewardDone=false;let pendingRewards=[];let battleFlash=0;let battleBusy=false;let battleGeneration=0;let battleView=null;let battleKind='test';let wildTeamIndex=-1;let escapeAttempts=0;let battleFighters=new Map();const battlePanel=document.querySelector('#battle-panel');const keys=new Set();let last=0;let scriptedRun=false;let storyGeneration=0;const saveKey='pokemon-wu-xing-dev',autoKey='pokemon-wu-xing-autosave',legacyKey='monsterreise-dev1';const starterPanel=document.querySelector('#starter-panel'),starterSearch=document.querySelector('#starter-search'),starterList=document.querySelector('#starter-list'),starterStatus=document.querySelector('#starter-status');
 const journal=document.querySelector('#journal'),journalButton=document.querySelector('#journal-toggle');
 const devMode=developerModeEnabled(window.location.search);
 
 function move(dir){if(scriptedRun||menuOpen||!starterPanel.hidden||!battlePanel.hidden)return;engine.step(dir);if(engine.lastEvent==='transition')autoSave();if(engine.lastEvent==='wildEncounter'){const wild=engine.pendingWild;engine.pendingWild=null;engine.lastEvent=null;startWildBattle(wild);return}engine.lastEvent=null;draw()}
-function interact(){if(scriptedRun||menuOpen||!starterPanel.hidden||!battlePanel.hidden)return;keys.clear();const before=engine.mode;engine.interact();const event=engine.lastEvent;if(event==='storageOpened'){engine.lastEvent=null;toggleMenu(true);menuPanel('storage');draw();return}if(event==='shopOpened'){engine.lastEvent=null;toggleMenu(true);menuPanel('shop');draw();return}if(event==='trainerChallenge'){const trainer=engine.pendingTrainer;engine.pendingTrainer=null;engine.lastEvent=null;startTrainerBattle(trainer);return}if(['stationHealed','suppliesCollected','dialogueFinished','birthdayPreviewFinished','starterWishFinished','riftSceneFinished','absolSceneFinished','professorDemoFinished','route1Hatched'].includes(event))autoSave();engine.lastEvent=null;
+function interact(){if(scriptedRun||menuOpen||!starterPanel.hidden||!battlePanel.hidden)return;keys.clear();const before=engine.mode;engine.interact();const event=engine.lastEvent;if(event==='storageOpened'){engine.lastEvent=null;toggleMenu(true);menuPanel('storage');draw();return}if(event==='shopOpened'){engine.lastEvent=null;toggleMenu(true);menuPanel('shop');draw();return}if(event==='trainerChallenge'){const trainer=engine.pendingTrainer;engine.pendingTrainer=null;engine.lastEvent=null;startTrainerBattle(trainer);return}if(['stationHealed','suppliesCollected','dialogueFinished','birthdayPreviewFinished','starterWishFinished','riftSceneFinished','absolSceneFinished','parentsReportFinished','professorDemoFinished','route1Hatched'].includes(event))autoSave();engine.lastEvent=null;
  if(before==='dialogue'&&engine.mode==='exploration'){
+  if(event==='riftSceneFinished'){runToRival();return}
+  if(event==='absolSceneFinished'){runToParents();return}
   if(event==='birthdayPreviewFinished'&&!engine.state.flags.egg_received){draw();openStarters();return}
   if(event==='starterWishFinished'&&engine.state.flags.egg_received&&!engine.state.flags.rift_closed){runToVillageSquare();return}
   if(!engine.state.flags.birthday_wish_pending&&!engine.state.flags.egg_received&&engine.state.mapId==='ground'&&engine.state.flags.spokenToBreederA&&engine.state.flags.spokenToBreederB){engine.beginBirthdayPreview();autoSave()}
@@ -46,10 +50,52 @@ function interact(){if(scriptedRun||menuOpen||!starterPanel.hidden||!battlePanel
 function runToVillageSquare(){
  if(scriptedRun)return;scriptedRun=true;keys.clear();engine.message='Ein Erdbeben! Du rennst zum Dorfplatz!';draw();
  const route=[['ground',5,7],['yard',7,2],['yard',7,4],['yard',7,6],['yard',7,8],['yard',7,10],['village',10,1],['village',10,3],['village',10,5],['village',10,7],['village',11,7]];
- let i=0;
- function next(){if(i>=route.length){scriptedRun=false;engine.state.facing='up';engine.setFlag('visitedYard',true);engine.setFlag('visitedVillage',true);engine.beginRiftScene();autoSave();draw();return}
- const [mapId,x,y]=route[i++];engine.state.mapId=mapId;engine.state.x=x;engine.state.y=y;engine.state.elevation=0;engine.state.steps++;engine.state.facing=mapId==='ground'?'down':mapId==='yard'?'down':'down';draw();setTimeout(next,130)}
+ let i=0;if(engine.state.mapId==='yard')i=route.findIndex(step=>step[0]==='yard'&&step[2]>=engine.state.y);else if(engine.state.mapId==='village')i=route.findIndex(step=>step[0]==='village'&&step[2]>=engine.state.y);if(i<0)i=route.length;const generation=storyGeneration;
+ function next(){if(generation!==storyGeneration)return;if(i>=route.length){scriptedRun=false;engine.state.facing='up';engine.setFlag('visitedYard',true);engine.setFlag('visitedVillage',true);engine.beginRiftScene();autoSave();draw();return}
+ const [mapId,x,y]=route[i++];engine.state.mapId=mapId;engine.state.x=x;engine.state.y=y;engine.state.elevation=0;engine.state.steps++;engine.state.facing='down';autoSave();draw();setTimeout(next,130)}
  next();
+}
+// Automatischer Prolog: Giratina → Rivale/Absol → Eltern → Professor.
+function walkStoryTo(mapId,target,done){
+ const route=findStoryWalk(mapId,[engine.state.x,engine.state.y],target);
+ if(!route){scriptedRun=false;engine.message='Der automatische Storyweg ist blockiert.';draw();return}
+ let index=0;const generation=storyGeneration;
+ function advance(){if(generation!==storyGeneration)return;if(index===route.length){done();return}
+  const [x,y]=route[index++],oldX=engine.state.x,oldY=engine.state.y;engine.state.x=x;engine.state.y=y;engine.state.steps++;
+  engine.state.elevation=0;engine.state.facing=x>oldX?'right':x<oldX?'left':y>oldY?'down':'up';
+  autoSave();draw();setTimeout(advance,110);
+ }
+ advance();
+}
+function runToRival(){
+ if(scriptedRun||engine.state.mapId!=='village'||engine.state.flags.rival_absol)return;
+ scriptedRun=true;keys.clear();walkStoryTo('village',STORY_WALK_TARGETS.rival,()=>{
+  scriptedRun=false;engine.state.facing='up';engine.beginAbsolScene();autoSave();draw();
+ });
+}
+function runToParents(){
+ if(scriptedRun||!['village','yard','ground'].includes(engine.state.mapId)||!engine.state.flags.rival_absol||engine.state.flags.parents_briefed)return;
+ scriptedRun=true;keys.clear();
+ function reachGround(){
+  if(engine.state.mapId==='ground')return walkStoryTo('ground',STORY_WALK_TARGETS.parents,()=>{
+   scriptedRun=false;engine.state.facing='up';engine.beginParentsReport();autoSave();draw();
+  });
+  walkStoryTo('yard',STORY_WALK_TARGETS.yardExit,()=>{
+   engine.state.mapId='ground';engine.state.x=5;engine.state.y=7;engine.state.elevation=0;autoSave();draw();reachGround();
+  });
+ }
+ if(engine.state.mapId==='village')walkStoryTo('village',STORY_WALK_TARGETS.villageExit,()=>{
+  engine.state.mapId='yard';engine.state.x=7;engine.state.y=10;engine.state.elevation=0;autoSave();draw();reachGround();
+ });else reachGround();
+}
+function resumePrologue(){
+ if(engine.mode!=='exploration')return false;
+ const phase=prologuePhase(engine.state.flags,engine.state.mapId);
+ if(phase==='rift-scene'&&engine.state.mapId==='village'){engine.beginRiftScene();autoSave();draw();return true}
+ if(phase==='rift-approach'&&['ground','yard'].includes(engine.state.mapId)){runToVillageSquare();return true}
+ if(phase==='to-rival'&&engine.state.mapId==='village'){runToRival();return true}
+ if(phase==='to-parents'&&['village','yard','ground'].includes(engine.state.mapId)){runToParents();return true}
+ return false;
 }
 function autoSave(){try{localStorage.setItem(autoKey,engine.save())}catch(e){console.warn('Automatisches Speichern nicht möglich',e)}}
 function renderStarters(){
@@ -99,10 +145,10 @@ window.addEventListener('keydown',e=>{if(e.target instanceof HTMLElement&&['INPU
 window.addEventListener('keyup',e=>keys.delete(e.key));window.addEventListener('blur',()=>keys.clear());
 for(const b of document.querySelectorAll('[data-dir]'))b.addEventListener('click',()=>move(b.dataset.dir));
 document.querySelector('#interact').addEventListener('click',interact);dialogBox.addEventListener('click',interact);
-journalButton.addEventListener('click',toggleJournal);document.querySelector('#continue').addEventListener('click',()=>{try{const raw=localStorage.getItem(autoKey)||localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');engine.load(raw);if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)!=='none'){if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)==='scene'){engine.beginRiftScene();autoSave()}else runToVillageSquare();}keys.clear();draw();notice.textContent='Letzten Stand fortgesetzt'}catch(e){notice.textContent=`Fortsetzen fehlgeschlagen: ${e.message}`}});
+journalButton.addEventListener('click',toggleJournal);document.querySelector('#continue').addEventListener('click',()=>{try{const raw=localStorage.getItem(autoKey)||localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');storyGeneration++;scriptedRun=false;engine.load(raw);if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)!=='none'){if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)==='scene'){engine.beginRiftScene();autoSave()}else runToVillageSquare();}else resumePrologue();keys.clear();draw();notice.textContent='Letzten Stand fortgesetzt'}catch(e){notice.textContent=`Fortsetzen fehlgeschlagen: ${e.message}`}});
 document.querySelector('#save').addEventListener('click',()=>{try{localStorage.setItem(saveKey,engine.save());notice.textContent='Spielstand gespeichert'}catch(e){notice.textContent=`Speichern fehlgeschlagen: ${e.message}`}});
-document.querySelector('#load').addEventListener('click',()=>{try{const raw=localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');engine.load(raw);if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)!=='none'){if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)==='scene'){engine.beginRiftScene();autoSave()}else runToVillageSquare();}keys.clear();draw();notice.textContent='Spielstand geladen'}catch(e){notice.textContent=`Laden fehlgeschlagen: ${e.message}`}});
-document.querySelector('#reset').addEventListener('click',()=>{keys.clear();starterPanel.hidden=true;engine.reset();try{localStorage.removeItem(autoKey)}catch(e){}draw();notice.textContent='Neues Spiel gestartet'});
+document.querySelector('#load').addEventListener('click',()=>{try{const raw=localStorage.getItem(saveKey)||localStorage.getItem(legacyKey);if(!raw)throw Error('Noch kein Spielstand vorhanden');storyGeneration++;scriptedRun=false;engine.load(raw);if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)!=='none'){if(pendingRiftRecovery(engine.state.flags,engine.state.mapId)==='scene'){engine.beginRiftScene();autoSave()}else runToVillageSquare();}else resumePrologue();keys.clear();draw();notice.textContent='Spielstand geladen'}catch(e){notice.textContent=`Laden fehlgeschlagen: ${e.message}`}});
+document.querySelector('#reset').addEventListener('click',()=>{keys.clear();starterPanel.hidden=true;storyGeneration++;scriptedRun=false;engine.reset();try{localStorage.removeItem(autoKey)}catch(e){}draw();notice.textContent='Neues Spiel gestartet'});
 function frame(t){if(t-last>=125){if(engine.mode==='exploration'&&!menuOpen&&starterPanel.hidden&&battlePanel.hidden){const key=[...keys].at(-1);if(key)move(directions[key])}last=t}requestAnimationFrame(frame)}
 
 // Abgeschlossene technische Testarena: keine Änderung an Engine-Team oder Story.

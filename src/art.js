@@ -66,13 +66,13 @@ function drawVillage(c,map){
   if(typeof c.fillText==='function'){c.save();c.fillStyle='#fff2d1';c.font='bold 9px sans-serif';c.fillText(label,x*T+8,(y+h-1)*T+18);c.restore()}
  }
  // Offener Marktstand statt Marktgebäude; Händler steht direkt davor.
- for(let x=16;x<=18;x++){R(c,x*T,7*T+4,T,9,'#b87553');R(c,x*T,7*T+13,T,4,'#e1b36b');R(c,x*T,8*T+3,T,7,x%2?'#f4d5a1':'#a84e46');}
- R(c,16*T+4,8*T+12,3,24,'#6d4b37');R(c,18*T+25,8*T+12,3,24,'#6d4b37');
- R(c,16*T+7,8*T+22,2*T+18,7,'#956a43');
+ for(let x=14;x<=16;x++){R(c,x*T,9*T+4,T,9,'#b87553');R(c,x*T,9*T+13,T,4,'#e1b36b');R(c,x*T,10*T+3,T,7,x%2?'#f4d5a1':'#a84e46');}
+ R(c,14*T+4,10*T+12,3,24,'#6d4b37');R(c,16*T+25,10*T+12,3,24,'#6d4b37');
+ R(c,14*T+7,10*T+22,2*T+18,7,'#956a43');
  for(const x of [10,11]){const X=x*T,Y=9*T;R(c,X+1,Y+4,30,24,'#777d82');R(c,X+4,Y+7,24,17,'#5eaebc');R(c,X+9,Y+9,14,5,'#a0d9e0')}
  for(const [x,y] of [[1,5],[5,5],[19,5],[1,13],[20,13],[12,12],[7,13]])pot(c,x*T,y*T);
  for(let x=0;x<map.w;x++){if(x!==10)fence(c,x*T,0);if(x<8||x>13)fence(c,x*T,(map.h-1)*T)}
- for(const [x,y] of [[6,3],[10,3],[5,7],[20,7],[5,11],[19,11]]){door(c,x*T,y*T);R(c,x*T+7,y*T+26,18,4,'#e4c88f')}
+ for(const [x,y] of [[6,3],[13,4],[5,7],[20,7],[5,11],[19,11]]){door(c,x*T,y*T);R(c,x*T+7,y*T+26,18,4,'#e4c88f')}
  R(c,10*T+4,(map.h-1)*T+8,24,18,'#cbb58a');R(c,10*T+4,0,24,9,'#b5a07c');
 }
 function drawBeerendorf(c,map){
