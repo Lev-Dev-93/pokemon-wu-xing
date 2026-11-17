@@ -1,3 +1,29 @@
+## 1.0.0-dev.774 – Phase 16
+- Gebäudesprites mit zusätzlichen Dach-, Sockel- und Holzdetails.
+- Neuer transparenter Gebäudeschatten-Atlas und Renderer-Anbindung.
+- Spielmechanik und Kartenlayout unverändert.
+
+## dev.770 – PNG-Komposition des Züchterhofs
+
+- PNG-Wohnhaus und PNG-Scheune sind nun die primäre Gebäudedarstellung; die alten Canvas-Gebäude werden nur als Fallback gezeichnet, nicht mehr unter transparenten PNG-Flächen.
+- Weideboden verwendet PNG-Gras, sofern das Tileset geladen ist, statt der bisherigen großflächigen Canvas-Übermalung.
+- Überholte rechteckige Grasplatzhalter nach dem Teich-Rendering entfernt.
+- Drei zusätzliche Regressionstests für Layer-Reihenfolge und Headless-Fallback.
+- Keine Karten-, Kollisions-, Story- oder Pokémon-Daten verändert.
+
+## 1.0.0-dev.768 – PNG-Grafik-Detailpass
+- Detailliertere Originalsprites für Wohnhaus und Scheune.
+- Neu gezeichnete Gras-, Erdweg- und Pflanzenatlanten.
+- Alte Weg-Überzeichnung bei geladenem PNG verhindert.
+- Vier neue Grafik-Regressionstests.
+
+## dev.767 – Phase 16: Originale PNG-Tilesets und Gebäudesprites
+
+- Eigenes Züchterhof-Atlas-PNG, Baum-/Zaun-/Blumen-Props und zwei Gebäudesprites.
+- Asynchroner Sprite-Loader und PNG-Rendering mit Canvas-Fallback.
+- Keine Änderungen an Kollisionen, Portalen, Story oder Baby-Pokémon.
+- 1.303/1.303 automatisierte Tests bestanden.
+
 ## dev.766 – Phase 15: Züchterhof-Neugestaltung
 
 Scheune rechts des Wohnhauses, Beete am ehemaligen Scheunenstandort, südlich versetzte Weide mit schmaleren Zäunen, ruhige Gras-/Wegtexturen, verbesserte Gebäudedetails und angepasste Baby-Pokémon-Routen. 1.297 Tests bestanden. Siehe PHASE15_DEV763_766.md.
@@ -1647,3 +1673,15 @@ Gemeinsame Gebäudefassaden; Entfernung statischer Möbel- und Figurenduplikate;
 - Neue regionale Pflanzencluster mit Beerensträuchern, Farnen und Wiesenpflanzen.
 - Render-only, ohne Änderungen an Story, Portalen, Karten oder Fundgegenständen.
 - Sieben neue Tests, insgesamt 1217 bestanden.
+
+## dev.769 – Phase 16: PNG-Umgebungsobjekte
+- Originaler PNG-Atlas mit Vegetation, Beeten, Wasserpflanzen und Zaunsprites; Renderer-Integration mit Fallback.
+
+## 1.0.0-dev.771
+- Züchterhof: 64px-Baumsprites, 3×2-Teichsprite, 16 Wegkanten-Kacheln und Renderer-Integration.
+
+## 1.0.0-dev.772
+- 96×96-Baumgrafiken und überarbeiteter Teich; veraltete Hof-Overlays reduziert, vier Regressionstests.
+
+## dev.773 – Gebäude-Pixelart
+- Detaillierte Wohnhaus- und Scheunen-PNGs, bei identischen Abmessungen und unveränderter Spiellogik.

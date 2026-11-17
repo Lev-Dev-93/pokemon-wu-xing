@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+import {dirname,resolve} from 'node:path';
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+const art=readFileSync(resolve(root,'src/art.js'),'utf8');
+const assets=readFileSync(resolve(root,'src/yard-sprite-assets.js'),'utf8');
+test('yard no longer draws obsolete beige raised-ground seam',()=>assert.doesNotMatch(art,/R\(c,8\*32,8\*32,3\*32,2/));
+test('yard has 96px multilayer trees with negative top anchor',()=>{assert.match(assets,/yard_trees_96\.png/);assert.match(assets,/x\*32-16,y\*32-32,96,96/)});
+test('yard skips legacy habitat rectangles when PNG terrain is ready',()=>assert.match(art,/!yardAssetReadyTerrain\(\)/));
+test('yard avoids legacy outdoor accents',()=>assert.match(art,/map\.id==='yard'\?\[\]:outdoorGroundAccents/));
