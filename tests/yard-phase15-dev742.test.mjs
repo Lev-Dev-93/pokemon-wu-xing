@@ -7,7 +7,7 @@ const ctx=()=>({fillStyle:'',ops:[],fillRect(x,y,w,h){this.ops.push([x,y,w,h,thi
 test('dev742 routes are closed, safe and restricted to their habitat',()=>{
  for(const actor of yardBabyPokemon){const path=yardBabyRoutes[actor.id];assert.deepEqual(path[0],path.at(-1));
   for(let i=0;i<path.length;i++){const [x,y]=path[i];assert.ok(!map.walls.has(`${x},${y}`));assert.ok(!map.portals.some(p=>p.x===x&&p.y===y));
-   if(actor.zone==='pasture')assert.ok(x>=10&&x<=13&&y>=4&&y<=6);else assert.ok(x>=5&&x<=6&&y>=8&&y<=9);
+   if(actor.zone==='pasture')assert.ok(x>=10&&x<=13&&y>=5&&y<=7);else assert.ok(x>=5&&x<=6&&y>=8&&y<=9);
    if(i)assert.equal(Math.abs(x-path[i-1][0])+Math.abs(y-path[i-1][1]),1);
   }
  }

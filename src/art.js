@@ -31,8 +31,23 @@ const R=(c,x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(Math.round(x),Math.roun
 const L=(c,x,y,w,h,a,b)=>{R(c,x,y,w,h,a);R(c,x,y,w,2,b)};
 function wood(c,x,y,n){R(c,x,y,T,T,'#bc8b5b');R(c,x,y,32,1,'#e0b584');R(c,x,y+15,32,1,'#98623e');R(c,x+31,y,1,32,'#98623e');R(c,x+5+(n*7)%16,y+6,9,1,'#d8a676');R(c,x+3+(n*13)%15,y+24,11,1,'#9f704b')}
 function stone(c,x,y,n){R(c,x,y,32,32,'#c9b69b');R(c,x,y+15,32,1,'#a99880');R(c,x+((n%2)*16),y,1,16,'#aa9980');R(c,x+16-((n%2)*16),y+16,1,16,'#aa9980');R(c,x+4,y+4,5,1,'#e6d6b9')}
-function grass(c,x,y,n){R(c,x,y,32,32,((n*17)%5===0)?'#7da66a':'#87ad71');for(let i=0;i<5;i++){let xx=(n*13+i*11)%29,yy=(n*7+i*17)%29;R(c,x+xx,y+yy,2,4,i%2?'#669257':'#a5c287');R(c,x+xx+3,y+yy+2,2,2,'#6e9c5a')}}
-function path(c,x,y,n){R(c,x,y,32,32,'#cbb58a');R(c,x+2,y+4,12,9,'#d1bc93');R(c,x+18,y+19,11,9,'#c2ab81');R(c,x+7,y+17,9,7,'#c6af85')}
+function grass(c,x,y,n){
+ // Fine-grained, low-contrast original 32px grass with non-grid-aligned clusters.
+ R(c,x,y,32,32,'#83aa72');
+ for(let i=0;i<9;i++){
+  const xx=(n*7+i*19+i*i*3)%31, yy=(n*13+i*11+i*i)%30;
+  R(c,x+xx,y+yy,1,2,i%3===0?'#9abc87':'#719d65');
+  if(i%3===0)R(c,x+xx+2,y+yy+1,1,1,'#a6c58f');
+ }
+}
+function path(c,x,y,n){
+ // Soft contiguous earth without the former horizontal hatch marks.
+ R(c,x,y,32,32,'#c9b18a');
+ for(let i=0;i<7;i++){
+  const xx=(n*7+i*13+i*i)%30,yy=(n*11+i*17)%30;
+  R(c,x+xx,y+yy,2,2,i%2?'#d3bf9b':'#bda581');
+ }
+}
 function wallpaper(c,x,y,n){R(c,x,y,32,32,'#e9d5a9');R(c,x,y+24,32,8,'#91664a');R(c,x,y+23,32,2,'#f8e6bc');R(c,x+7,y+5,2,8,'#ddc394');R(c,x+22,y+5,2,8,'#ddc394')}
 function window(c,x,y){R(c,x+4,y+3,24,24,'#8a6248');R(c,x+7,y+6,18,17,'#b9dce0');R(c,x+15,y+6,2,17,'#f9e4bb');R(c,x+7,y+14,18,2,'#f9e4bb');R(c,x+2,y+25,28,4,'#d5a876')}
 function carpet(c,x,y,w,h,color='#9c5c58'){R(c,x+2,y+3,w-4,h-6,'#68464a');R(c,x+5,y+6,w-10,h-12,color);R(c,x+10,y+11,w-20,h-22,'#c89079');R(c,x+15,y+16,w-30,h-32,color)}
@@ -86,46 +101,66 @@ function drawGround(c){
  window(c,5*T,0);window(c,9*T,0);
  stairs(c,10*T,T);door(c,5*T,8*T);
 }
-function drawYard(c,map){const W=map.w*T;
- // Weidegräser nur auf freien Feldern, nicht auf Türen, Wegen oder Portalen.
- for(const [x,y] of [[10,5],[11,5],[12,6],[13,5],[11,6],[5,8],[6,6]]){
-  if(map.walls.has(`${x},${y}`)||map.portals.some(p=>p.x===x&&p.y===y)||x===7||y===10)continue;
-  R(c,x*T+10,y*T+18,2,9,'#5a914c');R(c,x*T+17,y*T+15,2,12,'#6d9c52');
- }
-
- // Wohnhaus: Dach und Fassade bilden einen einzigen, nicht begehbaren Baukörper.
- for(let x=2;x<=8;x++)roof(c,x*T,0);
+function drawYard(c,map){
+ // Purpose-built Gen-5-inspired original pixel architecture, not reused fence tiles.
+ // Home: fixed footprint x=2..8, roof y=0, façade y=1, entrance (7,1).
  for(let x=2;x<=8;x++){
-  wallBlock(c,x*T,T);
+  roof(c,x*T,0);wallBlock(c,x*T,T);
   if(x===3||x===5)window(c,x*T,T);
  }
- // Der Hauseingang ist IN die Fassade eingelassen (Portal 7,1).
  door(c,7*T,T);
- R(c,2*T,0,7*T,4,'#684535');R(c,2*T+5,4,7*T-10,3,'#e2b780');
- // Eigenständige Scheune, zwei Kachelreihen hoch, mit geschlossener Kollision.
- for(let x=1;x<=4;x++){
-  roof(c,x*T,3*T);
-  wallBlock(c,x*T,4*T);
+ R(c,2*T,0,7*T,4,'#5b3834');R(c,2*T+5,4,7*T-10,3,'#e8bd8a');
+ // Fine original roof tiles, layered eaves and irregular warm highlights.
+ for(let yy=5;yy<28;yy+=6)for(let xx=2*T+5+(Math.floor(yy/6)%2)*5;xx<9*T-7;xx+=11){
+  R(c,xx,yy,8,2,'#b87358');R(c,xx+1,yy+2,6,1,'#79483d');
  }
- R(c,T+3,3*T+5,4*T-6,5,'#593d32');
- R(c,T+6,4*T+3,4*T-12,24,'#a97951');
- for(let x=1;x<=4;x++){
-  R(c,x*T+4,4*T+3,4,24,'#654631');
-  R(c,x*T+24,4*T+3,4,24,'#654631');
+ R(c,2*T+2,26,7*T-4,4,'#633f38');R(c,2*T+5,27,7*T-10,2,'#e1ad7d');
+ for(const xx of [3,5]){R(c,xx*T+3,T+2,26,26,'#684a3b');R(c,xx*T+6,T+4,20,20,'#d3e7db');R(c,xx*T+8,T+6,16,16,'#83bdca');R(c,xx*T+15,T+5,2,19,'#f4dfb7');R(c,xx*T+8,T+14,16,2,'#f4dfb7');R(c,xx*T+5,T+25,22,3,'#d3a474');}
+ // Standalone barn directly to the right of the house.
+ for(let x=10;x<=14;x++){roof(c,x*T,0);wallBlock(c,x*T,T)}
+ for(let yy=6;yy<28;yy+=7)for(let xx=10*T+5+(Math.floor(yy/7)%2)*6;xx<15*T-8;xx+=12){
+  R(c,xx,yy,9,2,'#c18462');R(c,xx+1,yy+2,7,1,'#7b493b');
  }
- R(c,2*T+9,4*T+5,43,23,'#493b32');
- R(c,2*T+12,4*T+7,37,21,'#76513a');
- R(c,3*T,4*T+8,3,19,'#d2a274');
+ R(c,10*T+2,26,5*T-4,4,'#61423b');R(c,10*T+5,27,5*T-10,2,'#e1b184');
+ // Barn ventilation window, framed in timber.
+ R(c,13*T+9,T+5,16,13,'#543c32');R(c,13*T+11,T+7,12,9,'#2c3835');
+ for(let i=0;i<3;i++)R(c,13*T+12+i*4,T+8,2,7,'#c59b68');
+ R(c,10*T+3,T+4,5*T-6,23,'#a76f49');
+ for(let x=10;x<=14;x++){
+  R(c,x*T+3,T+4,5,24,'#6c4637');R(c,x*T+25,T+4,4,24,'#765039');
+  R(c,x*T+10,T+9,12,2,'#c99467');
+ }
+ R(c,11*T+9,T+5,3*T-18,24,'#5c3e32');
+ R(c,11*T+12,T+8,3*T-24,21,'#80563b');
+ R(c,12*T+15,T+8,3,21,'#e5bb83');
+ R(c,11*T+12,T+27,3*T-24,3,'#382f2d');
+ // Garden beds occupy the former barn site (left of central path).
+ for(let y=3;y<=4;y++)for(let x=1;x<=4;x++){
+  const X=x*T,Y=y*T;
+  R(c,X+2,Y+8,28,19,'#71543a');R(c,X+4,Y+9,24,16,'#98704c');
+  for(let i=0;i<3;i++){
+   const dx=X+7+i*8,dy=Y+10+((x+y+i)%2)*3;
+   R(c,dx+2,dy+5,2,10,'#457b4b');
+   R(c,dx-1,dy+2,7,6,['#f6d5b0','#f3b5c5','#e6d3f5'][(x+i)%3]);
+   R(c,dx+1,dy+3,3,2,'#f6edbd');
+  }
+ }
+ // Quiet connected paths: no tiny lines, crosshatching, or loose thresholds.
  for(let y=2;y<11;y++)if(!map.walls.has(`7,${y}`))path(c,7*T,y*T,y);
  for(let x=4;x<11;x++)if(!map.walls.has(`${x},10`))path(c,x*T,10*T,x);
- // Umzäunte Weide mit offenem Tor im Süden; Zaun-Kollisionen liegen in maps.js.
- for(let x=9;x<=14;x++){fence(c,x*T,3*T);if(x!==10)fence(c,x*T,7*T)}
- for(let y=4;y<=6;y++){fence(c,9*T,y*T);fence(c,14*T,y*T)}
- for(const [x,y] of [[10,4],[12,5],[13,6]]){R(c,x*T+6,y*T+12,20,13,'#77a45a');R(c,x*T+11,y*T+7,9,9,'#a3c875')}
- // Wasser und Ufer werden vom gemeinsamen Züchterhof-Tileset gezeichnet.
- for(const [x,y] of [[2,6],[4,7],[12,9],[13,9],[14,8]])flower(c,x*T,y*T);
- for(const [x,y] of [[1,9],[14,2],[2,10]])pot(c,x*T,y*T);
- // Die äußeren Kartenränder bleiben offen; nur die Weide ist eingezäunt.
+ // Narrow two-post fence, shifted one row south. The southern opening is at x=10.
+ for(let x=9;x<=14;x++){
+  thinYardFence(c,x*T,4*T);
+  if(x!==10)thinYardFence(c,x*T,8*T);
+ }
+ for(let y=5;y<=7;y++)for(const x of [9,14])thinYardFence(c,x*T,y*T);
+}
+function thinYardFence(c,x,y){
+ R(c,x+2,y+12,28,3,'#a7784b');R(c,x+2,y+22,28,3,'#b88c59');
+ for(const dx of [5,25]){
+  R(c,x+dx,y+6,4,23,'#765238');R(c,x+dx+1,y+5,3,22,'#d2a875');
+  R(c,x+dx+1,y+7,2,2,'#f2d4a2');
+ }
 }
 function drawBuildingFacades(c,buildings){
  const mapId=Object.entries(outdoorBuildings).find(([,value])=>value===buildings)?.[0];
@@ -265,8 +300,8 @@ export function drawScene(c,map,state,animationFrame=0,actors=npcs[map.id]||[],h
 // Subtle original ground vegetation for the inhabited outdoor areas.
 // Never cover paths, portals, buildings or blocked cells.
 for(const part of outdoorGroundAccents(map,(id,x,y)=>id==='yard'?(x===7&&y>=2||y===10&&x>=4&&x<=10):id==='beerendorf'?isBerryVillagePath(x,y):isVillagePath(x,y)))R(c,part.x,part.y,part.w,part.h,part.color);
-if(map.id==='bedroom'){drawBedroom(c)}if(map.id==='ground'){drawGround(c)}if(map.id==='yard'){yardGround(c,map);for(const part of yardHabitatPixels(map))R(c,part.x,part.y,part.w,part.h,part.color);drawYard(c,map);for(const part of yardArchitecturePixels(map))R(c,part.x,part.y,part.w,part.h,part.color);yardWater(c,animationFrame);for(const part of yardFinishingPixels(map))R(c,part.x,part.y,part.w,part.h,part.color);for(const [fx,fy] of [[1,6],[4,7],[12,8],[14,6]]){R(c,fx*T+6,fy*T+11,20,15,'#6b8e50');R(c,fx*T+10,fy*T+6,12,12,'#96b36c')}}if(map.id==='village')drawVillage(c,map);if(map.id==='professor_clearing')drawProfessorClearing(c,map);if(map.id==='beerendorf')drawBeerendorf(c,map);if(map.id==='route2'){for(let y=11;y<=12;y++)for(let x=9;x<=10;x++){wallBlock(c,x*T,y*T);if(y===11)roof(c,x*T,y*T)}door(c,10*T,13*T);}if(map.id==='beerendorf_haus2'){drawInterior(c,'village_home');for(const [x,y] of [[2,2],[8,2],[2,5]]){R(c,x*T+10,y*T+12,13,13,'#608b51');R(c,x*T+13,y*T+15,5,5,'#c95667')}}if(map.id==='beerendorf_haus'){drawInterior(c,'village_home')}if(map.id==='beerendorf_wohnhaus'){drawInterior(c,'village_home')}if(map.id==='forest_elder_house'){drawInterior(c,'village_home')}if(map.id==='beerendorf_werkstatt'){drawInterior(c,'study')}if(((map.id==='route1'||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))drawRoute1(c,map);if(map.id==='brook'){for(let x=0;x<map.w;x++)for(let y=7;y<=9;y++)if(x<6||x>9){const X=x*T,Y=y*T;R(c,X+4,Y+9,18,2,'#82c6ce');R(c,X+12,Y+23,12,2,'#75b8c5');waterGlint(c,X,Y,state.steps||0)}for(const [x,y] of [[2,3],[13,3],[2,12],[13,12]])if(!map.walls.has(`${x},${y}`)&&terrainKind(map.id,x,y)==='grass'){pot(c,x*T,y*T)}for(let x=0;x<map.w;x++){if(x<6||x>9){for(let y of [6,10]){R(c,x*T,y*T+18,32,14,'#739c66');R(c,x*T+8,y*T+12,3,15,'#4c7e57');R(c,x*T+21,y*T+10,3,18,'#527d51')}}}for(let y=7;y<=9;y++)for(let x=6;x<=9;x++){const X=x*T,Y=y*T;R(c,X,Y,32,32,'#a47848');R(c,X+2,Y+3,28,5,'#d4a36b');R(c,X+2,Y+19,28,4,'#744e32');R(c,X+14,Y,3,32,'#5f402b');if(x===6||x===9){R(c,X+(x===6?2:26),Y+3,4,26,'#66462f');R(c,X+(x===6?2:26),Y+3,4,3,'#e7b77e')}}}if(map.id==='village_home'||map.id==='village_house_east'||map.id==='professor_house'||map.id==='chapel'||map.id==='rival_house'||map.id==='study'){drawInterior(c,map.id==='study'?'study':'village_home');if(map.id==='chapel'){carpet(c,4*T,T,3*T,5*T,'#927b9c')}}
-drawPathEdges(c,map);
+if(map.id==='bedroom'){drawBedroom(c)}if(map.id==='ground'){drawGround(c)}if(map.id==='yard'){yardGround(c,map);for(const part of yardHabitatPixels(map))if(!(part.x>=10*T&&part.x<14*T&&part.y>=5*T&&part.y<8*T))R(c,part.x,part.y,part.w,part.h,part.color);drawYard(c,map);yardWater(c,animationFrame);for(const [fx,fy] of [[1,6],[4,7],[12,8],[14,6]]){R(c,fx*T+6,fy*T+11,20,15,'#6b8e50');R(c,fx*T+10,fy*T+6,12,12,'#96b36c')}}if(map.id==='village')drawVillage(c,map);if(map.id==='professor_clearing')drawProfessorClearing(c,map);if(map.id==='beerendorf')drawBeerendorf(c,map);if(map.id==='route2'){for(let y=11;y<=12;y++)for(let x=9;x<=10;x++){wallBlock(c,x*T,y*T);if(y===11)roof(c,x*T,y*T)}door(c,10*T,13*T);}if(map.id==='beerendorf_haus2'){drawInterior(c,'village_home');for(const [x,y] of [[2,2],[8,2],[2,5]]){R(c,x*T+10,y*T+12,13,13,'#608b51');R(c,x*T+13,y*T+15,5,5,'#c95667')}}if(map.id==='beerendorf_haus'){drawInterior(c,'village_home')}if(map.id==='beerendorf_wohnhaus'){drawInterior(c,'village_home')}if(map.id==='forest_elder_house'){drawInterior(c,'village_home')}if(map.id==='beerendorf_werkstatt'){drawInterior(c,'study')}if(((map.id==='route1'||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))drawRoute1(c,map);if(map.id==='brook'){for(let x=0;x<map.w;x++)for(let y=7;y<=9;y++)if(x<6||x>9){const X=x*T,Y=y*T;R(c,X+4,Y+9,18,2,'#82c6ce');R(c,X+12,Y+23,12,2,'#75b8c5');waterGlint(c,X,Y,state.steps||0)}for(const [x,y] of [[2,3],[13,3],[2,12],[13,12]])if(!map.walls.has(`${x},${y}`)&&terrainKind(map.id,x,y)==='grass'){pot(c,x*T,y*T)}for(let x=0;x<map.w;x++){if(x<6||x>9){for(let y of [6,10]){R(c,x*T,y*T+18,32,14,'#739c66');R(c,x*T+8,y*T+12,3,15,'#4c7e57');R(c,x*T+21,y*T+10,3,18,'#527d51')}}}for(let y=7;y<=9;y++)for(let x=6;x<=9;x++){const X=x*T,Y=y*T;R(c,X,Y,32,32,'#a47848');R(c,X+2,Y+3,28,5,'#d4a36b');R(c,X+2,Y+19,28,4,'#744e32');R(c,X+14,Y,3,32,'#5f402b');if(x===6||x===9){R(c,X+(x===6?2:26),Y+3,4,26,'#66462f');R(c,X+(x===6?2:26),Y+3,4,3,'#e7b77e')}}}if(map.id==='village_home'||map.id==='village_house_east'||map.id==='professor_house'||map.id==='chapel'||map.id==='rival_house'||map.id==='study'){drawInterior(c,map.id==='study'?'study':'village_home');if(map.id==='chapel'){carpet(c,4*T,T,3*T,5*T,'#927b9c')}}
+if(map.id!=='yard')drawPathEdges(c,map);
 for(const part of settlementPlazaPixels(map,(id,x,y)=>id==='village'?isVillagePath(x,y):id==='beerendorf'?isBerryVillagePath(x,y):isProfessorClearingPath(x,y)))R(c,part.x,part.y,part.w,part.h,part.color);
 // dev.733: large, regional path emblems distinguish settlements at normal zoom.
 for(const part of settlementLandmarkPixels(map,(id,x,y)=>id==='village'?isVillagePath(x,y):id==='beerendorf'?isBerryVillagePath(x,y):isProfessorClearingPath(x,y)))R(c,part.x,part.y,part.w,part.h,part.color);
@@ -279,6 +314,15 @@ drawVillageDecor(c,map);
 drawBrookBanks(c,map);
 drawWoodlandAccents(c,map);
 drawBerryVillageDecor(c,map);
+// Pasture finishing pass: only low grass, no flowers, shrubs, high grass or old overlays.
+if(map.id==='yard')for(let y=5;y<=7;y++)for(let x=10;x<=13;x++){
+ const X=x*T,Y=y*T;
+ R(c,X,Y,T,T,'#85ad72');
+ for(let i=0;i<9;i++){
+  const dx=(x*11+y*7+i*13+i*i)%30,dy=(x*5+y*17+i*9)%29;
+  R(c,X+dx,Y+dy,1,2,i%2?'#739e65':'#a1c28b');
+ }
+}
 // Collision layer is always visually indicated, without changing the engine's walls.
 for(const cell of map.walls){const [x,y]=cell.split(',').map(Number);if(map.id==='bedroom')continue;if(map.id==='ground'&&((x===1||x===2)&&y===1||(x===8||x===9)&&y===1||(x===2||x===3)&&y===5))continue;if(map.id==='brook'||map.id==='yard'||map.id==='village'||map.id==='professor_clearing'||(((map.id==='route1'||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id)))continue;wallBlock(c,x*32,y*32)}
 // Baeume werden ausschliesslich auf den echten, blockierten Baumkacheln gezeichnet.

@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {maps} from '../src/maps.js';
+import {yardBabyPokemon,yardBabyRoutes} from '../src/yard-biome-art.js';
+import {readFileSync} from 'node:fs';
+const yard=maps.yard;
+test('dev766 barn is east of home and solid',()=>{for(let x=10;x<=14;x++)for(const y of [0,1])assert.ok(yard.walls.has(`${x},${y}`));});
+test('dev766 former barn site is clear for flower beds',()=>{for(let x=1;x<=4;x++)for(let y=3;y<=4;y++)assert.ok(!yard.walls.has(`${x},${y}`));});
+test('dev766 pasture is shifted south with open gate',()=>{for(let x=9;x<=14;x++)assert.ok(yard.walls.has(`${x},4`));for(let x=9;x<=14;x++)if(x!==10)assert.ok(yard.walls.has(`${x},8`));assert.ok(!yard.walls.has('10,8'));});
+test('dev766 baby patrol paths stay in clear interior',()=>{for(const a of yardBabyPokemon)for(const [x,y] of yardBabyRoutes[a.id]){assert.ok(!yard.walls.has(`${x},${y}`));if(a.zone==='pasture'){assert.ok(x>=10&&x<=13&&y>=5&&y<=7)}}});
+test('dev766 integrated house entrance and story exit remain open',()=>{assert.ok(yard.portals.some(p=>p.x===7&&p.y===1&&p.target==='ground'));assert.ok(yard.portals.some(p=>p.x===7&&p.y===11&&p.target==='village'));});
+test('dev766 rendering no longer applies old yard hatch and barn finishing layers',()=>{const src=readFileSync(new URL('../src/art.js',import.meta.url),'utf8');assert.match(src,/function thinYardFence/);assert.match(src,/if\(map.id!=='yard'\)drawPathEdges/);assert.doesNotMatch(src,/for\(const part of yardFinishingPixels\(map\)\)/);});

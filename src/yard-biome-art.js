@@ -6,7 +6,7 @@ const portal=(map,x,y)=>map.portals.some(p=>p.x===x&&p.y===y);
 export const yardPondCells=Object.freeze([[2,8],[3,8],[4,8],[2,9],[3,9],[4,9]]);
 export const yardMeadowCells=Object.freeze([[1,4],[2,4],[3,5],[4,5],[5,5],[1,6],[2,6],[3,6],[4,6],[5,7],[6,7],[5,8],[6,8],[11,8],[12,8],[13,8],[11,9],[12,9],[13,9],[4,10],[5,10],[6,10]]);
 export const yardFlowerbeds=Object.freeze([[1,5],[2,5],[3,7],[4,7],[5,9],[11,9],[12,9],[13,9]]);
-export const yardSaplings=Object.freeze([[1,3],[5,4],[12,2],[14,9]]);
+export const yardSaplings=Object.freeze([[5,4],[12,2],[14,9]]);
 export const yardBabyPokemon=Object.freeze([
  {id:'azurill',name:'Azurill',x:5,y:8,zone:'pond',phase:0},
  {id:'pichu',name:'Pichu',x:11,y:5,zone:'pasture',phase:1},
@@ -21,8 +21,8 @@ export function yardGround(c,map){
   if(n<9){rect(c,px+2,py+3,26,24,n%2?'#84ad6d':'#82aa69');rect(c,px+19,py+23,16,10,'#82aa69')}
   for(let i=0;i<3;i++){const sx=(n*7+i*13)%31,sy=(n*11+i*9)%28;rect(c,px+sx,py+sy,2,5,'#5e944f');rect(c,px+sx+3,py+sy+2,2,3,'#a4c780')}
  }
- for(const [x,y] of yardMeadowCells){if(!yardSafeDecor(map,x,y))continue;const X=x*T,Y=y*T;for(let i=0;i<5;i++){const xx=X+((i*11+x*7+y*3)%29),yy=Y+((i*7+y*11)%24);rect(c,xx,yy+4,2,5,'#4d884b');rect(c,xx-2,yy+3,4,3,i%3===0?'#f2d4df':i%3===1?'#f7e7a2':'#d7c6ed');rect(c,xx-1,yy+3,2,2,'#f6c96d')}}
- for(const [x,y] of yardFlowerbeds){if(!yardSafeDecor(map,x,y))continue;const X=x*T,Y=y*T;rect(c,X+2,Y+10,28,17,'#896a4b');rect(c,X+3,Y+11,26,14,'#a37b53');for(let i=0;i<3;i++){const xx=X+7+i*8;rect(c,xx,Y+11,2,11,'#548b4b');rect(c,xx-3,Y+9+(i%2)*2,8,7,['#f2b9c9','#f3e1a2','#d5c1ee'][i]);rect(c,xx,Y+11+(i%2)*2,2,2,'#fff2bd')}}
+ for(const [x,y] of yardMeadowCells){if(!yardSafeDecor(map,x,y)||(x>=10&&x<=13&&y>=5&&y<=7))continue;const X=x*T,Y=y*T;for(let i=0;i<5;i++){const xx=X+((i*11+x*7+y*3)%29),yy=Y+((i*7+y*11)%24);rect(c,xx,yy+4,2,5,'#4d884b');rect(c,xx-2,yy+3,4,3,i%3===0?'#f2d4df':i%3===1?'#f7e7a2':'#d7c6ed');rect(c,xx-1,yy+3,2,2,'#f6c96d')}}
+ for(const [x,y] of yardFlowerbeds){if(!yardSafeDecor(map,x,y)||(x>=10&&x<=13&&y>=5&&y<=7))continue;const X=x*T,Y=y*T;rect(c,X+2,Y+10,28,17,'#896a4b');rect(c,X+3,Y+11,26,14,'#a37b53');for(let i=0;i<3;i++){const xx=X+7+i*8;rect(c,xx,Y+11,2,11,'#548b4b');rect(c,xx-3,Y+9+(i%2)*2,8,7,['#f2b9c9','#f3e1a2','#d5c1ee'][i]);rect(c,xx,Y+11+(i%2)*2,2,2,'#fff2bd')}}
  for(const [x,y] of yardSaplings){if(!yardSafeDecor(map,x,y))continue;const X=x*T,Y=y*T;rect(c,X+14,Y+17,5,14,'#7a5438');for(const [dx,dy,w,h] of [[6,10,21,14],[10,4,16,16],[4,16,25,7]])rect(c,X+dx,Y+dy,w,h,'#477e4a');rect(c,X+8,Y+11,13,5,'#70a65b');rect(c,X+15,Y+6,8,4,'#8abc6e')}
 }
 // Shared shoreline geometry: render the six water cells as one continuous pond.
@@ -50,7 +50,7 @@ export function yardWater(c,frame=0){
 // Larger regional planting patches, assembled without new colliders or pickups.
 export const yardHabitatPatches=Object.freeze([
  {kind:'flower-meadow',cells:[[1,6],[2,6],[1,7],[2,7]]},
- {kind:'pasture-clover',cells:[[10,4],[11,4],[12,4],[13,4],[10,5],[11,5],[12,5],[13,5],[10,6],[11,6],[12,6],[13,6]]},
+ {kind:'pasture-clover',cells:[[10,5],[11,5],[12,5],[13,5],[10,6],[11,6],[12,6],[13,6],[10,7],[11,7],[12,7],[13,7]]},
  {kind:'orchard-edge',cells:[[5,4],[6,4],[5,5],[6,5]]}
 ]);
 export function yardHabitatPixels(map){
@@ -89,8 +89,8 @@ function baby(c,id,x,y,frame){
 // The positions are render-only; no NPC, encounter, save, or collision state is changed.
 export const yardBabyRoutes=Object.freeze({
  azurill:Object.freeze([[5,8],[6,8],[6,9],[5,9],[5,8]]),
- pichu:Object.freeze([[11,5],[12,5],[13,5],[13,4],[12,4],[11,4],[11,5]]),
- togepi:Object.freeze([[12,6],[11,6],[10,6],[10,5],[10,4],[11,4],[12,4],[12,5],[12,6]])
+ pichu:Object.freeze([[11,5],[12,5],[13,5],[13,6],[12,6],[11,6],[11,5]]),
+ togepi:Object.freeze([[12,6],[11,6],[10,6],[10,5],[11,5],[12,5],[13,5],[13,6],[12,6]])
 });
 export const BABY_WALK_FRAMES=9;
 export const BABY_REST_FRAMES=13;

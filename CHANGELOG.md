@@ -1,3 +1,7 @@
+## dev.766 – Phase 15: Züchterhof-Neugestaltung
+
+Scheune rechts des Wohnhauses, Beete am ehemaligen Scheunenstandort, südlich versetzte Weide mit schmaleren Zäunen, ruhige Gras-/Wegtexturen, verbesserte Gebäudedetails und angepasste Baby-Pokémon-Routen. 1.297 Tests bestanden. Siehe PHASE15_DEV763_766.md.
+
 ## dev.762 – Züchterhof: Gebäude, Kollisionen, Scheune, Wege
 
 Siehe `PHASE15_DEV755_762.md`.

@@ -11,7 +11,7 @@ test('dev762 house roof and facade block movement except the integrated door',()
  assert.equal(canMove(yard,6,2,6,1),false);
 });
 test('dev762 independent barn has solid roof and walls',()=>{
- for(let x=1;x<=4;x++)for(let y=3;y<=4;y++)assert.ok(yard.walls.has(`${x},${y}`));
+ for(let x=10;x<=14;x++)for(let y=0;y<=1;y++)assert.ok(yard.walls.has(`${x},${y}`));
 });
 test('dev762 story entrances and baby habitats remain usable',()=>{
  assert.ok(yard.portals.some(p=>p.x===7&&p.y===11&&p.target==='village'));
