@@ -7,6 +7,25 @@ const original={};
 const originalInteriorExits=Object.fromEntries(Object.entries(maps).map(([id,map])=>[id,map.portals.map(p=>({...p}))]));
 for(const id of supported){const map=maps[id];original[id]={walls:new Set(map.walls),portals:map.portals.map(p=>({...p})),buildings:(outdoorBuildings[id]||[]).map(b=>({...b})),objects:(objects[id]||[]).map(o=>({...o}))}}
 const defaults=layoutCopy(DEFAULT_LAYOUT);
+// Objects required by the prologue cannot be removed or silently rewritten by imported files.
+const protectedFurniture=new Set(['player-bed','pokemon-pc']);
+const canonicalDoors=new Map(Object.entries(defaults).flatMap(([mapId,items])=>items.filter(o=>o.door).map(o=>[o.id,{mapId,kind:o.kind,art:o.art,w:o.w,h:o.h,door:{...o.door}}])));
+function checkProtectedObjects(layout){
+ const errors=[];
+ for(const [mapId,items] of Object.entries(defaults))for(const baseline of items){
+  const item=(layout[mapId]||[]).find(o=>o.id===baseline.id);
+  if(protectedFurniture.has(baseline.id)&&(!item||item.kind!==baseline.kind||item.art!==baseline.art||item.w!==baseline.w||item.h!==baseline.h))errors.push(`${baseline.id}: protected story object`);
+  if(!baseline.door)continue;
+  if(!item||item.kind!==baseline.kind||item.art!==baseline.art||item.w!==baseline.w||item.h!==baseline.h||!item.door||item.door.target!==baseline.door.target||item.door.tx!==baseline.door.tx||item.door.ty!==baseline.door.ty)errors.push(`${baseline.id}: protected door destination`);
+ }
+ for(const [mapId,items] of Object.entries(layout))for(const item of items||[]){
+  const canonical=canonicalDoors.get(item.id);
+  if(canonical&&canonical.mapId!==mapId)errors.push(`${item.id}: door moved to another map`);
+  if(item.door&&!canonicalDoors.has(item.id))errors.push(`${item.id}: custom doors not supported`);
+ }
+ return errors;
+}
+
 const bounds=Object.fromEntries(supported.map(id=>[id,{w:maps[id].w,h:maps[id].h}]));
 // Protected spawn, stair, exit and story interaction tiles. Doors are exempt only at their own positions.
 const fixedWalls=Object.fromEntries(supported.map(id=>[id,new Set(original[id].walls)]));
@@ -14,7 +33,7 @@ for(const id of supported)for(const item of defaults[id])for(const {x,y} of foot
 const reserved=Object.fromEntries(supported.map(id=>[id,new Set([...fixedWalls[id],...original[id].portals.filter(p=>p.kind!=='door').map(p=>`${p.x},${p.y}`),...(npcs[id]||[]).map(n=>`${n.x},${n.y}`)])]));
 // Preserve story-critical floor interaction positions and paths.
 reserved.bedroom.add('5,5');reserved.ground.add('6,2');reserved.ground.add('3,3');
-function check(layout){const validation=validateLayout(layout,bounds,Object.fromEntries(supported.map(id=>[id,[...reserved[id]]])));const errors=[...validation.errors];for(const id of supported){const map=maps[id];const doors=new Set();for(const item of layout[id]||[]){if(item.door){const d=item.door,key=`${d.x},${d.y}`;if(d.x<0||d.y<0||d.x>=map.w||d.y>=map.h||reserved[id].has(key)||doors.has(key))errors.push(`${item.id}: blocked door`);doors.add(key);if(footprint(item).some(cell=>cell.x===d.x&&cell.y===d.y))errors.push(`${item.id}: door inside building`);if((layout[id]||[]).some(other=>footprint(other).some(cell=>cell.x===d.x&&cell.y===d.y)))errors.push(`${item.id}: door overlaps object`)} } }return {ok:!errors.length,errors}}
+function check(layout){const validation=validateLayout(layout,bounds,Object.fromEntries(supported.map(id=>[id,[...reserved[id]]])));const errors=[...validation.errors,...checkProtectedObjects(layout)];for(const id of supported){const map=maps[id];const doors=new Set();for(const item of layout[id]||[]){if(item.door){const d=item.door,key=`${d.x},${d.y}`;if(d.x<0||d.y<0||d.x>=map.w||d.y>=map.h||reserved[id].has(key)||doors.has(key))errors.push(`${item.id}: blocked door`);doors.add(key);if(footprint(item).some(cell=>cell.x===d.x&&cell.y===d.y))errors.push(`${item.id}: door inside building`);if((layout[id]||[]).some(other=>footprint(other).some(cell=>cell.x===d.x&&cell.y===d.y)))errors.push(`${item.id}: door overlaps object`)} } }return {ok:!errors.length,errors}}
 let current=layoutCopy(defaults);
 const undoStack=[],redoStack=[];
 const historyLimit=40;
@@ -38,7 +57,7 @@ export function applyLayout(next,player=null,{record=false}={}){const validation
  if(record)remember(current);current=layoutCopy(next);return {ok:true,migration}}
 export function editLayout(action,mapId,id,x,y,art,player=null){if(!supported.includes(mapId))return {ok:false,errors:['unsupported map']};let result;
  if(action==='move')result=moveObject(current,mapId,id,x,y);
- else if(action==='remove'){const existing=current[mapId]?.find(o=>o.id===id);if(existing?.door)return {ok:false,errors:['Gebäude mit Story-Eingang dürfen nicht gelöscht werden. Bitte verschieben.']};result=removeObject(current,mapId,id);}
+ else if(action==='remove'){const existing=current[mapId]?.find(o=>o.id===id);if(existing?.door||protectedFurniture.has(id))return {ok:false,errors:['Storywichtige Objekte dürfen nicht gelöscht werden. Bitte verschieben.']};result=removeObject(current,mapId,id);}
  else if(action==='add'){const kind=['village','professor_clearing','beerendorf'].includes(mapId)?'building':'furniture';const w=kind==='building'?3:1,h=kind==='building'?2:1;result=addObject(current,mapId,{id,kind,art:art|| (kind==='building'?'mu-home':'pot'),x,y,w,h});}
  else return {ok:false,errors:['unknown action']};if(!result.ok)return result;return applyLayout(result.layout,player,{record:true})}
 export function resetLayout(player=null){return applyLayout(defaults,player,{record:true})}
@@ -62,9 +81,10 @@ export function inspectImportedLayout(text){
     if(!item||typeof item!=='object'||Array.isArray(item))throw Error('Ungültiges Objekt: '+id);
     if(![item.x,item.y,item.w,item.h].every(Number.isSafeInteger)||item.w<1||item.h<1||item.w>20||item.h>20)throw Error('Ungültige Objektabmessungen: '+id);
     if(typeof item.id!=='string'||item.id.length>100||typeof item.art!=='string'||item.art.length>100)throw Error('Ungültige Objektkennung: '+id);
-    if(item.door&&(!item.door.target||typeof item.door.target!=='string'||!maps[item.door.target]))throw Error('Unbekanntes Türziel: '+id);
+    if(item.door&&(!item.door.target||typeof item.door.target!=='string'||!maps[item.door.target]||![item.door.x,item.door.y,item.door.tx,item.door.ty].every(Number.isSafeInteger)))throw Error('Unbekanntes Türziel: '+id);
    }
    merged[id]=items;
+
   }
   const validation=check(merged);
   if(!validation.ok)return validation;
@@ -79,7 +99,7 @@ export function saveLayout(storage){
  try{
   const previous=storage.getItem(storageKey);
   if(previous){const checkPrevious=inspectImportedLayout(previous);if(checkPrevious.ok)storage.setItem(backupKey,previous)}
-  storage.setItem(storageKey,exportLayout());return true
+  const serialized=exportLayout();storage.setItem(storageKey,serialized);return storage.getItem(storageKey)===serialized
  }catch(e){return false}
 }
 export function loadLayout(storage){try{const raw=storage.getItem(storageKey);if(!raw)return {ok:true,default:true};const result=inspectImportedLayout(raw);if(!result.ok)return result;return applyLayout(result.layout)}catch(e){return {ok:false,errors:[String(e.message)]}}}

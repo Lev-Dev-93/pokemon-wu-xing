@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {prologueGuide,prologueConsistency,PROLOGUE_STAGES} from '../src/prologue-guide.js';
+test('prologue has six ordered canonical milestones',()=>assert.deepEqual(PROLOGUE_STAGES.map(s=>s.flag),['birthday_wish_pending','egg_received','rift_closed','rival_absol','professor_demo','route1_hatched']));
+test('initial guidance sends player to both breeders',()=>{const g=prologueGuide();assert.equal(g.completed,0);assert.match(g.tip,/beiden Züchtern/)});
+test('birthday wish waits for egg',()=>{const g=prologueGuide({birthday_wish_pending:true});assert.equal(g.completed,1);assert.match(g.tip,/Wähle/)});
+test('rift occurs after egg',()=>assert.match(prologueGuide({birthday_wish_pending:true,egg_received:true}).tip,/Dimensionsereignis/));
+test('Absol occurs after rift',()=>assert.match(prologueGuide({birthday_wish_pending:true,egg_received:true,rift_closed:true}).tip,/Absol/));
+test('parents are briefed before professor',()=>assert.match(prologueGuide({birthday_wish_pending:true,egg_received:true,rift_closed:true,rival_absol:true}).tip,/Adoptiveltern/));
+test('professor precedes Route 1',()=>assert.match(prologueGuide({birthday_wish_pending:true,egg_received:true,rift_closed:true,rival_absol:true,parents_briefed:true}).tip,/Professor/));
+test('route 1 hatching finishes prologue',()=>{const flags=Object.fromEntries(PROLOGUE_STAGES.map(s=>[s.flag,true]));const g=prologueGuide(flags);assert.equal(g.finished,true);assert.equal(g.completed,6)});
+test('consistency rejects out of order milestones',()=>assert.equal(prologueConsistency({route1_hatched:true}).ok,false));
+test('consistency rejects unhatched egg after route',()=>{const f=Object.fromEntries(PROLOGUE_STAGES.map(s=>[s.flag,true]));assert.equal(prologueConsistency(f,{hatched:false},[{}]).ok,false)});
+test('guide does not mutate story flags',()=>{const f={egg_received:true};const before=JSON.stringify(f);prologueGuide(f);assert.equal(JSON.stringify(f),before)});

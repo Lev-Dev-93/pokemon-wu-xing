@@ -1273,3 +1273,19 @@ NPC-Animationszyklus, prozedurale Kampf-Pixelsilhouetten und Cutscene-Overlays. 
 ## dev.579 – Phase 8
 - Visueller Drag-and-Drop-Rastereditor mit Pointer-Eingabe und Objektauswahl.
 - Zwei neue automatisierte Tests für Koordinaten und Objektauswahl.
+
+## dev.639 – Phase 11
+- Vereinheitlichte Möbel-Pixelgrafik, footprintgenaue Darstellung, eigenständige PC-Grafik und Renderer-Tests.
+
+## dev.659 – Phase 11 Abschlussblock
+Gemeinsame Gebäudefassaden; Entfernung statischer Möbel- und Figurenduplikate; gemeinsame Layoutmöbel-Zeichenphase. Siehe PHASE11_COMPLETION.md.
+
+## dev.660 – Phase 12 Prologführung
+- Kanonische Meilensteinanzeige und kontextbezogene Hinweise im Tagebuch.
+- Diagnostik für Prologzustände ohne Änderungen am Spielstandschema.
+- Elf zusätzliche Regressionstests; vollständige Browserabnahme noch offen.
+
+## dev.661 – Phase 12 Integrationsabnahme
+- Durchgehender Prolog-Integrationstest mit Save/Load-Meilensteinen und einmaligem Schlüpfen.
+- Schutz vor unzulässigem direktem Start der Professoren-Demonstration.
+- PHASE12_COMPLETION.md mit Testgrenzen und Browser-Abnahme.
