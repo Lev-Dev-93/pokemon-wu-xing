@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {BAG_CATEGORIES,bagCategory,bagName,bagEntries,bagTargets,applyBagItem} from '../src/bag.js';
 import {Engine} from '../src/engine.js';
 import {createPokemon} from '../src/team.js';
-test('Beutel hat sechs eindeutige Kategorien',()=>{assert.equal(new Set(BAG_CATEGORIES.map(x=>x.id)).size,6);assert.equal(bagCategory('potion'),'medicine');assert.equal(bagCategory('poke-ball'),'balls');assert.equal(bagCategory('ether'),'pp');});
+test('Beutel hat sieben eindeutige Kategorien',()=>{assert.equal(new Set(BAG_CATEGORIES.map(x=>x.id)).size,7);assert.equal(bagCategory('potion'),'medicine');assert.equal(bagCategory('poke-ball'),'balls');assert.equal(bagCategory('ether'),'pp');});
 test('Gegenstände werden nach Kategorie gefiltert und benannt',()=>{const entries=bagEntries([{id:'potion',quantity:2},{id:'poke-ball',quantity:3}], 'medicine');assert.equal(entries.length,1);assert.equal(entries[0].quantity,2);assert.equal(entries[0].name,bagName('potion'));});
 test('Trank nur für lebende verletzte Pokémon',()=>{const p=createPokemon(1,{level:8});assert.equal(bagTargets('potion',[p]).length,0);p.currentHp-=4;assert.equal(bagTargets('potion',[p]).length,1);p.currentHp=0;assert.equal(bagTargets('potion',[p]).length,0);});
 test('Ungültiger Gegenstand wird nicht verbraucht',()=>{const e=new Engine();e.state.team=[createPokemon(1,{level:8})];e.addItem('potion',2);assert.equal(applyBagItem(e,'potion',null),false);assert.equal(e.inventory.find(i=>i.id==='potion').quantity,2);});

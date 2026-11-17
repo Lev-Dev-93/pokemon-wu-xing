@@ -1,3 +1,5 @@
+import {chooseTrainerMove} from './trainer-ai.js';
+import {captureDecision,commitCapture} from './capture-transaction.js';
 import {prologueGuide} from './prologue-guide.js';
 import {keyboardMove} from './editor-keyboard.js';
 import {gridCellFromPointer,objectAtCell,paintLayoutGrid} from './visual-layout-editor.js';
@@ -23,6 +25,7 @@ import {findStoryWalk,storyWalkIsAdjacent,STORY_WALK_TARGETS} from './story-auto
 import {pendingRiftRecovery} from './story-guards.js';
 import {BAG_CATEGORIES,bagEntries,bagTargets,applyBagItem} from './bag.js';
 import {battleOutcome} from './battle-flow.js';
+import {trainerBattleAction,trainerDefeated} from './trainer-battle-lifecycle.js';
 import {developerModeEnabled,grantDevelopmentSupplies} from './developer-tools.js';
 import {EVOLUTION_STONES,stoneEvolutionOptions} from './progression.js';
 import {currentTimeOfDay} from './day-night.js';
@@ -31,8 +34,9 @@ import {SHOP_STOCK} from './shop.js';
 import {POTION_ITEM,STATUS_REMEDIES,REVIVE_ITEM,FULL_RESTORE_ITEM} from './healing.js';
 import {useBattlePotion,useBattleRemedy,useBattleRecovery,useBattlePpItem} from './battle-items.js';
 import {tryEscape} from './wild-encounters.js';
-import {startBattle,playTurn,playEnemyOnlyTurn,availableMoves} from './battle.js';
+import {startBattle,playTurn,playEnemyOnlyTurn,resumeInterruptedTurn,availableMoves} from './battle.js';
 import {switchTeamPokemon,availableSwitches} from './battle-switch.js';
+import {resolveOpponentSwitch} from './battle-pending-switch.js';
 import {POKEBALL_ITEM,tryCapture,captureProbability} from './capture.js';
 import {grantTestExperience,acceptMove,acceptEvolution,describeMove,createRewardQueue} from './battle-rewards.js';
 import {createPokemon} from './team.js';
@@ -185,9 +189,10 @@ function draw(){const m=engine.map;canvas.width=VIEW_W;canvas.height=VIEW_H;worl
 let bagTab='all';
 function renderBag(heading,list,category=bagTab,selected=null){bagTab=BAG_CATEGORIES.some(c=>c.id===category)?category:'all';heading.textContent=`Beutel · ${engine.state.money??0} Pokédollar`;
  const tabs=document.createElement('li');tabs.className='bag-tabs';for(const tab of BAG_CATEGORIES){const b=document.createElement('button');b.type='button';b.textContent=tab.name+' ('+bagEntries(engine.inventory,tab.id).length+')';b.setAttribute('aria-pressed',String(tab.id===bagTab));b.addEventListener('click',()=>menuPanel('inventory:'+tab.id));tabs.append(b)}list.append(tabs);
+ if(bagTab==='held'||bagTab==='all'){for(const [index,pokemon] of engine.team.entries()){if(!pokemon.heldItemId)continue;const li=document.createElement('li');const b=document.createElement('button');b.type='button';b.textContent=`#${pokemon.speciesId}: ${pokemon.heldItemId} abnehmen`;b.addEventListener('click',()=>{if(engine.removeHeldItem(index)){autoSave();notice.textContent=engine.message;menuPanel('inventory:'+bagTab);draw()}});li.append(b);list.append(li)}}
  const entries=bagEntries(engine.inventory,bagTab);if(!entries.length){const empty=document.createElement('li');empty.textContent='In dieser Kategorie sind keine Gegenstände vorhanden.';list.append(empty);return;}
  for(const item of entries){const li=document.createElement('li');li.className='bag-entry';const button=document.createElement('button');button.type='button';button.textContent=`${item.name} × ${item.quantity}`;button.setAttribute('aria-expanded',String(selected===item.id));button.addEventListener('click',()=>menuPanel('inventory:'+bagTab+':'+item.id));li.append(button);
- if(selected===item.id){const targets=bagTargets(item.id,engine.team);if(!targets.length){const info=document.createElement('p');info.textContent=item.category==='balls'?'Pokébälle können nur in wilden Kämpfen verwendet werden.':'Der Gegenstand kann momentan bei keinem Team-Pokémon eingesetzt werden.';li.append(info)}else{const info=document.createElement('p');info.textContent='Ziel auswählen (Verbrauch: 1 Stück):';li.append(info);const back=document.createElement('button');back.type='button';back.textContent='← Zurück zur Übersicht';back.addEventListener('click',()=>menuPanel('inventory:'+bagTab));li.append(back);for(const target of targets){const b=document.createElement('button');b.type='button';b.className='bag-target';b.textContent=target.label;b.addEventListener('click',()=>{if(applyBagItem(engine,item.id,target)){autoSave();notice.textContent=engine.message;menuPanel('inventory:'+bagTab)}else{notice.textContent='Gegenstand kann nicht verwendet werden.';menuPanel('inventory:'+bagTab+':'+item.id)}draw()});li.append(b)}}}list.append(li)}
+ if(selected===item.id){const targets=bagTargets(item.id,engine.team);if(!targets.length){const info=document.createElement('p');info.textContent=item.category==='balls'?'Pokébälle können nur in wilden Kämpfen verwendet werden.':'Der Gegenstand kann momentan bei keinem Team-Pokémon eingesetzt werden.';li.append(info)}else{const info=document.createElement('p');info.textContent=item.category==='held'?'Pokémon zum Ausrüsten auswählen (altes Item zurück in den Beutel):':'Ziel auswählen (Verbrauch: 1 Stück):';li.append(info);const back=document.createElement('button');back.type='button';back.textContent='← Zurück zur Übersicht';back.addEventListener('click',()=>menuPanel('inventory:'+bagTab));li.append(back);for(const target of targets){const b=document.createElement('button');b.type='button';b.className='bag-target';b.textContent=target.label;b.addEventListener('click',()=>{if(applyBagItem(engine,item.id,target)){autoSave();notice.textContent=engine.message;menuPanel('inventory:'+bagTab)}else{notice.textContent='Gegenstand kann nicht verwendet werden.';menuPanel('inventory:'+bagTab+':'+item.id)}draw()});li.append(b)}}}list.append(li)}
 }
 
 function toggleMenu(force){if(!starterPanel.hidden||!battlePanel.hidden)return;if(!journal.hidden){journal.hidden=true;journalButton.setAttribute('aria-expanded','false');}if(engine.mode==='dialogue'&&force!==false)return;menuOpen=typeof force==='boolean'?force:!menuOpen;menu.hidden=!menuOpen;document.querySelector('#menu-toggle').setAttribute('aria-expanded',String(menuOpen));keys.clear();if(!menuOpen){menuContent.replaceChildren();document.querySelector('#menu-toggle').focus();}else{menuPanel('team');menu.querySelector('#menu-close')?.focus();}}
@@ -214,7 +219,7 @@ function frame(t){const nextAmbient=ambientFrame(t,reduceWorldMotion);if(nextAmb
 
 // Abgeschlossene technische Testarena: keine Änderung an Engine-Team oder Story.
 function rewardNotice(text){const el=document.querySelector('#battle-reward');const p=document.createElement('p');p.textContent=text;el.append(p)}
-function nextReward(){const el=document.querySelector('#battle-choices');el.replaceChildren();const task=pendingRewards.shift();if(!task){if(['wild','trainer'].includes(battleKind))syncWildPokemon();return;}
+function nextReward(){const el=document.querySelector('#battle-choices');el.replaceChildren();const task=pendingRewards.shift();if(!task){if(['wild','trainer'].includes(battleKind)){syncWildPokemon();autoSave();}renderBattle();return;}
  const prompt=document.createElement('p');prompt.textContent=task.kind==='move'?`Neue Attacke: ${describeMove(task.id)}. Lernen?`:`Entwicklung zu Pokémon #${task.id} durchführen?`;el.append(prompt);
  function option(label,fn){const b=document.createElement('button');b.textContent=label;b.addEventListener('click',()=>{try{fn();nextReward()}catch(err){rewardNotice(err.message)}});el.append(b)}
  if(task.kind==='move'){const p=battle.player.pokemon;if(p.moves.length<4)option('Attacke lernen',()=>{acceptMove(p,task.id);battle.player.pp=[...p.pp];rewardNotice(`${describeMove(task.id)} gelernt.`)});else p.moves.forEach((id,index)=>option(`${describeMove(id)} ersetzen`,()=>{acceptMove(p,task.id,index);battle.player.pp=[...p.pp];rewardNotice(`${describeMove(task.id)} gelernt.`)}));option('Nicht lernen',()=>rewardNotice('Attacke nicht gelernt.'))}
@@ -231,16 +236,16 @@ function createPokemonPortrait(speciesId,back=false,label='Pokémon-Grafik'){
 function renderBattle(){if(!battle)return;for(const [side,pokemon,back] of [['player',battle.player.pokemon,true],['enemy',battle.opponent.pokemon,false]]){const holder=document.querySelector('.battle-mon.'+side+' .battle-sprite');if(holder){let sprite=holder.querySelector('canvas');if(!sprite){holder.replaceChildren();sprite=document.createElement('canvas');sprite.width=48;sprite.height=48;sprite.className='procedural-mon';holder.append(sprite)}if(sprite.dataset.species!==String(pokemon.speciesId)||sprite.dataset.back!==String(back)){const rendered=drawBattleSprite(sprite,pokemon.speciesId,back);sprite.dataset.species=String(pokemon.speciesId);sprite.dataset.back=String(back);holder.setAttribute('aria-label',`Pokémon #${pokemon.speciesId}`);if(!rendered){holder.textContent=`#${pokemon.speciesId}`}}}}for(const [id,f,key] of [['player-hp',battle.player,'playerHp'],['enemy-hp',battle.opponent,'opponentHp']]){const p=f.pokemon;const hp=battleView?.[key]??p.currentHp;const el=document.querySelector('#'+id);el.replaceChildren();const label=document.createElement('div');label.textContent=`#${String(p.speciesId).padStart(3,'0')} · Lv. ${p.level} · KP ${hp}/${p.stats.hp}`;const bar=document.createElement('progress');bar.max=p.stats.hp;bar.value=hp;el.append(label,bar);el.dataset.hpBand=hpBand(hp,p.stats.hp);bar.setAttribute('aria-label',`KP ${hp} von ${p.stats.hp}`)}
  document.querySelector('#battle-panel').dataset.battleKind=battleKind;document.querySelector('#battle-panel').dataset.battlePhase=battle.finished?'finished':battleBusy?'animating':'selection';
  const log=document.querySelector('#battle-log');log.replaceChildren();for(const line of (battleView?.log??battle.log)){const p=document.createElement('p');p.textContent=line;log.append(p)}
- const moves=document.querySelector('#battle-moves');moves.replaceChildren();for(const move of availableMoves(battle.player)){const b=document.createElement('button');const pp=battleView?.playerPp?.[move.index]??move.pp;b.textContent=`${move.name} · AP ${pp}/${move.maxPp}`;b.dataset.moveType=String(getMove(battle.player.pokemon.moves[move.index])?.typeId??0);b.title=`Typ: ${moveTypeLabel(Number(b.dataset.moveType))}`;b.disabled=battleBusy||battle.finished||pp<=0;b.addEventListener('click',()=>void executeBattleTurn(move.index));moves.append(b)}
+ const moves=document.querySelector('#battle-moves');moves.replaceChildren();for(const move of availableMoves(battle.player)){const b=document.createElement('button');const pp=battleView?.playerPp?.[move.index]??move.pp;b.textContent=`${move.name} · AP ${pp}/${move.maxPp}`;b.dataset.moveType=String(getMove(battle.player.pokemon.moves[move.index])?.typeId??0);b.title=`Typ: ${moveTypeLabel(Number(b.dataset.moveType))}`;b.disabled=battleBusy||battle.finished||!!battle.pendingSwitch||!!battle.pendingTurn||pp<=0;b.addEventListener('click',()=>void executeBattleTurn(move.index));moves.append(b)}
  const potionButton=document.querySelector('#battle-potion');potionButton.hidden=battleKind==='test';potionButton.disabled=battleBusy||battle.finished||!['wild','trainer'].includes(battleKind)||!engine.inventory.some(i=>i.id===POTION_ITEM&&i.quantity>0)||battle.player.pokemon.currentHp<=0||battle.player.pokemon.currentHp>=battle.player.pokemon.stats.hp;
  const remedyButton=document.querySelector('#battle-remedy');remedyButton.hidden=battleKind==='test';remedyButton.disabled=battleBusy||battle.finished||!['wild','trainer'].includes(battleKind)||battle.player.pokemon.currentHp<=0||!STATUS_REMEDIES.some(r=>r.status===battle.player.pokemon.status&&engine.inventory.some(i=>i.id===r.id&&i.quantity>0));
  const recoveryButton=document.querySelector('#battle-recovery');recoveryButton.hidden=battleKind==='test';recoveryButton.disabled=battleBusy||battle.finished||!['wild','trainer'].includes(battleKind)||!engine.inventory.some(i=>[REVIVE_ITEM,FULL_RESTORE_ITEM].includes(i.id)&&i.quantity>0);
  const ppButton=document.querySelector('#battle-pp');ppButton.hidden=battleKind==='test';ppButton.disabled=battleBusy||battle.finished||!['wild','trainer'].includes(battleKind)||!PP_ITEMS.some(item=>engine.inventory.some(i=>i.id===item.id&&i.quantity>0));
- const switchButton=document.querySelector('#battle-switch');switchButton.hidden=battleKind==='test';switchButton.disabled=battleBusy||!['wild','trainer'].includes(battleKind)||!availableSwitches(engine.state.team,wildTeamIndex).length||(battle.finished&&battle.winner!=='opponent');
+ const switchButton=document.querySelector('#battle-switch');switchButton.hidden=battleKind==='test';switchButton.disabled=battleBusy||pendingRewards.length>0||!['wild','trainer'].includes(battleKind)||!availableSwitches(engine.state.team,wildTeamIndex).length||(battle.finished&&battle.winner!=='opponent');
  for(const id of ['battle-restart','battle-close'])document.querySelector('#'+id).disabled=battleBusy;document.querySelector('#battle-restart').hidden=battleKind!=='test';document.querySelector('#battle-escape').hidden=!['wild','trainer'].includes(battleKind);document.querySelector('#battle-escape').disabled=battleBusy||battle.finished;document.querySelector('#battle-catch').hidden=battleKind!=='wild';document.querySelector('#battle-catch').disabled=battleBusy||battle.finished||!engine.inventory.some(i=>i.id===POKEBALL_ITEM&&i.quantity>0);
- if(battle.finished&&!battleBusy){if(battleOutcome(battleKind,battle.winner,0,remainingTrainerPokemon.length)==='next-opponent'){const p=document.createElement('p');p.textContent=`Noch ${remainingTrainerPokemon.length} Pokémon des Trainers übrig.`;log.append(p);const next=document.createElement('button');next.textContent='Nächstes Trainer-Pokémon';next.addEventListener('click',advanceTrainerOpponent);log.append(next);return}if(['wild','trainer'].includes(battleKind)&&resolveBattleState(battleKind,battle,engine.state.team,wildTeamIndex,remainingTrainerPokemon.length)==='switch'){const p=document.createElement('p');p.textContent='Dein Pokémon ist kampfunfähig. Wechsle ein anderes Pokémon ein!';log.append(p);return}settleTestBattle();const p=document.createElement('p');p.textContent=battle.winner==='player'?'Sieg!':battle.winner==='opponent'?'Niederlage.':battle.winner==='escape'?'Entkommen.':battle.winner==='caught'?'Gefangen!':'Unentschieden.';log.append(p)}}
+ if(battle.finished&&!battleBusy){settleTestBattle();if(trainerBattleAction({kind:battleKind,finished:battle.finished,winner:battle.winner,remaining:remainingTrainerPokemon.length,rewardsPending:pendingRewards.length>0||document.querySelector('#battle-choices').children.length>0})==='next-opponent'){const p=document.createElement('p');p.textContent=`Noch ${remainingTrainerPokemon.length} Pokémon des Trainers übrig.`;log.append(p);const next=document.createElement('button');next.textContent='Nächstes Trainer-Pokémon';next.addEventListener('click',advanceTrainerOpponent);log.append(next);return}if(['wild','trainer'].includes(battleKind)&&resolveBattleState(battleKind,battle,engine.state.team,wildTeamIndex,remainingTrainerPokemon.length)==='switch'){const p=document.createElement('p');p.textContent='Dein Pokémon ist kampfunfähig. Wechsle ein anderes Pokémon ein!';log.append(p);return}const p=document.createElement('p');p.textContent=battle.winner==='player'?'Sieg!':battle.winner==='opponent'?'Niederlage.':battle.winner==='escape'?'Entkommen.':battle.winner==='caught'?'Gefangen!':'Unentschieden.';log.append(p)}}
 const battleWait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-function chooseOpponentMove(){return chooseLegalMove(battle?.opponent);}
+function chooseOpponentMove(){return battleKind==='trainer'?chooseTrainerMove(battle?.opponent,battle?.player):chooseLegalMove(battle?.opponent);}
 
 // Visuelle Effekte sind rein darstellend und verändern keine Kampfdaten.
 function showAttackPresentation(event,previous){
@@ -265,37 +270,52 @@ function clearAttackPresentation(){
  const field=document.querySelector('#battle-panel .battle-field');if(field)delete field.dataset.attackEffect;
  for(const mon of document.querySelectorAll('#battle-panel .battle-mon')){delete mon.dataset.attackEffect;mon.classList.remove('battle-hit');}
 }
-async function executeBattleTurn(index){if(!battle||battleBusy||battle.finished||!legalMoveIndices(battle.player).includes(index))return;const enemy=availableMoves(battle.opponent).filter(m=>m.pp>0);if(!enemy.length){battle.log=['Der Gegner hat keine AP mehr. Der Kampf wird beendet.'];battle.finished=true;battle.winner='player';renderBattle();return}
+async function executeBattleTurn(index){if(!battle||battleBusy||battle.finished||pendingRewards.length||battle.pendingSwitch||!legalMoveIndices(battle.player).includes(index))return;const enemy=availableMoves(battle.opponent).filter(m=>m.pp>0);if(!enemy.length){battle.log=['Der Gegner hat keine AP mehr. Der Kampf wird beendet.'];battle.finished=true;battle.winner='player';renderBattle();return}
  battleBusy=true;const generation=++battleGeneration;const before={playerHp:battle.player.pokemon.currentHp,opponentHp:battle.opponent.pokemon.currentHp,playerPp:[...battle.player.pp],opponentPp:[...battle.opponent.pp],log:[]};battleView=before;
- try{playTurn(battle,index,enemy[Math.floor(Math.random()*enemy.length)].index);const events=battle.turnEvents||[];renderBattle();for(const event of events){if(generation!==battleGeneration)return;await battleWait(350);if(generation!==battleGeneration)return;const previous=battleView;battleView=event;renderBattle();showAttackPresentation(event,previous);await battleWait(550);clearAttackPresentation()}if(generation!==battleGeneration)return}
+ try{playTurn(battle,index,chooseOpponentMove());const events=battle.turnEvents||[];renderBattle();for(const event of events){if(generation!==battleGeneration)return;await battleWait(350);if(generation!==battleGeneration)return;const previous=battleView;battleView=event;renderBattle();showAttackPresentation(event,previous);await battleWait(550);clearAttackPresentation()}if(generation!==battleGeneration)return}
  catch(error){battle.log=[error.message]}
- finally{if(generation===battleGeneration){battleView=null;battleBusy=false;renderBattle()}}}
+ finally{if(generation===battleGeneration){battleView=null;battleBusy=false;resolvePendingBattleSwitch();renderBattle()}}}
+function resolvePendingBattleSwitch(){
+ if(!battle?.pendingSwitch)return;
+ if(battle.pendingSwitch.side==='opponent'){
+  const reserves=battleKind==='trainer'?remainingTrainerPokemon:[];
+  const normalized=reserves.map(p=>p.moves?structuredClone(p):createPokemon(p.speciesId,{level:p.level}));
+  const result=resolveOpponentSwitch(battle,normalized);
+  if(result.switched&&battleKind==='trainer')remainingTrainerPokemon=normalized;
+  if(!result.switched)battle.log.push('Der Kampf wird ohne gegnerischen Wechsel fortgesetzt.');
+  if(battle.pendingTurn&&!battle.pendingSwitch&&!battle.finished)resumeInterruptedTurn(battle);
+  if(battle.pendingSwitch)resolvePendingBattleSwitch();
+ }else if(battle.pendingSwitch.side==='player'){
+  if(!['wild','trainer'].includes(battleKind)||!availableSwitches(engine.state.team,wildTeamIndex).length){battle.pendingSwitch=null;battle.log.push('Kein Ersatz-Pokémon verfügbar.');if(battle.pendingTurn)resumeInterruptedTurn(battle);}
+  else void chooseBattleSwitch();
+ }
+}
 function startTestBattle(){if(engine.mode!=='exploration'||!starterPanel.hidden||battleBusy)return;toggleMenu(false);keys.clear();battleGeneration++;battleView=null;battleBusy=false;battleKind='test';battleFighters=new Map();battle=startBattle(createPokemon(4,{level:8}),createPokemon(1,{level:7}));rewardDone=false;pendingRewards=[];document.querySelector('#battle-reward').replaceChildren();document.querySelector('#battle-choices').replaceChildren();battlePanel.hidden=false;document.querySelector('#battle-title').textContent=battleAnnouncement('test')+' – Einzelkampf';document.querySelector('#battle-note').textContent='Nur technische Probe: temporäre Pokémon. Team und Story bleiben unverändert.';renderBattle();document.querySelector('#battle-close').focus()}
 function syncWildPokemon(){if(!['wild','trainer'].includes(battleKind)||wildTeamIndex<0||!battle)return;const p=battle.player.pokemon;const pp=Array.isArray(p.pp)&&p.pp.length===p.moves.length?p.pp:battle.player.pp;engine.state.team[wildTeamIndex]=structuredClone({...p,pp:[...pp]});autoSave()}
-function startWildBattle(wild){if(!wild||!battleCanBegin(engine.state.team))return;engine.registerEncounter(wild.speciesId);autoSave();battleStartPosition=battleOrigin(engine.state);wildTeamIndex=engine.state.team.findIndex(p=>p.currentHp>0);if(wildTeamIndex<0)return;toggleMenu(false);keys.clear();battleGeneration++;battleView=null;battleBusy=false;battleKind='wild';battleFighters=new Map();escapeAttempts=0;battle=startBattle(engine.state.team[wildTeamIndex],wild);battle.log=['Ein wildes Pokémon erscheint!'];rewardDone=false;pendingRewards=[];document.querySelector('#battle-reward').replaceChildren();document.querySelector('#battle-choices').replaceChildren();battlePanel.hidden=false;document.querySelector('#battle-title').textContent=`Wildes Pokémon – ${engine.map.name}`;document.querySelector('#battle-note').textContent=`${currentTimeOfDay()==='night'?'Nacht':'Tag'} · Dein echtes Team-Pokémon kämpft. KP und EP bleiben erhalten; Pokébälle sind einsetzbar.`;renderBattle()}
+function startWildBattle(wild){if(!wild||!battleCanBegin(engine.state.team))return;engine.registerEncounter(wild.speciesId);autoSave();battleStartPosition=battleOrigin(engine.state);wildTeamIndex=engine.state.team.findIndex(p=>p.currentHp>0);if(wildTeamIndex<0)return;toggleMenu(false);keys.clear();battleGeneration++;battleView=null;battleBusy=false;battleKind='wild';battleFighters=new Map();escapeAttempts=0;battle=startBattle(engine.state.team[wildTeamIndex],wild);battle.playerTeam=engine.state.team;battle.playerTeamIndex=wildTeamIndex;battle.log=['Ein wildes Pokémon erscheint!'];rewardDone=false;pendingRewards=[];document.querySelector('#battle-reward').replaceChildren();document.querySelector('#battle-choices').replaceChildren();battlePanel.hidden=false;document.querySelector('#battle-title').textContent=`Wildes Pokémon – ${engine.map.name}`;document.querySelector('#battle-note').textContent=`${currentTimeOfDay()==='night'?'Nacht':'Tag'} · Dein echtes Team-Pokémon kämpft. KP und EP bleiben erhalten; Pokébälle sind einsetzbar.`;renderBattle()}
 let remainingTrainerPokemon=[];let battleStartPosition=null;
-function startTrainerBattle(trainer){if(!trainer||engine.state.flags.route1TrainerDefeated||!battleCanBegin(engine.state.team))return;battleStartPosition=battleOrigin(engine.state);wildTeamIndex=engine.state.team.findIndex(p=>p.currentHp>0);if(wildTeamIndex<0)return;toggleMenu(false);keys.clear();battleGeneration++;battleView=null;battleBusy=false;battleKind='trainer';battleFighters=new Map();remainingTrainerPokemon=(trainer.team||[{speciesId:trainer.speciesId,level:trainer.level}]).slice(1);const first=(trainer.team||[trainer])[0];engine.registerEncounter(first.speciesId);autoSave();battle=startBattle(engine.state.team[wildTeamIndex],createPokemon(first.speciesId,{level:first.level}));battle.log=['Ein junger Trainer fordert dich zum Kampf heraus!'];rewardDone=false;pendingRewards=[];document.querySelector('#battle-reward').replaceChildren();document.querySelector('#battle-choices').replaceChildren();battlePanel.hidden=false;document.querySelector('#battle-title').textContent='Trainerkampf – Route 1';document.querySelector('#battle-note').textContent='Ein Übungskampf gegen einen Trainer. Fang ist nicht möglich; Flucht gilt als Aufgabe ohne Belohnung.';renderBattle()}
+function startTrainerBattle(trainer){if(!trainer||engine.state.flags.route1TrainerDefeated||!battleCanBegin(engine.state.team))return;battleStartPosition=battleOrigin(engine.state);wildTeamIndex=engine.state.team.findIndex(p=>p.currentHp>0);if(wildTeamIndex<0)return;toggleMenu(false);keys.clear();battleGeneration++;battleView=null;battleBusy=false;battleKind='trainer';battleFighters=new Map();remainingTrainerPokemon=(trainer.team||[{speciesId:trainer.speciesId,level:trainer.level}]).slice(1);const first=(trainer.team||[trainer])[0];engine.registerEncounter(first.speciesId);autoSave();battle=startBattle(engine.state.team[wildTeamIndex],createPokemon(first.speciesId,{level:first.level}));battle.playerTeam=engine.state.team;battle.playerTeamIndex=wildTeamIndex;battle.log=['Ein junger Trainer fordert dich zum Kampf heraus!'];rewardDone=false;pendingRewards=[];document.querySelector('#battle-reward').replaceChildren();document.querySelector('#battle-choices').replaceChildren();battlePanel.hidden=false;document.querySelector('#battle-title').textContent='Trainerkampf – Route 1';document.querySelector('#battle-note').textContent='Ein Übungskampf gegen einen Trainer. Fang ist nicht möglich; Flucht gilt als Aufgabe ohne Belohnung.';renderBattle()}
 function advanceTrainerOpponent(){
- if(battleKind!=='trainer'||!battle?.finished||battle.winner!=='player'||battleBusy||!remainingTrainerPokemon.length)return false;
- const defeated=battle.opponent.pokemon;
- const result=grantTestExperience(battle.player.pokemon,defeated);
+ if(trainerBattleAction({kind:battleKind,finished:battle?.finished,winner:battle?.winner,remaining:remainingTrainerPokemon.length,busy:battleBusy,rewardsPending:pendingRewards.length>0||document.querySelector('#battle-choices').children.length>0})!=='next-opponent')return false;
+ // Rewards were already granted when the defeated opponent was resolved.
+ // Never grant experience a second time when advancing the trainer.
  syncWildPokemon();
  const next=remainingTrainerPokemon.shift();
  const player=engine.state.team[wildTeamIndex];
  battle=startBattle(player,createPokemon(next.speciesId,{level:next.level}));
- battle.log=[`Der Trainer schickt Pokémon #${next.speciesId} in den Kampf!`,`${result.amount} EP für das besiegte Pokémon erhalten.`];
+ battle.log=[`Der Trainer schickt Pokémon #${next.speciesId} in den Kampf!`];
  rewardDone=false;pendingRewards=[];battleView=null;
  document.querySelector('#battle-reward').replaceChildren();document.querySelector('#battle-choices').replaceChildren();renderBattle();return true;
 }
-function closeBattle(){if(battleBusy)return;if(battleStartPosition&&!sameWorldPosition(battleStartPosition,engine.state)){notice.textContent='Kampfposition verändert: Rückkehr zur Spielwelt abgebrochen.';return;}if(battleKind==='wild'||battleKind==='trainer'){if(!battle.finished){notice.textContent='Du kannst den Kampf erst nach seinem Ende verlassen.';return}if(battle.winner==='opponent'&&availableSwitches(engine.state.team,wildTeamIndex).length){notice.textContent='Wechsle zuerst ein kampffähiges Pokémon ein.';return}if(pendingRewards.length||document.querySelector('#battle-choices').children.length){notice.textContent='Schließe zuerst die Level- und Entwicklungsentscheidungen ab.';return}syncWildPokemon();if(battle.winner==='opponent')engine.recoverFromBlackout();if(battleKind==='trainer'&&remainingTrainerPokemon.length===0)engine.finishTrainerBattle(battle.winner==='player');autoSave()}battleGeneration++;clearAttackPresentation();battlePanel.hidden=true;battle=null;battleView=null;battleStartPosition=null;keys.clear();draw()}
+function closeBattle(){if(battleBusy)return;if(battleStartPosition&&!sameWorldPosition(battleStartPosition,engine.state)){notice.textContent='Kampfposition verändert: Rückkehr zur Spielwelt abgebrochen.';return;}if(battleKind==='wild'||battleKind==='trainer'){if(!battle.finished){notice.textContent='Du kannst den Kampf erst nach seinem Ende verlassen.';return}if(battle.winner==='opponent'&&availableSwitches(engine.state.team,wildTeamIndex).length){notice.textContent='Wechsle zuerst ein kampffähiges Pokémon ein.';return}if(pendingRewards.length||document.querySelector('#battle-choices').children.length){notice.textContent='Schließe zuerst die Level- und Entwicklungsentscheidungen ab.';return}if(trainerBattleAction({kind:battleKind,finished:battle.finished,winner:battle.winner,remaining:remainingTrainerPokemon.length})==='next-opponent'){notice.textContent='Der Trainer hat noch weitere Pokémon. Setze den Kampf fort.';return}syncWildPokemon();if(battle.winner==='opponent')engine.recoverFromBlackout();if(battleKind==='trainer'&&trainerDefeated({kind:battleKind,finished:battle.finished,winner:battle.winner,remaining:remainingTrainerPokemon.length}))engine.finishTrainerBattle(true);autoSave()}battleGeneration++;clearAttackPresentation();battlePanel.hidden=true;battle=null;battleView=null;battleStartPosition=null;keys.clear();draw()}
 async function throwPokeball(){
  if(battleKind!=='wild'||!battle||battleBusy||battle.finished)return;
- if(!engine.inventory.some(i=>i.id===POKEBALL_ITEM&&i.quantity>0)){rewardNotice('Keine Pokébälle mehr.');return;}
- if(engine.state.team.length>=6&&engine.state.storage.length>=500){rewardNotice('Team und Lager sind voll.');return;}
- if(!engine.removeItem(POKEBALL_ITEM,1))return;
- const success=tryCapture(battle.opponent.pokemon);autoSave();
+ const decision=captureDecision({pokemon:battle.opponent.pokemon,inventory:engine.inventory,team:engine.state.team,storage:engine.state.storage});
+ if(!decision.attempted){rewardNotice(decision.reason==='full'?'Team und Lager sind voll.':'Keine Pokébälle mehr.');return;}
+ const success=decision.caught;
+ if(!commitCapture(engine,battle.opponent.pokemon,decision)){rewardNotice('Fangzustand verändert; der Fangversuch wurde abgebrochen.');return;}
+ autoSave();
  if(success){const caught=structuredClone(battle.opponent.pokemon);caught.currentHp=Math.max(1,caught.currentHp);
-  if(!engine.catchPokemon(caught)){engine.addItem(POKEBALL_ITEM,1);rewardNotice('Pokémon konnte nicht aufgenommen werden.');return;}
   battle.finished=true;battle.winner='caught';battle.log=['Klick! Das wilde Pokémon wurde gefangen!'];rewardDone=true;
   rewardNotice(`Pokémon #${caught.speciesId} gefangen und ${engine.state.team.length<=6&&engine.state.team.at(-1)?.speciesId===caught.speciesId?'ins Team':'ins Lager'} aufgenommen.`);
   syncWildPokemon();autoSave();renderBattle();return;
@@ -308,18 +328,21 @@ async function throwPokeball(){
  finally{if(generation===battleGeneration){battleBusy=false;battleView=null;syncWildPokemon();renderBattle()}}
 }
 async function chooseBattleSwitch(){
- if(!battle||battleBusy||!['wild','trainer'].includes(battleKind))return;
+ if(!battle||battleBusy||!['wild','trainer'].includes(battleKind)||pendingRewards.length||document.querySelector('#battle-choices').children.length)return;
  syncWildPokemon();const choices=availableSwitches(engine.state.team,wildTeamIndex);
  const panel=document.querySelector('#battle-choices');panel.replaceChildren();
  for(const {index,pokemon} of choices){const button=document.createElement('button');button.textContent=`#${pokemon.speciesId} · Lv. ${pokemon.level} · KP ${pokemon.currentHp}/${pokemon.stats.hp}`;
  button.addEventListener('click',()=>void performBattleSwitch(index));panel.append(button)}
- const cancel=document.createElement('button');cancel.textContent='Abbrechen';cancel.addEventListener('click',()=>{panel.replaceChildren();renderBattle()});panel.append(cancel);
+ const cancel=document.createElement('button');cancel.textContent='Abbrechen';cancel.disabled=battle.pendingSwitch?.side==='player';cancel.addEventListener('click',()=>{panel.replaceChildren();renderBattle()});panel.append(cancel);
 }
 async function performBattleSwitch(index){
- if(!battle||battleBusy||!switchAllowed(battle,engine.state.team,wildTeamIndex,index))return;
- const forced=forcedSwitchRequired(battle,engine.state.team,wildTeamIndex);
+ if(!battle||battleBusy||pendingRewards.length||!switchAllowed(battle,engine.state.team,wildTeamIndex,index))return;
+ const forced=forcedSwitchRequired(battle,engine.state.team,wildTeamIndex)||battle.pendingSwitch?.side==='player';
  try{wildTeamIndex=switchTeamPokemon(battle,engine.state.team,wildTeamIndex,index,battleFighters)}catch(error){rewardNotice(error.message);return}
- document.querySelector('#battle-choices').replaceChildren();syncWildPokemon();renderBattle();
+ document.querySelector('#battle-choices').replaceChildren();syncWildPokemon();
+ if(battle.pendingSwitch?.side==='player'){syncWildPokemon();resolvePendingBattleSwitch();renderBattle();return;}
+ if(forced&&battle.pendingTurn&&!battle.pendingSwitch&&!battle.finished){resumeInterruptedTurn(battle);syncWildPokemon();resolvePendingBattleSwitch();}
+ renderBattle();
  if(forced)return;
  const enemy=availableMoves(battle.opponent).filter(m=>m.pp>0);if(!enemy.length)return;
  battleBusy=true;const generation=++battleGeneration;
@@ -387,7 +410,7 @@ document.querySelector('#battle-pp').addEventListener('click',()=>{
    }
   });
  }
- const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Abbrechen';cancel.addEventListener('click',()=>panel.replaceChildren());panel.append(cancel);
+ const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Abbrechen';cancel.disabled=battle.pendingSwitch?.side==='player';cancel.addEventListener('click',()=>panel.replaceChildren());panel.append(cancel);
 });
 document.querySelector('#battle-recovery').addEventListener('click',()=>{
  if(!battle||battleBusy||battle.finished)return;
@@ -400,14 +423,14 @@ document.querySelector('#battle-recovery').addEventListener('click',()=>{
    const button=document.createElement('button');button.type='button';button.textContent=`${label} × ${count} → #${p.speciesId} (KP ${p.currentHp}/${p.stats.hp})`;button.disabled=!usable;button.addEventListener('click',()=>void useRecoveryInBattle(id,i));panel.append(button);
   }
  }
- const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Abbrechen';cancel.addEventListener('click',()=>panel.replaceChildren());panel.append(cancel);
+ const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Abbrechen';cancel.disabled=battle.pendingSwitch?.side==='player';cancel.addEventListener('click',()=>panel.replaceChildren());panel.append(cancel);
 });
 document.querySelector('#battle-remedy').addEventListener('click',()=>{
  if(!battle||battleBusy||battle.finished)return;
  const panel=document.querySelector('#battle-choices');panel.replaceChildren();
  const title=document.createElement('p');title.textContent='Statusheilmittel auswählen:';panel.append(title);
  for(const remedy of STATUS_REMEDIES){const count=engine.inventory.find(i=>i.id===remedy.id)?.quantity||0;if(!count)continue;const button=document.createElement('button');button.type='button';button.textContent=`${remedy.name} × ${count}`;button.disabled=battle.player.pokemon.status!==remedy.status;button.addEventListener('click',()=>void useRemedyInBattle(remedy.id));panel.append(button)}
- const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Abbrechen';cancel.addEventListener('click',()=>panel.replaceChildren());panel.append(cancel);
+ const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Abbrechen';cancel.disabled=battle.pendingSwitch?.side==='player';cancel.addEventListener('click',()=>panel.replaceChildren());panel.append(cancel);
 });
 document.querySelector('#battle-potion').addEventListener('click',()=>void usePotionInBattle());
 document.querySelector('#battle-switch').addEventListener('click',()=>void chooseBattleSwitch());

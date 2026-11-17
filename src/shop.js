@@ -1,3 +1,4 @@
+import {HELD_BATTLE_ITEMS} from './held-battle-items.js';
 import {EVOLUTION_STONES} from './progression.js';
 import {PP_ITEMS} from './pp-items.js';
 import {POKEBALL_ITEM} from './capture.js';
@@ -10,7 +11,8 @@ export const SHOP_STOCK=Object.freeze([
  Object.freeze({id:FULL_RESTORE_ITEM,name:'Top-Genesung',price:180}),
  ...EVOLUTION_STONES.map(({id,name})=>Object.freeze({id,name,price:600})),
  ...PP_ITEMS.map(({id,name,price})=>Object.freeze({id,name,price})),
- ...STATUS_REMEDIES.map(({id,name,price})=>Object.freeze({id,name,price}))
+ ...STATUS_REMEDIES.map(({id,name,price})=>Object.freeze({id,name,price})),
+ ...Object.entries({'muscle-band':1200,'wise-glasses':1200,'expert-belt':1800,'leftovers':2200,'life-orb':3000,'focus-sash':2500}).map(([id,price])=>Object.freeze({id,name:HELD_BATTLE_ITEMS[id].name,price}))
 ]);
 export function shopItem(id){return SHOP_STOCK.find(i=>i.id===id)||null}
 export function canPurchase(state,id,quantity=1){const item=shopItem(id);return !!item&&Number.isSafeInteger(quantity)&&quantity>0&&quantity<=99&&Number.isSafeInteger(state.money)&&state.money>=item.price*quantity&&state.money<=999999999;}

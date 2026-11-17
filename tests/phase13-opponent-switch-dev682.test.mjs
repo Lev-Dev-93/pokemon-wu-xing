@@ -1,0 +1,11 @@
+import {test} from 'node:test';
+import {strict as assert} from 'node:assert';
+import {createPokemon} from '../src/team.js';
+import {startBattle} from '../src/battle.js';
+import {resolveOpponentSwitch} from '../src/battle-pending-switch.js';
+const setup=()=>{const b=startBattle(createPokemon(1),createPokemon(4));b.pendingSwitch={side:'opponent',kind:'forced'};return b;};
+test('Gegnerischer Wechsel tauscht aktives Pokémon mit Reserve',()=>{const b=setup(),reserves=[createPokemon(7)];const r=resolveOpponentSwitch(b,reserves,{rng:()=>0});assert.equal(r.switched,true);assert.equal(b.opponent.pokemon.speciesId,7);assert.equal(reserves.length,1);assert.equal(reserves[0].speciesId,4);assert.equal(b.pendingSwitch,null);});
+test('Ohne Ersatz wird ein Wechselauftrag sicher gelöscht',()=>{const b=setup();assert.equal(resolveOpponentSwitch(b,[]).switched,false);assert.equal(b.pendingSwitch,null);});
+test('Gegnerischer Wechsel behält teamweite Schutzfelder und setzt Kampfwerte zurück',()=>{const b=setup();b.opponent.volatile.reflectTurns=3;b.opponent.stages.attack=4;resolveOpponentSwitch(b,[createPokemon(7)],{rng:()=>0});assert.equal(b.opponent.volatile.reflectTurns,3);assert.equal(b.opponent.stages.attack,0);});
+test('Ungültige Reserve lässt Wechselauftrag unverändert',()=>{const b=setup();assert.throws(()=>resolveOpponentSwitch(b,[createPokemon(7)],{rng:()=>1}));assert.equal(b.pendingSwitch.side,'opponent');});
+test('Gegnerische Pivot-Attacke nutzt denselben Wechselresolver',()=>{const b=setup();b.pendingSwitch.kind='pivot';assert.equal(resolveOpponentSwitch(b,[createPokemon(7)],{rng:()=>0}).switched,true);});

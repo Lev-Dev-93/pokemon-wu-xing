@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createPokemon} from '../src/team.js';
+import {startBattle,playTurn} from '../src/battle.js';
+import {heldEndTurnHeal,heldLifeOrbRecoil,heldDamageMultiplier,validHeldBattleItem} from '../src/held-battle-items.js';
+const pokemon=(item)=>createPokemon(1,{level:30,heldItemId:item});
+test('Neue Items sind validiert',()=>{assert.ok(validHeldBattleItem('leftovers'));assert.ok(validHeldBattleItem('life-orb'));assert.equal(validHeldBattleItem('unknown'),false)});
+test('Überreste heilen höchstens fehlende KP',()=>{const p=pokemon('leftovers');p.currentHp=p.stats.hp-1;assert.equal(heldEndTurnHeal(p),1);p.currentHp=p.stats.hp;assert.equal(heldEndTurnHeal(p),0)});
+test('Überreste wirken nicht auf besiegte Pokémon',()=>{const p=pokemon('leftovers');p.currentHp=0;assert.equal(heldEndTurnHeal(p),0)});
+test('Leben-Orb schadet nur bei tatsächlich verursachtem Schaden',()=>{const p=pokemon('life-orb');assert.equal(heldLifeOrbRecoil(p,0),0);assert.equal(heldLifeOrbRecoil(p,10),Math.max(1,Math.floor(p.stats.hp/10)))});
+test('Leben-Orb verstärkt physischen und speziellen Schaden',()=>{const p=pokemon('life-orb');assert.equal(heldDamageMultiplier(p,{power:50,category:2},1),1.3);assert.equal(heldDamageMultiplier(p,{power:50,category:3},1),1.3);assert.equal(heldDamageMultiplier(p,{power:0,category:1},1),1)});
+test('Leben-Orb wird bei einem realen Treffer abgezogen',()=>{const a=pokemon('life-orb'),b=createPokemon(4,{level:30});a.moves=[33];b.moves=[150];const battle=startBattle(a,b);playTurn(battle,0,0,{rng:()=>0.5});assert.ok(battle.log.some(x=>x.includes('Leben-Orb')))});
+test('Überreste regenerieren am echten Rundenende',()=>{const a=pokemon('leftovers'),b=createPokemon(4,{level:30});a.currentHp-=15;a.moves=[150];b.moves=[150];const battle=startBattle(a,b);const before=battle.player.pokemon.currentHp;playTurn(battle,0,0,{rng:()=>0.5});assert.ok(battle.player.pokemon.currentHp>before);assert.ok(battle.log.some(x=>x.includes('Überreste')))});

@@ -1,3 +1,144 @@
+## dev.702 – GitHub-Pages-Browserprüfung
+- Separate Browser-Testseite mit sechs deterministischen Kampfszenarien und manueller End-to-End-Checkliste.
+- Zwei neue Tests, 1066/1066 bestanden. Browser-Headless-Test wegen Timeout nicht abgeschlossen.
+- Keine Karten oder Fundgegenstände verändert.
+
+## dev.701 – Heilblockade und Absorptionsattacken
+- Heilblockade verhindert KP-Regeneration durch Absorber, Megasauger, Gigasauger und Ableithieb, nicht deren Schaden.
+- Drei Regressionstests. Keine Kartenänderungen.
+
+## dev.700 – Heilblockade und passive Regeneration
+- Heilblockade blockiert passive Heilung und Wunschtraum; Dauer wird korrekt nach Endrundeneffekten reduziert.
+- Fünf neue Regressionstests, 1061 Tests insgesamt.
+
+## dev.699 – Kampfregression und Phase-13-Freigabeprüfung
+- Robustheit/Fokusgurt-Protokoll korrigiert; drei neue echte Kampfregressionstests.
+- Keine neuen Fundgegenstände platziert. Phase 13 bleibt bis zur vollständigen Browser- und Fachdatenabnahme offen.
+
+## dev.698 – Optionale Fundgegenstandsmechanik (keine Kartenplatzierungen)
+- Validierte, derzeit leere Fundgegenstands-Registry; einmaliges Aufheben und Save-Persistenz; 10 Tests.
+
+## dev.697 – Kampfitems im Dorfladen
+- Sechs getragene Kampfitems zum vorläufigen Dorfladen-Sortiment hinzugefügt.
+- Fünf neue Regressionstests für Preise, Kauf, Ausrüstung und Wechsel.
+- 1043 automatisierte Tests bestanden.
+
+## dev.696 – Getragene Items im Inventar ausrüsten
+
+- Ausrüsten, Wechseln und Abnehmen mit Inventartransfer und UI; Speichern/Laden bleibt kompatibel.
+
+## dev.695 – Fokusgurt und Magieschild
+- Fokusgurt mit Verbrauch und K.-o.-Schutz bei vollen KP.
+- Magieschild verhindert Leben-Orb-Eigenverlust.
+- 1029 automatisierte Tests bestanden.
+
+## dev.694
+- Überreste und Leben-Orb mit passiven KP-Effekten, Schadensbonus und Regressionstests.
+
+## dev.693 – Getragene Kampfitems (erster Block)
+
+- Muskelband, Schlauglas und Expertengurt in Schadensformel und optionalem Pokémon-Datensatz.
+- Validierung und neue Regressionstests. Details: PHASE13_DEV693.md.
+
+## dev.692 – Mehrfachtreffer und Wertelink
+- Eigenes Mehrfachtreffer-Regelmodul und Wertelink-Integration.
+- 13 neue Regressionstests; 1008 Tests bestanden.
+
+## dev.691 – Zweirunden-Sonderinteraktionen
+- Treffer-Ausnahmen und Schadensverdopplung während Fliegen, Schaufler, Taucher und Sprungfeder.
+- Intensität mit Stärkestufen 4–10.
+- 995/995 automatisierte Tests erfolgreich.
+
+## dev.690 – Phase 13: Vorbereitungsattacken
+- Acht Zweirunden-Attacken einschließlich Solarstrahl, Fliegen, Schaufler, Taucher, Sprungfeder, Klingensturm, Schädelwumme und Himmelsfeger werden unterstützt.
+- Schutz während der Vorbereitungsphase für vier Bewegungsattacken, Verteidigungsbonus durch Schädelwumme.
+- 12 neue Regressionstests; 982/982 bestanden. Browser-E2E weiterhin offen.
+
+## dev.689 – Phase 13: Aufladerunden
+- Hyperstrahl, Gigastoß, Felswerfer und Zeitenlärm: Aussetzrunde nach erfolgreichem Treffer.
+- Keine zusätzliche AP-Abbuchung während der Aussetzrunde; Wechsel setzt den Zustand zurück.
+- 969 automatisierte Tests bestanden.
+
+## dev.688 – Spezialschaden und Statuswertmechaniken
+
+- Fester KP-Schaden: Ultraschall (Sonic Boom), Drachenwut, Geowurf, Nachtnebel.
+- Proportionaler Schaden: Superzahn und Notsituation.
+- Typimmunität, Robustheit und Ausdauer bleiben im Schadenspfad berücksichtigt.
+- Wachstum: +2 Angriff und Spezial-Angriff bei Sonne, sonst +1.
+- Klärsmog setzt nach erfolgreichem Treffer gegnerische Kampfstufen zurück.
+- 12 neue automatisierte Regressionstests; insgesamt 964 bestanden.
+- Browser-End-to-End-Test nicht durchgeführt; Phase 13 bleibt offen.
+
+## dev.687 – Trainerkampf-Integration und Wechselketten
+- Korrektur: nach Fallen-K.O. eines eingewechselten Pokémon bleibt das gesunde, vorher aktive Pokémon als Ersatz verfügbar.
+- Sperren für Spielerwechsel und Kampfaktionen während offener Belohnungsentscheidungen.
+- Sechs neue Regressionstests, zwei bisherige Erwartungswerte für das korrigierte Wechselverhalten angepasst.
+- 952 automatisierte Tests erfolgreich; vollständiger Browser-End-to-End-Trainerkampf noch nicht abgenommen.
+
+## dev.685 – Trainerkampf-Lebenszyklus
+- Sichere Fortschritts-/Abschlussentscheidung für mehrteilige Trainerkämpfe; Schutz vor vorzeitigem Kampfende und Trainer-Sieg.
+- 6 neue Tests; 941/941 erfolgreich.
+
+## dev.684 – Wechselketten und Eintrittsfallen
+- Gegnerische Wechselketten werden in einem Resolver bis zum überlebenden Ersatz oder zum Kampfende abgearbeitet.
+- Durch Fallen besiegte Gegner-Pokémon kehren nicht in die Reserve zurück.
+- Spieler können bei einem durch Fallen besiegten Ersatz einen weiteren Ersatz auswählen, sofern ein weiteres Team-Pokémon verfügbar ist.
+- Unterbrochene Runden werden erst nach abgeschlossener Wechselkette fortgesetzt.
+- Fünf neue Regressionstests; 935/935 Tests bestanden.
+- Browser-E2E-Test noch offen.
+
+## dev.683 – Unterbrochene Kampfrunden und Wechselauflösung (17.11.2026)
+- Offene Kampfaktionen werden nach Pivot-/Zwangswechsel in derselben Runde fortgesetzt.
+- Erzwungene Wechsel verhindern die ausstehende Aktion des betroffenen Pokémon.
+- Teamwechsel erhalten die ausstehende Runde; automatische Gegnerwechsel schließen sie ab.
+- Vier neue Regressionstests, insgesamt 930 bestanden.
+- Einschränkung: Browser-End-to-End-Test und komplexe Mehrfachwechsel noch offen.
+
+## dev.682 – Gegnerwechsel auflösen
+- Gegnerische Wechselaufträge mit Trainerreserve, Schutzfeldern, Eintrittsfallen und Eintrittsfähigkeiten verknüpft.
+- Wechselentscheidung für Spieler-Aufträge angebunden; fünf neue Regressionstests.
+
+## dev.681 – Wechselaufträge
+- Kehrtwende, Voltwechsel, Brüller, Wirbelwind und Drachenrute mit ausstehenden Wechselaufträgen und ersten Integrationstests.
+- Gegnerwechsel und UI-Integration noch offen.
+
+## dev.680 – Teamheilung und Wunschtraum
+
+- Teamweite Statusheilung und wechselbeständiger Wunschtraum.
+- Vier neue Regressionstests.
+
+## dev.679 – Statusattacken, Rückenwind und Wunschtraum
+
+Siehe `PHASE13_DEV679.md`. 912/912 Node-Tests. Phase 13 weiterhin offen.
+
+## dev.678 – Phase 13: Inventur und komplexe Statusattacken
+- Krafttausch, Statustausch, Leidteiler und Bauchtrommel integriert.
+- Reproduzierbare Kataloginventur und sechs Regressionstests.
+- Phase 13 nicht abgeschlossen.
+
+## dev.677 – Phase 13: Kampfwert- und Spezialmechaniken
+
+Neue Attackenregeln, Statuswert-Schutzfähigkeiten und zehn Regressionstests (896/896 bestanden). Siehe PHASE13_DEV677.md.
+
+## dev.675 – Phase 13: Eintrittsfallen und Feldbereinigung
+
+Stachler, Giftspitzen, Tarnsteine, Turbodreher und Auflockern; Teamseiten-Fallen und Wechselintegration. 881/881 Tests. Details: PHASE13_DEV675.md.
+
+## dev.672 – Schutzfelder und Kampfzielregeln
+- Reflektor, Lichtschild, Bodyguard und Weißnebel mit Rundenlaufzeit.
+- Selbstgerichtete Feldattacken umgehen gegnerischen Schutz und Genauigkeitsprüfung.
+- Fünf neue Regressionstests; 856/856 erfolgreich.
+- Browser-End-to-End-Abnahme weiterhin offen.
+
+## dev.668 – Phase 13: Schadensfähigkeiten
+Neun Fähigkeiten in die Schadensberechnung integriert; fünf neue Tests.
+
+## dev.667 – Phase 13: Zweirundige Attacken
+- Solarstrahl-Fortsetzung mit 0 AP für beide Seiten repariert; 830/830 Tests erfolgreich.
+
+## dev.664 – Phase 13 Wechselintegrität
+- Ungültige aktive Teamplätze und doppelte K. o.-Wechsel abgesichert; vier Tests ergänzt.
+
 ## dev.599 – Phase 9: Tastaturbedienbarer Karteneditor
 - Kartenraster per Tab fokussierbar, ausgewählte Objekte per Pfeiltasten verschiebbar.
 - Randprüfung vor der bestehenden Layoutvalidierung.
@@ -1285,7 +1426,37 @@ Gemeinsame Gebäudefassaden; Entfernung statischer Möbel- und Figurenduplikate;
 - Diagnostik für Prologzustände ohne Änderungen am Spielstandschema.
 - Elf zusätzliche Regressionstests; vollständige Browserabnahme noch offen.
 
-## dev.661 – Phase 12 Integrationsabnahme
-- Durchgehender Prolog-Integrationstest mit Save/Load-Meilensteinen und einmaligem Schlüpfen.
-- Schutz vor unzulässigem direktem Start der Professoren-Demonstration.
-- PHASE12_COMPLETION.md mit Testgrenzen und Browser-Abnahme.
+## dev.665 – Phase 13 AP-Wechselkonsistenz
+- Korrigiert: veraltete Kämpfer-Caches überschreiben keine persistenten AP mehr.
+- Zwei neue Regressionstests; 825/825 Tests bestanden.
+
+## dev.666
+- Trainer-KI mit Typen-, STAB-, Genauigkeits- und AP-Bewertung; Regressionstests.
+
+## dev.669 – Phase 13 defensive Fähigkeiten
+- Wunderwache und Robustheit in die Schadensabwicklung integriert.
+- Regressionstests für Schutzschwellen und Kampfintegration.
+
+## dev.670 – Sekundäre Fähigkeiten
+- Puderabwehr, Konzentrator und Edelmut in Kampf-Zusatzeffekte integriert; vier Regressionstests.
+
+## dev.673 – Teamweite Schutzfelder
+- Reflektor, Lichtschild, Bodyguard und Weißnebel bleiben bei Pokémon-Wechsel erhalten.
+- Fünf Regressionstests für Wechsel und Rundenablauf.
+
+## dev.674 – Großer Phase-13-Attackenblock
+- Zahlreiche neue Status-, Unterstützungs- und Schadens-Zusatzeffekte integriert; verzögerter Schlaf, Verhöhner, Heilung, Heilwoge, Angeberei und Schmeichler.
+- Erweiterte datenbasierte Tabellen für Statuswert-, Status- und Zurückschreckeffekte.
+- 872/872 automatisierte Tests; Details in `PHASE13_DEV674.md`.
+
+## dev.676 – Schwere Vergiftung
+- Toxin und zweistufige Giftspitzen mit steigendem Giftschaden.
+- Giftzähler wird bei Wechsel und Heilung zurückgesetzt.
+- Fünf Regressionstests für Status- und Wechselverhalten.
+
+## dev.686 – Trainerbelohnungen pro besiegtem Pokémon
+- EP-Vergabe und Lern-/Entwicklungsdialog nach jedem gegnerischen K.O. statt erst beim Trainerabschluss.
+- Kein doppelter EP-Gewinn beim Weiterblättern zum nächsten Gegner.
+- Trainerübergang wartet auf abgeschlossene Belohnungsentscheidungen.
+- Fortschritt wird nach Abschluss der Belohnungsdialoge synchronisiert und automatisch gespeichert.
+- Neue Regressionstests für Trainerkampf- und Belohnungsintegration.

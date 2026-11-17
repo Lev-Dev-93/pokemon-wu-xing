@@ -1,3 +1,4 @@
+import {validHeldBattleItem} from './held-battle-items.js';
 import {isEligibleSpecies} from './pokemon-extensions.js';
 import {extendedEntry,extendedForm} from './extended-pokemon.js';
 import {currentPp,maxPp} from './pp-items.js';
@@ -11,17 +12,19 @@ export function calculateStats(speciesId,level,ivs=Array(6).fill(31),evs=Array(6
  const entry=extendedEntry(speciesId);if(!entry||!validInt(level,1,MAX_LEVEL)||!Array.isArray(ivs)||ivs.length!==6||!ivs.every(v=>validInt(v,0,31))||!Array.isArray(evs)||evs.length!==6||!evs.every(v=>validInt(v,0,252))||evs.reduce((a,b)=>a+b,0)>510)throw Error('Ungültige Pokémon-Statusdaten');
  const out={};for(let i=0;i<6;i++){const raw=Math.floor((2*entry.stats[i]+ivs[i]+Math.floor(evs[i]/4))*level/100);out[statsNames[i]]=i===0?raw+level+10:raw+5;}return out;
 }
-export function createPokemon(speciesId,{level=5,ivs=Array(6).fill(31),evs=Array(6).fill(0),abilityId=null,shiny=false,formId=null}={}){
+export function createPokemon(speciesId,{level=5,ivs=Array(6).fill(31),evs=Array(6).fill(0),abilityId=null,shiny=false,formId=null,heldItemId=null}={}){
  const entry=extendedEntry(speciesId);if(!entry)throw Error('Unbekannte Pokémon-Art');
  if(formId!==null&&!extendedForm(speciesId,formId))throw Error('Ungültige Regionalform');
  const stats=calculateStats(formId??speciesId,level,ivs,evs);
  const abilities=(formId===null?entry:extendedEntry(formId)).abilities;const chosen=abilityId===null?(abilities.find(a=>a.hidden)||abilities[0]):abilities.find(a=>a.id===abilityId);
  if(!chosen)throw Error('Ungültige Fähigkeit');
+ if(!validHeldBattleItem(heldItemId))throw Error('Ungültiges getragenes Kampfitem');
  if(typeof shiny!=='boolean')throw Error('Ungültiger Shiny-Status');
- return {speciesId:Number(speciesId),...(formId===null?{}:{formId}),level,experience:experienceForLevel(Number(speciesId),level),ivs:[...ivs],evs:[...evs],abilityId:chosen.id,hiddenAbility:chosen.hidden,shiny,stats,currentHp:stats.hp,status:'healthy',friendship:70,moves:movesAtLevel(Number(speciesId),level,formId)};
+ return {speciesId:Number(speciesId),...(formId===null?{}:{formId}),level,experience:experienceForLevel(Number(speciesId),level),ivs:[...ivs],evs:[...evs],abilityId:chosen.id,hiddenAbility:chosen.hidden,shiny,...(heldItemId===null?{}:{heldItemId}),stats,currentHp:stats.hp,status:'healthy',friendship:70,moves:movesAtLevel(Number(speciesId),level,formId)};
 }
 export function validatePokemon(p){
  if(!p||typeof p!=='object'||!isEligibleSpecies(p.speciesId)||!extendedEntry(p.speciesId)||(p.formId!==undefined&&!extendedForm(p.speciesId,p.formId))||!validInt(p.level,1,MAX_LEVEL)||!validInt(p.experience,0,100000000)||!Array.isArray(p.ivs)||!Array.isArray(p.evs))return false;
+ if(!validHeldBattleItem(p.heldItemId))return false;
  if(p.friendship!==undefined&&!validInt(p.friendship,0,255))return false;
  let stats;try{stats=calculateStats(p.formId??p.speciesId,p.level,p.ivs,p.evs)}catch{return false}
  if(!p.stats||statsNames.some(k=>p.stats[k]!==stats[k])||!validInt(p.currentHp,0,stats.hp))return false;
@@ -32,4 +35,4 @@ export function validateTeam(team){return Array.isArray(team)&&team.length<=TEAM
 export function addToTeam(team,pokemon){if(!validateTeam(team)||!validatePokemon(pokemon)||team.length>=TEAM_LIMIT)return false;team.push(structuredClone(pokemon));return true}
 export function removeFromTeam(team,index){if(!validateTeam(team)||!validInt(index,0,team.length-1))return null;return team.splice(index,1)[0]}
 export function reorderTeam(team,from,to){if(!validateTeam(team)||!validInt(from,0,team.length-1)||!validInt(to,0,team.length-1))return false;const [p]=team.splice(from,1);team.splice(to,0,p);return true}
-export function healTeam(team){if(!validateTeam(team))throw Error('Ungültiges Team');for(const p of team){p.currentHp=p.stats.hp;p.status='healthy'}return true}
+export function healTeam(team){if(!validateTeam(team))throw Error('Ungültiges Team');for(const p of team){p.currentHp=p.stats.hp;p.status='healthy';p.toxicCounter=0}return true}

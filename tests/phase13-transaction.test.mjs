@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {Engine} from '../src/engine.js';
+import {createPokemon} from '../src/team.js';
+import {captureDecision,commitCapture} from '../src/capture-transaction.js';
+const pokemon=()=>createPokemon(10,{level:3});
+test('Kein Pokéball: keine Zufallsziehung und keine Mutation',()=>{const e=new Engine();let rolls=0;const d=captureDecision({pokemon:pokemon(),inventory:e.inventory,team:e.team,storage:e.storage,rng:()=>{rolls++;return 0}});assert.equal(d.reason,'no-ball');assert.equal(rolls,0);assert.equal(commitCapture(e,pokemon(),d),false)});
+test('Erfolgreicher Fang: genau ein Ball, ein Pokémon und Pokédex-Eintrag',()=>{const e=new Engine();e.addItem('poke-ball',2);const p=pokemon();const d=captureDecision({pokemon:p,inventory:e.inventory,team:e.team,storage:e.storage,rng:()=>0});assert.equal(d.caught,true);assert.equal(commitCapture(e,p,d),true);assert.equal(e.inventory.find(x=>x.id==='poke-ball').quantity,1);assert.equal(e.team.length,1)});
+test('Fehlversuch: genau ein Ball und kein Pokémon',()=>{const e=new Engine();e.addItem('poke-ball',2);const p=pokemon();const d=captureDecision({pokemon:p,inventory:e.inventory,team:e.team,storage:e.storage,rng:()=>0.999});assert.equal(d.caught,false);assert.equal(commitCapture(e,p,d),true);assert.equal(e.team.length,0);assert.equal(e.inventory.find(x=>x.id==='poke-ball').quantity,1)});
+test('Volles Team und Lager: Fangversuch verbraucht nichts',()=>{const e=new Engine();e.addItem('poke-ball',1);for(let i=0;i<6;i++)e.addPokemon(pokemon());e.state.storage=Array.from({length:500},pokemon);const d=captureDecision({pokemon:pokemon(),inventory:e.inventory,team:e.team,storage:e.storage,rng:()=>{throw Error('should not roll')}});assert.equal(d.reason,'full');assert.equal(e.inventory[0].quantity,1)});
+test('Fangziel wird als Kopie übernommen',()=>{const e=new Engine();e.addItem('poke-ball',1);const p=pokemon();const d=captureDecision({pokemon:p,inventory:e.inventory,team:e.team,storage:e.storage,rng:()=>0});assert.equal(commitCapture(e,p,d),true);p.currentHp=0;assert.ok(e.team[0].currentHp>0)});

@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createPokemon,validatePokemon} from '../src/team.js';
+import {startBattle,playTurn} from '../src/battle.js';
+import {heldFocusSashSurvival,validHeldBattleItem,heldLifeOrbRecoil} from '../src/held-battle-items.js';
+const mon=(species=1,heldItemId=null,abilityId=null)=>createPokemon(species,{level:40,heldItemId,abilityId});
+test('Fokusgurt ist gültig und ohne Item bleibt der Datensatz gültig',()=>{assert.ok(validHeldBattleItem('focus-sash'));assert.ok(validatePokemon(mon()));});
+test('Fokusgurt schützt nur bei vollen KP vor einem K.-o.',()=>{const p=mon(1,'focus-sash');assert.equal(heldFocusSashSurvival(p,p.currentHp+50),p.currentHp-1);p.currentHp--;assert.equal(heldFocusSashSurvival(p,999),999);});
+test('Fokusgurt schützt nicht vor geringem Schaden',()=>{const p=mon(1,'focus-sash');assert.equal(heldFocusSashSurvival(p,2),2);});
+test('Fokusgurt wird im echten Kampf nach einem K.-o.-Treffer verbraucht',()=>{const a=mon(6),b=mon(1,'focus-sash');a.level=100;a.stats.attack=1000;a.stats.speed=1000;a.moves=[33];b.moves=[150];const battle=startBattle(mon(6),b);battle.player.pokemon.stats.attack=1000;battle.player.pokemon.stats.speed=1000;battle.player.pokemon.moves=[33];playTurn(battle,0,0,{rng:()=>0.5});assert.equal(battle.opponent.pokemon.currentHp,1);assert.equal(battle.opponent.pokemon.heldItemId,null);assert.ok(battle.log.some(x=>x.includes('Fokusgurt')));});
+test('Magieschild verhindert Leben-Orb-Rückstoß im echten Kampf',()=>{const a=mon(1,'life-orb'),b=mon(4);a.moves=[33];b.moves=[150];const battle=startBattle(a,b);battle.player.pokemon.abilityId=98;battle.player.pokemon.stats.speed=1000;const hp=battle.player.pokemon.currentHp;playTurn(battle,0,0,{rng:()=>0.5});assert.equal(battle.player.pokemon.currentHp,hp);assert.ok(battle.opponent.pokemon.currentHp<battle.opponent.pokemon.stats.hp);assert.equal(battle.log.some(x=>x.includes('verliert')&&x.includes('Leben-Orb')),false);});
+test('Leben-Orb bleibt ohne Magieschild schädlich',()=>{const p=mon(1,'life-orb');assert.ok(heldLifeOrbRecoil(p,10)>0);});

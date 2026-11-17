@@ -8,7 +8,7 @@ export function usePotion(pokemon){
 export function healPartyAtStation(team){
  if(!Array.isArray(team))throw Error('Ungültiges Team');
  let changed=false;
- for(const p of team){if(p.currentHp!==p.stats.hp||p.status!=='healthy')changed=true;p.currentHp=p.stats.hp;p.status='healthy';p.pp=maxPp(p);}
+ for(const p of team){if(p.currentHp!==p.stats.hp||p.status!=='healthy')changed=true;p.currentHp=p.stats.hp;p.status='healthy';p.toxicCounter=0;p.pp=maxPp(p);}
  return changed;
 }
 
@@ -24,7 +24,7 @@ export function remedyFor(id){return STATUS_REMEDIES.find(x=>x.id===id)||null}
 export function useStatusRemedy(pokemon,id){
  const remedy=remedyFor(id);
  if(!remedy||!pokemon||!pokemon.stats||!Number.isInteger(pokemon.currentHp)||pokemon.currentHp<=0||pokemon.status!==remedy.status)return false;
- pokemon.status='healthy';return true;
+ pokemon.status='healthy';pokemon.toxicCounter=0;return true;
 }
 
 // Wiederbelebung und vollständige Genesung (vorläufige Testökonomie).
@@ -32,10 +32,10 @@ export const REVIVE_ITEM='revive';
 export const FULL_RESTORE_ITEM='full_restore';
 export function useRevive(pokemon){
  if(!pokemon?.stats||!Number.isInteger(pokemon.currentHp)||pokemon.currentHp!==0||!Number.isInteger(pokemon.stats.hp)||pokemon.stats.hp<=0)return false;
- pokemon.currentHp=Math.max(1,Math.floor(pokemon.stats.hp/2));pokemon.status='healthy';return true;
+ pokemon.currentHp=Math.max(1,Math.floor(pokemon.stats.hp/2));pokemon.status='healthy';pokemon.toxicCounter=0;return true;
 }
 export function useFullRestore(pokemon){
  if(!pokemon?.stats||!Number.isInteger(pokemon.currentHp)||pokemon.currentHp<=0||!Number.isInteger(pokemon.stats.hp)||pokemon.stats.hp<=0)return false;
  if(pokemon.currentHp===pokemon.stats.hp&&(!pokemon.status||pokemon.status==='healthy'))return false;
- pokemon.currentHp=pokemon.stats.hp;pokemon.status='healthy';return true;
+ pokemon.currentHp=pokemon.stats.hp;pokemon.status='healthy';pokemon.toxicCounter=0;return true;
 }

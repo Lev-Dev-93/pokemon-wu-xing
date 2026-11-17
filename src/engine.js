@@ -1,3 +1,5 @@
+import {HELD_BATTLE_ITEMS} from './held-battle-items.js';
+import {WORLD_PICKUPS,validCollectedPickups,validatePickupPlacement,pickupAt,availablePickups} from './world-pickups.js';
 import {normalizeDex,registerDexSpecies,collectOwnedSpecies} from './pokedex-history.js';
 import {forestEncounterReadiness,forestBattleCanStart} from './forest-story-battle.js';
 import {canLeaveFarm,canEnterRoute1,canExploreBeyondRoute1,validatePrologueMilestones} from './story-guards.js';
@@ -31,6 +33,15 @@ export class Engine{
  reset(){this.state=structuredClone(start);this.state.questLog=[];this.state.pokedex=normalizeDex(this.state.pokedex,this.state.team,this.state.storage);this.mode='exploration';this.dialogue=null;this.message='';this.lastEvent=null;this.pendingWild=null;this.pendingTrainer=null;}
  get characters(){return npcs[this.state.mapId]||[]}
  get items(){return objects[this.state.mapId]||[]}
+ get groundPickups(){return availablePickups(this.state.mapId,this.state.collectedPickups||[])}
+ collectGroundPickup(x,y,registry=WORLD_PICKUPS){
+  if(this.mode!=='exploration'||!Number.isInteger(x)||!Number.isInteger(y)||Math.abs(this.state.x-x)+Math.abs(this.state.y-y)!==1)return false;
+  const pickup=pickupAt(this.state.mapId,x,y,this.state.collectedPickups||[],registry);
+  if(!pickup||!validatePickupPlacement(pickup,registry)||!this.addItem(pickup.itemId,pickup.quantity))return false;
+  this.state.collectedPickups??=[];this.state.collectedPickups.push(pickup.id);
+  this.state.eventLog.push({type:'groundPickup',id:pickup.id,item:pickup.itemId,quantity:pickup.quantity});
+  this.message=`${pickup.quantity} × ${HELD_BATTLE_ITEMS[pickup.itemId].name} gefunden!`;this.lastEvent='groundPickup';return true;
+ }
  step(direction){if(this.mode!=='exploration'||!dirs[direction])return false;this.state.facing=direction;const [dx,dy]=dirs[direction],{x,y}=this.state,nx=x+dx,ny=y+dy;
  if(this.characters.some(n=>n.x===nx&&n.y===ny)||!canMove(this.map,x,y,nx,ny))return false;
  const destination=this.map.portals.find(q=>q.x===nx&&q.y===ny);if(this.state.mapId==='yard'&&destination?.target==='village'&&!canLeaveFarm(this.state.flags)){this.message='Du kannst den Züchterhof erst verlassen, wenn du dein Ei erhalten hast.';return false;}if(['route2','waldrand','beerendorf','brook'].includes(destination?.target)&&!canExploreBeyondRoute1(this.state.flags)){this.message='Erst muss dein Starter-Ei schlüpfen.';return false;}if(destination?.target==='route1'&&!canEnterRoute1(this.state.flags)){this.message='Der Professor-Ausflug muss zuerst abgeschlossen werden.';return false;}
@@ -39,7 +50,7 @@ export class Engine{
  transition(portal){const dest=maps[portal.target];if(!dest||!inside(dest,portal.tx,portal.ty)||dest.walls.has(`${portal.tx},${portal.ty}`)|| (npcs[dest.id]||[]).some(n=>n.x===portal.tx&&n.y===portal.ty))throw Error('Ungültiger Portal-Spawn');
  const source=this.state.mapId;this.state.returns[`${source}->${portal.target}`]={x:this.state.x,y:this.state.y};this.state.mapId=portal.target;this.state.x=portal.tx;this.state.y=portal.ty;this.state.elevation=tileHeight(dest,portal.tx,portal.ty);if(dest.id==='yard')this.setFlag('visitedYard',true);if(dest.id==='village')this.setFlag('visitedVillage',true);if(dest.id==='village_home')this.setFlag('visitedVillageHome',true);if(dest.id==='study')this.setFlag('visitedStudy',true);if(dest.id==='route2')this.setFlag('visitedRoute2',true);if(dest.id==='beerendorf')this.setFlag('visitedBeerendorf',true);if(['beerendorf_werkstatt','beerendorf_haus','beerendorf_haus2','beerendorf_wohnhaus'].includes(dest.id))this.setFlag('visitedBeerendorf',true);if(dest.id==='waldrand')this.setFlag('visitedWaldrand',true);if(dest.id==='brook')this.setFlag('visitedBrook',true);if(dest.id==='route1'){this.setFlag('visitedRoute1',true);this.beginHatchScene();}this.message=portal.kind==='stairs'?'Treppe benutzt':'Bereich gewechselt';this.lastEvent='transition';}
  interact(){if(this.mode==='dialogue')return this.advanceDialogue();const [dx,dy]=dirs[this.state.facing];const x=this.state.x+dx,y=this.state.y+dy;
- const target=[...this.characters,...this.items].find(n=>n.x===x&&n.y===y);if(!target){this.message='Hier gibt es nichts zu untersuchen.';return false;}
+ const target=[...this.characters,...this.items].find(n=>n.x===x&&n.y===y);if(!target&&this.collectGroundPickup(x,y))return true;if(!target){this.message='Hier gibt es nichts zu untersuchen.';return false;}
  if(target.id==='route1_trainer'&&this.beginTrainerChallenge())return true;
  if(target.id==='merchant'){if(!this.state.flags.route1_hatched){this.message='Der kleine Laden öffnet für dich nach dem Schlüpfen deines Starters.';return true;}this.lastEvent='shopOpened';this.message='Willkommen im Dorfladen!';return true;}
  if(target.id==='breeder_a'&&this.state.flags.route1_hatched){this.healAtStation();return true;}
@@ -62,6 +73,21 @@ export class Engine{
  addItem(id,quantity=1){if(typeof id!=='string'||!id||!Number.isSafeInteger(quantity)||quantity<=0)throw Error('Ungültiger Gegenstand');this.state.inventory??=[];const found=this.state.inventory.find(i=>i.id===id);if(found){if(!Number.isSafeInteger(found.quantity)||found.quantity>Number.MAX_SAFE_INTEGER-quantity)return false;found.quantity+=quantity;}else this.state.inventory.push({id,quantity});return true;}
  removeItem(id,quantity=1){if(typeof id!=='string'||!id||!Number.isSafeInteger(quantity)||quantity<=0)return false;const found=(this.state.inventory||[]).find(i=>i.id===id);if(!found||found.quantity<quantity)return false;found.quantity-=quantity;if(found.quantity===0)this.state.inventory=this.state.inventory.filter(i=>i!==found);return true;}
  buyItem(id,quantity=1){if(this.mode!=='exploration'||this.state.mapId!=='village'||!this.state.flags.route1_hatched)return false;if(!canPurchase(this.state,id,quantity))return false;const item=shopItem(id);const total=item.price*quantity;const existing=this.state.inventory.find(i=>i.id===id);if(existing&&existing.quantity>Number.MAX_SAFE_INTEGER-quantity)return false;this.state.money-=total;this.addItem(id,quantity);this.state.eventLog.push({type:'shopPurchase',item:id,quantity,total});this.message=`${quantity} × ${item.name} gekauft für ${total} Pokédollar.`;this.lastEvent='shopPurchase';return true;}
+ equipHeldItem(id,index){
+  if(this.mode!=='exploration'||!Object.hasOwn(HELD_BATTLE_ITEMS,id)||!Number.isInteger(index)||index<0||index>=this.state.team.length)return false;
+  const pokemon=this.state.team[index];if(!pokemon||pokemon.heldItemId===id||!this.inventory.some(i=>i.id===id&&i.quantity>0))return false;
+  const previous=pokemon.heldItemId??null;
+  if(previous&&(!Object.hasOwn(HELD_BATTLE_ITEMS,previous)||this.state.inventory.some(i=>i.id===previous&&i.quantity===Number.MAX_SAFE_INTEGER)))return false;
+  if(!this.removeItem(id,1))return false;
+  if(previous&&!this.addItem(previous,1)){this.addItem(id,1);return false;}
+  pokemon.heldItemId=id;this.message=`${HELD_BATTLE_ITEMS[id].name} wurde #${pokemon.speciesId} gegeben${previous?' (vorheriges Item zurück im Beutel)':''}.`;this.lastEvent='heldItemEquipped';return true;
+ }
+ removeHeldItem(index){
+  if(this.mode!=='exploration'||!Number.isInteger(index)||index<0||index>=this.state.team.length)return false;
+  const pokemon=this.state.team[index],id=pokemon?.heldItemId;
+  if(!id||!Object.hasOwn(HELD_BATTLE_ITEMS,id)||!this.addItem(id,1))return false;
+  pokemon.heldItemId=null;this.message=`${HELD_BATTLE_ITEMS[id].name} wurde in den Beutel gelegt.`;this.lastEvent='heldItemRemoved';return true;
+ }
  get team(){return structuredClone(this.state.team||[])}
  get storage(){return structuredClone(this.state.storage||[])}
  addPokemon(p){this.state.team??=[];return addToTeam(this.state.team,p)}
@@ -145,7 +171,7 @@ export class Engine{
  save(){this.state.pokedex=normalizeDex(this.state.pokedex,this.state.team,this.state.storage);reconcileQuestLog(this.state);return JSON.stringify({schema:8,state:this.state});}
  load(raw){const data=JSON.parse(raw);if(![1,2,3,4,5,6,7,8].includes(data.schema))throw Error('Unbekannte Speicherstand-Version');const s=migrateLegacyMap(data);
  if(s.mapId==='upper'){s.mapId='ground';s.x=10;s.y=2;s.elevation=0;}
- s.flags={...start.flags,...(s.flags||{})};if(!validateStoryFlags(s.flags)||!validatePrologueMilestones(s.flags))throw Error('Ungültige Story-Reihenfolge im Spielstand');s.money=s.money??0;if(!Number.isSafeInteger(s.money)||s.money<0||s.money>999999999)throw Error('Ungültiges Guthaben');s.inventory=Array.isArray(s.inventory)?s.inventory:[];s.eventLog=Array.isArray(s.eventLog)?s.eventLog:[];if(s.questLog!==undefined&&!validateQuestLog(s.questLog,s.flags))throw Error('Ungültige Questdaten');reconcileQuestLog(s);if(!s.inventory.every(i=>i&&typeof i.id==='string'&&i.id.length>0&&Number.isSafeInteger(i.quantity)&&i.quantity>0)||new Set(s.inventory.map(i=>i.id)).size!==s.inventory.length)throw Error('Ungültiges Inventar');s.team=s.team??[];s.storage=s.storage??[];if(!validateTeam(s.team)||!Array.isArray(s.storage)||s.storage.length>500||!s.storage.every(p=>validateTeam([p])))throw Error('Ungültige Pokémon-Speicherdaten');s.pokedex=normalizeDex(s.pokedex,s.team,s.storage);s.starterWishSpeciesId=s.starterWishSpeciesId??null;s.starterEgg=s.starterEgg??null;
+ s.flags={...start.flags,...(s.flags||{})};if(!validateStoryFlags(s.flags)||!validatePrologueMilestones(s.flags))throw Error('Ungültige Story-Reihenfolge im Spielstand');s.money=s.money??0;if(!Number.isSafeInteger(s.money)||s.money<0||s.money>999999999)throw Error('Ungültiges Guthaben');s.inventory=Array.isArray(s.inventory)?s.inventory:[];s.collectedPickups=s.collectedPickups??[];if(!validCollectedPickups(s.collectedPickups))throw Error('Ungültige Fundgegenstandsdaten');s.eventLog=Array.isArray(s.eventLog)?s.eventLog:[];if(s.questLog!==undefined&&!validateQuestLog(s.questLog,s.flags))throw Error('Ungültige Questdaten');reconcileQuestLog(s);if(!s.inventory.every(i=>i&&typeof i.id==='string'&&i.id.length>0&&Number.isSafeInteger(i.quantity)&&i.quantity>0)||new Set(s.inventory.map(i=>i.id)).size!==s.inventory.length)throw Error('Ungültiges Inventar');s.team=s.team??[];s.storage=s.storage??[];if(!validateTeam(s.team)||!Array.isArray(s.storage)||s.storage.length>500||!s.storage.every(p=>validateTeam([p])))throw Error('Ungültige Pokémon-Speicherdaten');s.pokedex=normalizeDex(s.pokedex,s.team,s.storage);s.starterWishSpeciesId=s.starterWishSpeciesId??null;s.starterEgg=s.starterEgg??null;
  if(s.starterWishSpeciesId!==null&&!findStarter(s.starterWishSpeciesId))throw Error('Ungültiger Starterwunsch');
  if(s.starterEgg!==null){if(!findStarter(s.starterEgg.speciesId)||s.starterEgg.speciesId!==s.starterWishSpeciesId||s.starterEgg.hatched!==!!s.flags.route1_hatched||s.starterEgg.received!==true||!s.flags.egg_received)throw Error('Ungültiges Starter-Ei');}
  if(s.flags.egg_received&&!s.starterEgg)throw Error('Ei-Flag ohne Ei');if(s.flags.route1_hatched&&!(s.team.concat(s.storage)).some(p=>p.speciesId===s.starterEgg.speciesId&&p.level>=5))throw Error('Geschlüpftes Starter-Pokémon fehlt');

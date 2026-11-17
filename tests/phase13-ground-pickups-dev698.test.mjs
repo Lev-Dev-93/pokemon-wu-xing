@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {Engine} from '../src/engine.js';
+import {WORLD_PICKUPS,validatePickupPlacement,pickupAt,validCollectedPickups} from '../src/world-pickups.js';
+const item={id:'test_orb',mapId:'bedroom',x:5,y:4,itemId:'life-orb',quantity:1};
+test('no map placements ship with dev698',()=>assert.deepEqual(WORLD_PICKUPS,[]));
+test('valid item placement accepted without touching map data',()=>assert.equal(validatePickupPlacement(item,[item]),true));
+test('invalid placements and items rejected',()=>{for(const p of [{...item,itemId:'fake'},{...item,x:-1},{...item,quantity:0},{...item,x:5,y:7}])assert.equal(validatePickupPlacement(p,[p]),false)});
+test('duplicate placement identifiers and coordinates rejected',()=>{assert.equal(validatePickupPlacement(item,[item,{...item,itemId:'leftovers'}]),false);assert.equal(validatePickupPlacement(item,[item,{...item,id:'other'}]),false)});
+test('pickup lookup hides collected IDs',()=>{assert.equal(pickupAt('bedroom',5,4,[],[item])?.id,item.id);assert.equal(pickupAt('bedroom',5,4,['test_orb'],[item]),null)});
+test('collecting grants item exactly once',()=>{const e=new Engine();e.state.facing='up';assert.equal(e.collectGroundPickup(5,4,[item]),true);assert.equal(e.inventory.find(i=>i.id==='life-orb')?.quantity,1);assert.equal(e.collectGroundPickup(5,4,[item]),false);assert.deepEqual(e.state.collectedPickups,['test_orb'])});
+test('remote or non-exploration collection is rejected',()=>{const e=new Engine();assert.equal(e.collectGroundPickup(4,4,[item]),false);e.mode='dialogue';assert.equal(e.collectGroundPickup(5,4,[item]),false)});
+test('pickup persistence and malformed save validation',()=>{const e=new Engine();assert.equal(e.collectGroundPickup(5,4,[item]),true);const raw=e.save(),loaded=new Engine();loaded.load(raw);assert.deepEqual(loaded.state.collectedPickups,['test_orb']);assert.equal(loaded.collectGroundPickup(5,4,[item]),false);const broken=JSON.parse(raw);broken.state.collectedPickups=['test_orb','test_orb'];assert.throws(()=>new Engine().load(JSON.stringify(broken)),/Fundgegenstand/)});
+test('legacy saves without collectedPickups migrate cleanly',()=>{const e=new Engine();const data=JSON.parse(e.save());delete data.state.collectedPickups;const loaded=new Engine();loaded.load(JSON.stringify(data));assert.deepEqual(loaded.state.collectedPickups,[])});
+test('collected IDs must be unique and bounded',()=>{assert.equal(validCollectedPickups(['a','b']),true);assert.equal(validCollectedPickups(['a','a']),false);assert.equal(validCollectedPickups(['bad id']),false)});

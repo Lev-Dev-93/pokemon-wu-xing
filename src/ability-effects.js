@@ -36,3 +36,37 @@ export function ignoresBurnAttackPenalty(fighter){return abilityId(fighter)===62
 export function weatherAbilityHpFraction(fighter,weather){const id=abilityId(fighter);if(weather==='rain'&&id===44)return {fraction:1/16,name:'Regengenuss'};if(weather==='hail'&&id===115)return {fraction:1/16,name:'Eishaut'};if(id===87&&weather==='rain')return {fraction:1/8,name:'Trockenheit'};if(id===87&&weather==='sun')return {fraction:-1/8,name:'Trockenheit'};if(id===94&&weather==='sun')return {fraction:-1/8,name:'Solarkraft'};return null;}
 
 export function ignoresIndirectDamage(fighter){return abilityId(fighter)===98;}
+
+// Schadensfähigkeiten: typbasierte Boni und defensive Schutzmechaniken.
+// Die ID-Zuordnung folgt der in Monsterreise verwendeten PokéAPI-ID-Systematik.
+const PINCH_TYPE_BY_ABILITY=Object.freeze({65:12,66:10,67:11,68:7}); // Notdünger, Großbrand, Sturzbach, Hexaplaga
+export function pinchAbilityMultiplier(fighter,move){
+ const type=PINCH_TYPE_BY_ABILITY[abilityId(fighter)];
+ const hp=fighter?.pokemon?.currentHp,max=fighter?.pokemon?.stats?.hp;
+ return type===move.typeId&&Number.isFinite(hp)&&Number.isFinite(max)&&max>0&&hp>0&&hp*3<=max?1.5:1;
+}
+export function stabAbilityMultiplier(fighter,move,hasStab){return hasStab&&abilityId(fighter)===91?2:hasStab?1.5:1;}
+export function effectivenessAbilityMultiplier(attacker,defender,effectiveness){
+ if(effectiveness<=0)return 1; // Immunitäten werden nicht aufgehoben.
+ const attackerBonus=abilityId(attacker)===110&&effectiveness<1?2:1; // Aufwertung
+ const defenderReduction=[111,116].includes(abilityId(defender))&&effectiveness>1?0.75:1; // Filter, Felskern
+ return attackerBonus*defenderReduction;
+}
+export function fullHpDefenseMultiplier(defender){
+ return abilityId(defender)===136&&defender.pokemon.currentHp===defender.pokemon.stats.hp?0.5:1; // Multischuppe
+}
+
+// Schutzfähigkeiten bei direkten Treffern. Robustheit wirkt nur gegen einen
+// einzelnen K.-o.-Treffer bei vollen KP, nicht gegen spätere Mehrfachtreffer.
+export function wonderGuardBlocks(defender, effectiveness, move){
+ return abilityId(defender)===25 && move?.power>0 && [2,3].includes(move.category) && effectiveness<=1;
+}
+export function sturdySurvivalHp(defender, incoming){
+ const hp=defender?.pokemon?.currentHp,max=defender?.pokemon?.stats?.hp;
+ return abilityId(defender)===5 && Number.isFinite(hp)&&hp>0&&hp===max&&incoming>=hp ? hp-1 : incoming;
+}
+
+// Fähigkeiten gegen sekundäre Effekte von Schadensattacken.
+export function blocksSecondaryEffect(defender){return abilityId(defender)===19;} // Puderabwehr
+export function blocksFlinch(defender){return abilityId(defender)===39;} // Konzentrator
+export function secondaryEffectChance(attacker,chance){return Math.min(1,chance*(abilityId(attacker)===32?2:1));} // Edelmut
