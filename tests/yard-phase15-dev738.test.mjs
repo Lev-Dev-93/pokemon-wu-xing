@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {maps} from '../src/maps.js';
+import {yardBabyPokemon,yardPondCells,yardMeadowCells,yardFlowerbeds,yardSafeDecor,yardGround,yardWater,yardBabies} from '../src/yard-biome-art.js';
+const map=maps.yard;
+const ctx=()=>({fillStyle:'',ops:[],fillRect(x,y,w,h){this.ops.push([x,y,w,h,this.fillStyle])}});
+test('Phase 15: three named baby Pokemon in two different habitat zones',()=>{assert.deepEqual(yardBabyPokemon.map(a=>a.id),['azurill','pichu','togepi']);assert.equal(yardBabyPokemon.filter(a=>a.zone==='pond').length,1);assert.equal(yardBabyPokemon.filter(a=>a.zone==='pasture').length,2)});
+test('Phase 15: baby Pokemon remain on their respective habitat tiles',()=>{for(const a of yardBabyPokemon){assert.equal(map.walls.has(`${a.x},${a.y}`),false);assert.equal(map.portals.some(p=>p.x===a.x&&p.y===a.y),false);if(a.zone==='pasture'){assert.ok(a.x>9&&a.x<14&&a.y>3&&a.y<7)}else assert.ok(a.x<=6&&a.y>=7)}});
+test('Phase 15: pond remains the same six blocked tiles',()=>{assert.equal(yardPondCells.length,6);for(const [x,y] of yardPondCells)assert.ok(map.walls.has(`${x},${y}`))});
+test('Phase 15: new ground decorations do not occupy portals or blocked cells',()=>{for(const [x,y] of [...yardMeadowCells,...yardFlowerbeds])if(yardSafeDecor(map,x,y)){assert.ok(!map.walls.has(`${x},${y}`));assert.ok(!map.portals.some(p=>p.x===x&&p.y===y))}});
+test('Phase 15: art functions render on mock canvas',()=>{const c=ctx();yardGround(c,map);yardWater(c,0);yardBabies(c,0);assert.ok(c.ops.length>200)});
+test('Phase 15: ambient sprites animate without leaving habitat boundaries',()=>{const a=ctx(),b=ctx();yardBabies(a,0);yardBabies(b,4);assert.notDeepEqual(a.ops,b.ops);for(const op of [...a.ops,...b.ops]){assert.ok(op[0]>=0&&op[0]<map.w*32);assert.ok(op[1]>=0&&op[1]<map.h*32)}});
+test('Phase 15: decorative drawing does not modify gameplay map',()=>{const walls=[...map.walls].sort(),portals=JSON.stringify(map.portals);yardGround(ctx(),map);yardWater(ctx(),3);yardBabies(ctx(),3);assert.deepEqual([...map.walls].sort(),walls);assert.equal(JSON.stringify(map.portals),portals)});

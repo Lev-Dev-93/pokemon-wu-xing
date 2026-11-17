@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {maps} from '../src/maps.js';
+import {yardFinishingPixels} from '../src/yard-finishing-art.js';
+import {yardPondSet} from '../src/yard-biome-art.js';
+import {yardWalkway} from '../src/yard-architecture-art.js';
+const map=maps.yard;
+test('yard finishing only applies to the yard',()=>assert.deepEqual(yardFinishingPixels(maps.village),[]));
+test('yard finishing produces visible detail',()=>assert.ok(yardFinishingPixels(map).length>50));
+test('yard finishing remains within map pixel bounds',()=>{for(const p of yardFinishingPixels(map)){assert.ok(p.x>=0&&p.y>=0&&p.w>0&&p.h>0);assert.ok(p.x+p.w<=map.w*32&&p.y+p.h<=map.h*32)}});
+test('yard finishing is deterministic',()=>assert.deepEqual(yardFinishingPixels(map),yardFinishingPixels(map)));
+test('pond cells remain free of finishing paint',()=>{for(const p of yardFinishingPixels(map))for(const cell of yardPondSet){const [x,y]=cell.split(',').map(Number);assert.ok(p.x+p.w<=x*32||p.x>=(x+1)*32||p.y+p.h<=y*32||p.y>=(y+1)*32)}});
+test('main walking corridor remains free of finishing paint',()=>{for(const p of yardFinishingPixels(map)){const cx=Math.floor(p.x/32),cy=Math.floor(p.y/32);if(yardWalkway(cx,cy))assert.ok(p.y>=7*32+25&&cx===10&&cy===7,'only gate threshold may touch a walkway');}});

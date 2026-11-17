@@ -1,3 +1,28 @@
+## dev.754 – Phase 15: Züchterhof-Finishing
+- Einheitliche Übergänge an Wegen, Teich, Weide, Scheune und Tor; neue Rendering- und Regressionstests.
+- 1288 automatisierte Tests bestanden; Browsertest offen.
+
+## dev.750 – Phase 15: Züchterhof-Architektur und Wege
+- Neue Fassaden- und Zaunakzente sowie weichere Übergänge zwischen Wegen und Wiese.
+- Sechs neue Tests; 1.282/1.282 erfolgreich.
+- Story und Spielmechanik unverändert.
+
+## dev.746 – Phase 15: Züchterhof-Landschaft
+- Teichufer und Wasserfläche kachelübergreifend neu gerendert.
+- Zusammenhängende Wiesen-, Klee- und Gartenrandflächen.
+- 1276 automatisierte Tests bestanden.
+
+## dev.739–742 – Phase 15: Selbstständige Baby-Pokémon
+- Geschlossene, animierte Bewegungsrouten für Azurill, Pichu und Togepi am Züchterhof; unabhängige Bewegung und Ruhephasen.
+- Fünf neue Regressionstests, 1.270 Tests bestanden.
+- Keine Änderungen an Story, Kollisionen oder Kartenportalen.
+
+## dev.735–738 – Phase 15: Züchterhof-Grafikblock
+- Neue zusammenhängende Züchterhof-Wiesen, Beete, Setzlinge und Teichgrafik.
+- Azurill am Teich sowie Pichu und Togepi auf der Weide als animierte dekorative Overworld-Sprites.
+- Sieben zusätzliche Tests, keine Änderung an Story, Kartenkollisionen oder Portalen.
+- 1265/1265 automatisierte Tests bestanden.
+
 ## 1.0.0-dev.734 – Regionale Gartenanlagen
 
 - Originale regionale Blumenbeete mit sicherer Platzierung und kompaktem Fallback auf dicht bebauten Karten.
