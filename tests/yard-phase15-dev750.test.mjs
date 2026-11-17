@@ -5,7 +5,7 @@ import {yardWalkway,yardArchitecturePixels} from '../src/yard-architecture-art.j
 const parts=yardArchitecturePixels(maps.yard);
 test('yard architecture creates visible multi-tile structural details',()=>assert.ok(parts.length>45));
 test('architecture is only drawn in the yard',()=>assert.deepEqual(yardArchitecturePixels(maps.village),[]));
-test('barn trim remains inside barn footprint',()=>assert.ok(parts.some(p=>p.y===2&&p.x===34&&p.w>150)));
+test('house fascia remains within the new house footprint',()=>assert.ok(parts.some(p=>p.y===2&&p.x===67&&p.w>=200)));
 test('pasture gate remains visually open at south edge',()=>assert.ok(!parts.some(p=>p.y===7*32+9&&p.x===10*32+3)));
 test('yard walkway geometry keeps central access',()=>{assert.equal(yardWalkway(7,5),true);assert.equal(yardWalkway(7,10),true);assert.equal(yardWalkway(5,10),true);assert.equal(yardWalkway(6,6),false)});
 test('all generated pixel rectangles have positive dimensions',()=>assert.ok(parts.every(p=>p.w>0&&p.h>0&&Number.isFinite(p.x)&&Number.isFinite(p.y))));

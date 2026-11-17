@@ -19,14 +19,14 @@ export function yardArchitecturePixels(map){
    if(dx!==0){const edge=dx<0?X:X+29;for(let i=0;i<3;i++)add(edge+(dx<0?0:0),Y+5+i*9+seed%3,3+(i%2),4,'#a9ae78');}
    else {const edge=dy<0?Y:Y+29;for(let i=0;i<3;i++)add(X+4+i*9+seed%3,edge,5,3,'#a9ae78');}
   }
-  if((x*7+y*11)%3===0){add(X+8,Y+12,8,2,'#e4cea0');add(X+21,Y+23,5,2,'#ae956c');}
+
  }
- // Barn's long fascia and structural timber, within the existing footprint.
- add(T+2,2,6*T-4,5,'#604335');add(T+5,4,6*T-10,2,'#dfb47a');
- for(let x=1;x<=6;x++){
+ // Hausdetails bleiben innerhalb der neuen Hausfassade; der Eingang bleibt frei.
+ add(2*T+3,2,7*T-6,3,'#684535');
+ for(let x of [2,3,4,5,6,8]){
   const X=x*T;
-  add(X+3,T+3,4,24,'#785239');add(X+26,T+3,3,24,'#785239');
-  add(X+7,T+8,18,2,'#d2a777');
+  add(X+3,T+3,3,23,'#785239');
+  add(X+26,T+3,3,23,'#785239');
  }
  // The fenced pasture has a consistent top rail and visible timber grain.
  for(let x=9;x<=14;x++){

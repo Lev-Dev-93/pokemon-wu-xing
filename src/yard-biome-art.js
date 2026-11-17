@@ -51,7 +51,7 @@ export function yardWater(c,frame=0){
 export const yardHabitatPatches=Object.freeze([
  {kind:'flower-meadow',cells:[[1,6],[2,6],[1,7],[2,7]]},
  {kind:'pasture-clover',cells:[[10,4],[11,4],[12,4],[13,4],[10,5],[11,5],[12,5],[13,5],[10,6],[11,6],[12,6],[13,6]]},
- {kind:'orchard-edge',cells:[[4,4],[5,4],[4,5],[5,5]]}
+ {kind:'orchard-edge',cells:[[5,4],[6,4],[5,5],[6,5]]}
 ]);
 export function yardHabitatPixels(map){
  const pixels=[];

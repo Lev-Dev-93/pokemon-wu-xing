@@ -1,3 +1,7 @@
+## dev.762 – Züchterhof: Gebäude, Kollisionen, Scheune, Wege
+
+Siehe `PHASE15_DEV755_762.md`.
+
 ## dev.754 – Phase 15: Züchterhof-Finishing
 - Einheitliche Übergänge an Wegen, Teich, Weide, Scheune und Tor; neue Rendering- und Regressionstests.
 - 1288 automatisierte Tests bestanden; Browsertest offen.

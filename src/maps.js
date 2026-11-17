@@ -29,7 +29,7 @@ export const forestTreeCells=(id,w=16,h=18)=>{
 export const maps={
  bedroom:room('bedroom','Schlafzimmer',10,8,[[1,1],[2,1],[1,2],[7,1],[8,1]], [p(5,7,'ground',10,2,'stairs')]),
  ground:room('ground','Erdgeschoss',12,9,[[1,1],[2,1],[8,1],[9,1],[2,5],[3,5]], [p(10,1,'bedroom',5,6,'stairs'),p(5,8,'yard',7,2)]),
- yard:room('yard','Züchterhof',16,12,[[2,3],[3,3],[4,3],...Array.from({length:6},(_,i)=>[9+i,3]),...Array.from({length:6},(_,i)=>[9+i,7]).filter(([x])=>x!==10),...Array.from({length:3},(_,i)=>[9,4+i]),...Array.from({length:3},(_,i)=>[14,4+i]),...[ [2,8],[3,8],[4,8],[2,9],[3,9],[4,9] ]], [p(7,1,'ground',5,7),p(7,11,'village',10,1,'path')],{'8,8':1,'9,8':1,'10,8':1,'8,9':1,'9,9':1,'10,9':1},[[7,8],[7,9]]),
+ yard:room('yard','Züchterhof',16,12,[...Array.from({length:7},(_,i)=>[i+2,0]),...Array.from({length:7},(_,i)=>[i+2,1]).filter(([x])=>x!==7),...Array.from({length:4},(_,i)=>[i+1,3]),...Array.from({length:4},(_,i)=>[i+1,4]),[2,3],[3,3],[4,3],...Array.from({length:6},(_,i)=>[9+i,3]),...Array.from({length:6},(_,i)=>[9+i,7]).filter(([x])=>x!==10),...Array.from({length:3},(_,i)=>[9,4+i]),...Array.from({length:3},(_,i)=>[14,4+i]),...[ [2,8],[3,8],[4,8],[2,9],[3,9],[4,9] ]], [p(7,1,'ground',5,7),p(7,11,'village',10,1,'path')],{'8,8':1,'9,8':1,'10,8':1,'8,9':1,'9,9':1,'10,9':1},[[7,8],[7,9]]),
  village:room('village','Startdorf · Mu',22,16,
   [...buildingCells('village'),...Array.from({length:22},(_,x)=>[x,15])],
   [p(10,0,'yard',7,10,'path'),p(0,7,'professor_clearing',14,7,'path'),p(21,7,'route1',1,8,'path'),p(4,5,'village_home',5,6),p(17,5,'village_house_east',5,6),p(4,12,'chapel',5,6),p(17,12,'rival_house',5,6)]),

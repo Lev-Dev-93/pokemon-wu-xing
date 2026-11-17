@@ -32,7 +32,7 @@ const L=(c,x,y,w,h,a,b)=>{R(c,x,y,w,h,a);R(c,x,y,w,2,b)};
 function wood(c,x,y,n){R(c,x,y,T,T,'#bc8b5b');R(c,x,y,32,1,'#e0b584');R(c,x,y+15,32,1,'#98623e');R(c,x+31,y,1,32,'#98623e');R(c,x+5+(n*7)%16,y+6,9,1,'#d8a676');R(c,x+3+(n*13)%15,y+24,11,1,'#9f704b')}
 function stone(c,x,y,n){R(c,x,y,32,32,'#c9b69b');R(c,x,y+15,32,1,'#a99880');R(c,x+((n%2)*16),y,1,16,'#aa9980');R(c,x+16-((n%2)*16),y+16,1,16,'#aa9980');R(c,x+4,y+4,5,1,'#e6d6b9')}
 function grass(c,x,y,n){R(c,x,y,32,32,((n*17)%5===0)?'#7da66a':'#87ad71');for(let i=0;i<5;i++){let xx=(n*13+i*11)%29,yy=(n*7+i*17)%29;R(c,x+xx,y+yy,2,4,i%2?'#669257':'#a5c287');R(c,x+xx+3,y+yy+2,2,2,'#6e9c5a')}}
-function path(c,x,y,n){R(c,x,y,32,32,'#cbb58a');R(c,x+2,y+3,10,3,'#decba6');R(c,x+19,y+18,9,3,'#b5a079');R(c,x+8+(n%8),y+24,3,2,'#a9906d')}
+function path(c,x,y,n){R(c,x,y,32,32,'#cbb58a');R(c,x+2,y+4,12,9,'#d1bc93');R(c,x+18,y+19,11,9,'#c2ab81');R(c,x+7,y+17,9,7,'#c6af85')}
 function wallpaper(c,x,y,n){R(c,x,y,32,32,'#e9d5a9');R(c,x,y+24,32,8,'#91664a');R(c,x,y+23,32,2,'#f8e6bc');R(c,x+7,y+5,2,8,'#ddc394');R(c,x+22,y+5,2,8,'#ddc394')}
 function window(c,x,y){R(c,x+4,y+3,24,24,'#8a6248');R(c,x+7,y+6,18,17,'#b9dce0');R(c,x+15,y+6,2,17,'#f9e4bb');R(c,x+7,y+14,18,2,'#f9e4bb');R(c,x+2,y+25,28,4,'#d5a876')}
 function carpet(c,x,y,w,h,color='#9c5c58'){R(c,x+2,y+3,w-4,h-6,'#68464a');R(c,x+5,y+6,w-10,h-12,color);R(c,x+10,y+11,w-20,h-22,'#c89079');R(c,x+15,y+16,w-30,h-32,color)}
@@ -93,10 +93,29 @@ function drawYard(c,map){const W=map.w*T;
   R(c,x*T+10,y*T+18,2,9,'#5a914c');R(c,x*T+17,y*T+15,2,12,'#6d9c52');
  }
 
- for(let x=1;x<=6;x++)roof(c,x*T,0);
- for(let x=1;x<=6;x++){wallBlock(c,x*T,T);if(x===3||x===5)window(c,x*T,T)}
- R(c,7*T+4,T+4,24,25,'#6a4b39');R(c,7*T+7,T+6,18,22,'#3f5961');
- for(const part of yardBarnDetails())R(c,part.x,part.y,part.w,part.h,part.color);
+ // Wohnhaus: Dach und Fassade bilden einen einzigen, nicht begehbaren Baukörper.
+ for(let x=2;x<=8;x++)roof(c,x*T,0);
+ for(let x=2;x<=8;x++){
+  wallBlock(c,x*T,T);
+  if(x===3||x===5)window(c,x*T,T);
+ }
+ // Der Hauseingang ist IN die Fassade eingelassen (Portal 7,1).
+ door(c,7*T,T);
+ R(c,2*T,0,7*T,4,'#684535');R(c,2*T+5,4,7*T-10,3,'#e2b780');
+ // Eigenständige Scheune, zwei Kachelreihen hoch, mit geschlossener Kollision.
+ for(let x=1;x<=4;x++){
+  roof(c,x*T,3*T);
+  wallBlock(c,x*T,4*T);
+ }
+ R(c,T+3,3*T+5,4*T-6,5,'#593d32');
+ R(c,T+6,4*T+3,4*T-12,24,'#a97951');
+ for(let x=1;x<=4;x++){
+  R(c,x*T+4,4*T+3,4,24,'#654631');
+  R(c,x*T+24,4*T+3,4,24,'#654631');
+ }
+ R(c,2*T+9,4*T+5,43,23,'#493b32');
+ R(c,2*T+12,4*T+7,37,21,'#76513a');
+ R(c,3*T,4*T+8,3,19,'#d2a274');
  for(let y=2;y<11;y++)if(!map.walls.has(`7,${y}`))path(c,7*T,y*T,y);
  for(let x=4;x<11;x++)if(!map.walls.has(`${x},10`))path(c,x*T,10*T,x);
  // Umzäunte Weide mit offenem Tor im Süden; Zaun-Kollisionen liegen in maps.js.
@@ -106,7 +125,7 @@ function drawYard(c,map){const W=map.w*T;
  // Wasser und Ufer werden vom gemeinsamen Züchterhof-Tileset gezeichnet.
  for(const [x,y] of [[2,6],[4,7],[12,9],[13,9],[14,8]])flower(c,x*T,y*T);
  for(const [x,y] of [[1,9],[14,2],[2,10]])pot(c,x*T,y*T);
- for(let y=3;y<11;y++){fence(c,0,y*T);fence(c,W-T,y*T)}
+ // Die äußeren Kartenränder bleiben offen; nur die Weide ist eingezäunt.
 }
 function drawBuildingFacades(c,buildings){
  const mapId=Object.entries(outdoorBuildings).find(([,value])=>value===buildings)?.[0];
