@@ -1,3 +1,67 @@
+## dev.717 – Phase 14: Sichere NPC-Kollisionen und Kartenübergänge
+- NPC-Patrouillen laufen beim Portalwechsel nicht versehentlich auf der Quellkarte weiter.
+- NPC-Speicherstände mit Positionen auf interaktiven Objekten werden abgelehnt.
+- Neue Regressionstests für Kartenübergänge und NPC-Positionen.
+
+## dev.716 – NPC-Bewegungszustände speichern und laden
+- Speicherstandschema 9 mit NPC-Positionen und Simulationsschritt.
+- Validierung von geladenen NPC-Daten und Rückwärtskompatibilität.
+- Sieben neue automatisierte Tests.
+
+## dev.714 – Phase 14: Lebendige Dorfumgebung
+- Ein Neben-NPC in Beerendorf läuft eine sichere, optionale Vier-Kachel-Patrouille.
+- Bewegliche NPCs werden bei Portal-Ankunft und Objektkollision berücksichtigt.
+- Audit und Regressionstests für Patrouillen.
+
+## dev.712 – Phase 14: Charakter- und Laufanimationen
+
+- Visuelle Schrittinterpolation und sanft mitlaufende Kamera.
+- Keine Interpolation bei Teleports, Kartenwechseln oder reduzierter Bewegung.
+- Ruhende NPCs erhalten keine künstlichen Gehbewegungen.
+- 1115 automatisierte Tests erfolgreich; Browserabnahme ausstehend.
+
+## dev.710 – NPC-Tagesabläufe
+- Optionale deterministische NPC-Zeitfenster, Ruhephasen und Bewegungstaktung.
+- Validierung der Zeitfenster und sieben neue Tests (1106/1106 bestanden).
+- Keine Story-NPCs umplatziert; Browser-End-to-End noch offen.
+
+## dev.709 – NPC-Bewegungssteuerung
+- Opt-in-Patrouillen mit Kollisions- und Portalprüfung.
+- Instanzbezogene NPC-Positionen und Rendering-Integration.
+- Sechs neue Regressionstests; 1099/1099 bestanden.
+- Keine Story-NPCs umplatziert; kein Browsertest.
+
+## dev.708 – Phase 14: Interaktionssicherheit
+- Zentralisierte deterministische NPC-/Objekt-Interaktion; Welt-Audit auf überlappende Interaktionsfelder erweitert; sieben Regressionstests.
+- Keine Änderungen an Story, Kartenlayouts oder Fundgegenständen.
+
+## dev.707 – Phase 14: Welt-Sicherheitsprüfungen
+- Portal-Doppelbelegung und NPC-blockierte Ankunft werden erkannt.
+- NPC-Überlappungen und ungültige Zielkartengrößen werden abgefangen.
+- Erreichbarkeitsanalyse ignoriert nicht vorhandene Zielkarten.
+- Sechs Regressionstests ergänzt.
+
+## dev.706 – Phase 14: Höhen- und Treppensicherheit
+- Strengere Bewegungsregeln für Höhenstufen und Treppen.
+- Kartenweites Höhen-Audit und vier neue Regressionstests (1080 bestanden).
+- Keine Änderungen an Story, Kartenlayout oder Fundgegenständen.
+
+## dev.705 – Phase 14: atomare Kartenübergänge
+- Portal-Zielvalidierung vor Spielerbewegung, einschließlich NPC- und Kollisionsprüfung.
+- Vier neue Regressionstests; 1.076/1.076 Tests erfolgreich.
+- Browser-Headless-Versuch mit Timeout, keine Browser-Endabnahme.
+- Details: `PHASE14_DEV705.md`.
+
+## dev.704 – Phase-13-Prüfung und GitHub-Automatisierung
+- Vier Regressionstests zu getragenen Items und Freigabegrenzen.
+- Maschinenlesbarer Auditbericht und GitHub-Actions-Testworkflow.
+- 1072 automatisierte Tests bestanden; vollständige fachliche Freigabe bleibt offen.
+
+## dev.703 – Phase-13-Abschlussinventur
+- Deterministisches Katalog-Audit für reguläre Attackendaten und dokumentierte Fähigkeitsprüfstände.
+- Zwei neue Regressionstests; 1068 erfolgreich.
+- Freigabeblockaden ausdrücklich dokumentiert; keine unbewiesene Vollständigkeitsbehauptung.
+
 ## dev.702 – GitHub-Pages-Browserprüfung
 - Separate Browser-Testseite mit sechs deterministischen Kampfszenarien und manueller End-to-End-Checkliste.
 - Zwei neue Tests, 1066/1066 bestanden. Browser-Headless-Test wegen Timeout nicht abgeschlossen.
@@ -1460,3 +1524,20 @@ Gemeinsame Gebäudefassaden; Entfernung statischer Möbel- und Figurenduplikate;
 - Trainerübergang wartet auf abgeschlossene Belohnungsentscheidungen.
 - Fortschritt wird nach Abschluss der Belohnungsdialoge synchronisiert und automatisch gespeichert.
 - Neue Regressionstests für Trainerkampf- und Belohnungsintegration.
+
+## dev.711 – Phase 14: Lebendige Spielwelt
+- Deterministische Wasser- und Vegetationsanimationen ohne Einfluss auf Spiellogik.
+- Respektiert reduzierte Bewegung und bestehende Brücken-/Portal-/Weggeometrie.
+- Vier neue Regressionstests; 1110/1110 bestanden.
+
+## dev.713 – Phase 14: NPC-Laufanimationen
+- NPC-Schritte visuell interpoliert; Spiellogik und Kollision bleiben kachelbasiert.
+- Statische NPCs, Kartenwechsel und reduzierte Bewegung bleiben ohne Laufanimation.
+- Fünf neue automatisierte Regressionstests (1120 bestanden).
+- Browser-End-to-End-Abnahme weiterhin ausstehend.
+
+## dev.715 – Phase 14: NPC-Aufmerksamkeit
+- Opt-in-Blickreaktion für Umgebungs-NPCs bei Annäherung des Spielers.
+- Spaziergänger in Beerendorf reagiert innerhalb von zwei Kacheln.
+- Keine Story-, Karten- oder Kollisionsänderungen.
+- Sechs neue Tests; 1133/1133 bestanden. Browsertest ausstehend.

@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {Engine} from '../src/engine.js';
+import {npcs} from '../src/maps.js';
+import {restoreNpcRuntime} from '../src/npc-runtime-save.js';
+const player={mapId:'bedroom',x:1,y:1};
+test('runtime NPC position, direction and turn survive save/load',()=>{const e=new Engine();e.npcPositions.beerendorf=[{...npcs.beerendorf[0],x:8,facing:'right'}];e.npcTurn=1;const raw=e.save();const next=new Engine();next.load(raw);assert.equal(next.npcTurn,1);assert.equal(next.npcPositions.beerendorf[0].x,8);assert.equal(next.npcPositions.beerendorf[0].facing,'right');assert.equal(npcs.beerendorf[0].x,7)});
+test('old saves without runtime start with static NPCs',()=>{const e=new Engine();const old=JSON.parse(e.save());old.schema=8;delete old.npcRuntime;const next=new Engine();next.load(JSON.stringify(old));assert.equal(next.npcTurn,0);assert.deepEqual(next.npcPositions,{})});
+test('invalid NPC positions cannot be injected',()=>{assert.throws(()=>restoreNpcRuntime({turn:2,positions:{beerendorf:[{id:'berry_walker',x:-1,y:9,facing:'right'}]}},player))});
+test('unknown NPC identities cannot be injected',()=>{assert.throws(()=>restoreNpcRuntime({turn:2,positions:{beerendorf:[{id:'other',x:7,y:9,facing:'right'}]}},player))});
+test('invalid runtime turn is rejected',()=>{assert.throws(()=>restoreNpcRuntime({turn:-1,positions:{}},player))});
+test('saved NPC cannot overlap player',()=>{assert.throws(()=>restoreNpcRuntime({turn:1,positions:{beerendorf:[{id:'berry_walker',x:7,y:9,facing:'down'}]}},{mapId:'beerendorf',x:7,y:9}))});
+test('reset clears loaded NPC runtime',()=>{const e=new Engine();e.npcTurn=7;e.npcPositions.beerendorf=[{...npcs.beerendorf[0],x:8}];e.reset();assert.equal(e.npcTurn,0);assert.deepEqual(e.npcPositions,{})});

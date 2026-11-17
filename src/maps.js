@@ -70,7 +70,7 @@ for(const map of Object.values(maps)){
  map.landscapeBushes=new Set(landscapeObstacleCells(map).map(([x,y])=>`${x},${y}`).filter(k=>!arrivalCells.get(map.id)?.has(k)&&!entranceAprons.has(k)));
  for(const k of map.landscapeBushes)map.walls.add(k);
 }
-export const npcs={route2:[],beerendorf:[],beerendorf_haus:[{id:'herbal_witch',x:6,y:3,name:'Kräuterhexe',dialogue:['Willkommen in meiner Kräuterstube. Ich kann deine Pokémon versorgen.']}],beerendorf_haus2:[],beerendorf_wohnhaus:[],beerendorf_werkstatt:[],brook:[],waldrand:[],yard:[],bedroom:[],village_home:[],village_house_east:[],professor_house:[],chapel:[],rival_house:[],
+export const npcs={route2:[],beerendorf:[{id:'berry_walker',x:7,y:9,name:'Spaziergänger',noticePlayer:true,noticeRadius:2,dialogue:['Die Wege durch Beerendorf sind besonders schön.'],patrol:['right','down','left','up'],patrolEvery:1}],beerendorf_haus:[{id:'herbal_witch',x:6,y:3,name:'Kräuterhexe',dialogue:['Willkommen in meiner Kräuterstube. Ich kann deine Pokémon versorgen.']}],beerendorf_haus2:[],beerendorf_wohnhaus:[],beerendorf_werkstatt:[],brook:[],waldrand:[],yard:[],bedroom:[],village_home:[],village_house_east:[],professor_house:[],chapel:[],rival_house:[],
  forest_elder_house:[{id:'forest_elder',x:6,y:3,name:'Alte Dame',dialogue:['Der Alte Wald bewahrt Geschichten, die älter sind als unsere Dörfer.','Ich erinnere mich an Celebi. Doch nicht jede Erinnerung erzählt die ganze Wahrheit.','Tiefer im Wald liegen alte Ruinen. Dort findest du vielleicht weitere Spuren.','Bevor du weitergehst, solltest du dich gut auf den Weg vorbereiten.']}],
  route1:[{id:'route1_trainer',x:10,y:8,name:'Junger Trainer',dialogue:['Hallo! Lass uns unsere Pokémon in einem Übungskampf messen.']}],
  ground:[{id:'breeder_a',x:6,y:2,name:'Adoptivmutter',dialogue:['Guten Morgen! Schön, dass du da bist.','Heute ist ein besonderer Tag. Wir sprechen später in Ruhe darüber.']},{id:'breeder_b',x:3,y:3,name:'Züchter',dialogue:['Auf dem Hof gibt es immer etwas zu tun.','Sieh dich ruhig um.']}],
@@ -82,7 +82,33 @@ export const objects={route2:[],forest_elder_house:[],beerendorf:[],beerendorf_h
 export const start={mapId:'bedroom',x:5,y:5,facing:'down',elevation:0,returns:{},steps:0,flags:{introSeen:false,birthday_wish_pending:false,egg_received:false,rift_closed:false,rival_absol:false,parents_briefed:false,professor_demo:false,route1_hatched:false,spokenToBreederA:false,spokenToBreederB:false,visitedYard:false,visitedVillage:false,spokenToVillager:false,spokenToRival:false,spokenToProfessor:false,visitedVillageHome:false,visitedStudy:false,visitedRoute1:false,visitedRoute2:false,visitedBeerendorf:false,visitedWaldrand:false,visitedBrook:false,spokenToResident:false,suppliesCollected:false,route1TrainerDefeated:false},inventory:[],collectedPickups:[],money:0,eventLog:[],starterWishSpeciesId:null,starterEgg:null,team:[],storage:[]};
 export const tileHeight=(map,x,y)=>map.heights[`${x},${y}`]??0;
 export const inside=(map,x,y)=>x>=0&&y>=0&&x<map.w&&y<map.h;
-export function canMove(map,x,y,nx,ny){if(!inside(map,nx,ny)||map.walls.has(`${nx},${ny}`))return false;const a=tileHeight(map,x,y),b=tileHeight(map,nx,ny);return a===b||map.stairs.some(([sx,sy])=>(sx===x&&sy===y)||(sx===nx&&sy===ny));}
+export function canMove(map,x,y,nx,ny){
+ if(![x,y,nx,ny].every(Number.isInteger)||!inside(map,x,y)||!inside(map,nx,ny)||Math.abs(nx-x)+Math.abs(ny-y)!==1)return false;
+ if(map.walls.has(`${x},${y}`)||map.walls.has(`${nx},${ny}`))return false;
+ const a=tileHeight(map,x,y),b=tileHeight(map,nx,ny);
+ if(a===b)return true;
+ // Eine markierte Treppe erlaubt nur den Wechsel auf die direkt benachbarte Höhenstufe.
+ return Math.abs(a-b)===1&&map.stairs.some(([sx,sy])=>(sx===x&&sy===y)||(sx===nx&&sy===ny));
+}
+export function auditWorldHeights(registry=maps){
+ const issues=[];
+ for(const [id,map] of Object.entries(registry)){
+  for(const [key,value] of Object.entries(map.heights||{})){
+   const parts=key.split(',').map(Number),[x,y]=parts;
+   if(parts.length!==2||!parts.every(Number.isInteger)||!inside(map,x,y)||!Number.isInteger(value)||value<0||map.walls.has(key))issues.push(`${id}: ungültige Höhenkachel ${key}`);
+  }
+  const seen=new Set();
+  for(const cell of map.stairs||[]){
+   if(!Array.isArray(cell)||cell.length!==2||!cell.every(Number.isInteger)){issues.push(`${id}: ungültige Treppenkoordinate`);continue;}
+   const [x,y]=cell,key=`${x},${y}`;
+   if(seen.has(key)||!inside(map,x,y)||map.walls.has(key))issues.push(`${id}: ungültige oder doppelte Treppe ${key}`);
+   seen.add(key);
+   const neighbors=[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([nx,ny])=>inside(map,nx,ny)&&!map.walls.has(`${nx},${ny}`));
+   if(!neighbors.some(([nx,ny])=>Math.abs(tileHeight(map,x,y)-tileHeight(map,nx,ny))===1))issues.push(`${id}: Treppe ${key} ohne Höhenwechsel`);
+  }
+ }
+ return issues;
+}
 
 
 // Für jedes Außenportal muss mindestens eine begehbare Nachbarkachel erreichbar sein.

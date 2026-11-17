@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {npcScheduleAt,validateNpcSchedule,advanceNpcPatrol} from '../src/npc-patrol.js';
+import {Engine} from '../src/engine.js';
+const map={w:6,h:6,walls:new Set(),heights:{},stairs:new Set(),portals:[{x:5,y:2}],landscapeArrivalCells:new Set(['4,4'])};
+const actor={id:'extra',x:1,y:1,scheduleCycle:6,schedule:[{from:0,to:2,activity:'idle'},{from:2,to:5,activity:'patrol',path:['right','down','left']}]};
+test('NPC schedules select deterministic windows including cycle wrap',()=>{assert.equal(npcScheduleAt(actor,0).activity,'idle');assert.equal(npcScheduleAt(actor,2).activity,'patrol');assert.equal(npcScheduleAt(actor,5),null);assert.equal(npcScheduleAt(actor,8).activity,'patrol')});
+test('idle and unscheduled windows never move actors',()=>{assert.equal(advanceNpcPatrol(map,[actor],null,0)[0],actor);assert.equal(advanceNpcPatrol(map,[actor],null,5)[0],actor)});
+test('scheduled patrol moves with local phase and keeps input immutable',()=>{const moved=advanceNpcPatrol(map,[actor],null,2)[0];assert.deepEqual([moved.x,moved.y,moved.facing],[2,1,'right']);assert.deepEqual([actor.x,actor.y],[1,1])});
+test('schedule validation rejects overlapping or malformed windows',()=>{assert.equal(validateNpcSchedule(actor),true);assert.equal(validateNpcSchedule({...actor,schedule:[{from:0,to:4,activity:'idle'},{from:3,to:6,activity:'idle'}]}),false);assert.equal(validateNpcSchedule({...actor,schedule:[{from:0,to:6,activity:'patrol',path:['teleport']}]}),false)});
+test('cadence delays patrol movements',()=>{const a={...actor,patrolEvery:2};assert.equal(advanceNpcPatrol(map,[a],null,3)[0],a);assert.equal(advanceNpcPatrol(map,[a],null,2)[0].x,2)});
+test('scheduled NPC respects player and map collision',()=>{assert.equal(advanceNpcPatrol(map,[actor],{x:2,y:1},2)[0],actor);const blocked={...map,walls:new Set(['2,1'])};assert.equal(advanceNpcPatrol(blocked,[actor],null,2)[0],actor)});
+test('existing story NPCs have no schedule enabled',()=>{const e=new Engine();assert.equal(e.characters.some(a=>a.schedule!==undefined),false)});

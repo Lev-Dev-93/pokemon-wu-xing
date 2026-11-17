@@ -1,3 +1,5 @@
+import {validateNpcSchedule} from './npc-patrol.js';
+import {auditInteractionTargets} from './interaction-targets.js';
 import {maps,npcs,objects,inside,tileHeight,canMove} from './maps.js';
 export function auditWorld(){
  const errors=[];
@@ -15,8 +17,13 @@ export function auditWorld(){
    if(!inside(dest,portal.tx,portal.ty)||dest.walls.has(`${portal.tx},${portal.ty}`)||(npcs[dest.id]||[]).some(n=>n.x===portal.tx&&n.y===portal.ty))errors.push(`${id}: Zielposition blockiert`);
    if(!Array.isArray(dest.portals)||!dest.portals.some(back=>back.target===id))errors.push(`${id}: kein Rückweg aus ${dest.id}`);
   }
+  for(const issue of auditInteractionTargets(map,npcs[id]||[],objects[id]||[]))errors.push(`${id}: ${issue}`);
   const npcIds=new Set();
   for(const npc of npcs[id]||[]){if(npcIds.has(npc.id))errors.push(`${id}: doppelte NPC-ID ${npc.id}`);npcIds.add(npc.id);}
+  for(const npc of npcs[id]||[]){
+   if(npc.schedule!==undefined&&!validateNpcSchedule(npc))errors.push(`${id}: ungültiger NPC-Tagesablauf ${npc.id}`);
+   if(npc.patrol!==undefined&&(!Array.isArray(npc.patrol)||!npc.patrol.length||npc.patrol.some(direction=>!['up','down','left','right'].includes(direction))))errors.push(`${id}: ungültige NPC-Patrouille ${npc.id}`);
+  }
   for(const npc of npcs[id]||[])if(!inside(map,npc.x,npc.y)||map.walls.has(`${npc.x},${npc.y}`))errors.push(`${id}: NPC ${npc.id} außerhalb oder in Wand`);
   for(const object of objects[id]||[])if(!inside(map,object.x,object.y))errors.push(`${id}: Objekt ${object.id} außerhalb`);
  }
@@ -26,7 +33,10 @@ export function reachableMaps(origin='bedroom'){
  if(typeof origin!=='string'||!Object.hasOwn(maps,origin))return new Set();
 
  const seen=new Set([origin]),queue=[origin];
- for(let i=0;i<queue.length;i++)for(const portal of maps[queue[i]]?.portals||[])if(!seen.has(portal.target)){seen.add(portal.target);queue.push(portal.target);}
+ for(let i=0;i<queue.length;i++)for(const portal of maps[queue[i]]?.portals||[]){
+  if(!portal||typeof portal.target!=='string'||!Object.hasOwn(maps,portal.target)||seen.has(portal.target))continue;
+  seen.add(portal.target);queue.push(portal.target);
+ }
  return seen;
 }
 

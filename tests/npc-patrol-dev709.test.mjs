@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {advanceNpcPatrol} from '../src/npc-patrol.js';
+import {Engine} from '../src/engine.js';
+const map={w:5,h:5,walls:new Set(),heights:{},stairs:new Set(),portals:[{x:4,y:2}],landscapeArrivalCells:new Set(['3,3'])};
+test('NPC moves along an explicitly opted-in patrol',()=>{const a=[{id:'walker',x:1,y:1,patrol:['right','down']}];assert.deepEqual(advanceNpcPatrol(map,a,{x:0,y:0},0)[0].x,2);assert.equal(a[0].x,1)});
+test('NPC cannot walk onto player',()=>{const a=[{id:'walker',x:1,y:1,patrol:['right']}];assert.equal(advanceNpcPatrol(map,a,{x:2,y:1},0)[0].x,1)});
+test('NPC cannot occupy a portal or arrival point',()=>{assert.equal(advanceNpcPatrol(map,[{x:3,y:2,patrol:['right']}],null,0)[0].x,3);assert.equal(advanceNpcPatrol(map,[{x:2,y:3,patrol:['right']}],null,0)[0].x,2)});
+test('NPCs cannot collide with each other',()=>{const a=[{x:1,y:1,patrol:['right']},{x:2,y:1,patrol:['left']}];assert.deepEqual(advanceNpcPatrol(map,a,null,0).map(x=>x.x),[1,2])});
+test('unconfigured story NPCs stay still',()=>{const a=[{id:'story',x:1,y:1}];assert.equal(advanceNpcPatrol(map,a,null,0)[0],a[0])});
+test('engine initializes an isolated runtime NPC layer',()=>{const e=new Engine();assert.deepEqual(e.npcPositions,{});assert.equal(e.npcTurn,0)});

@@ -10,4 +10,4 @@ test('night encounter selection is passed through real Engine.step',()=>{
  // The state is normally populated after hatching; verify the dependency is wired.
  const source=Engine.prototype.step.toString();assert.match(source,/currentTimeOfDay\(this\.clock\(\)\)/);assert.match(source,/rng:this\.rng/);
 });
-test('time of day is not serialized into save schema',()=>{const e=new Engine({clock:()=>new Date(2026,0,1,23)});const saved=e.save();assert.equal(JSON.parse(saved).schema,8);assert.equal(JSON.parse(saved).state.timeOfDay,undefined);});
+test('time of day is not serialized into save schema',()=>{const e=new Engine({clock:()=>new Date(2026,0,1,23)});const saved=e.save();assert.equal(JSON.parse(saved).schema,9);assert.equal(JSON.parse(saved).state.timeOfDay,undefined);});

@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {maps,npcs,canMove} from '../src/maps.js';
+import {advanceNpcPatrol} from '../src/npc-patrol.js';
+import {auditWorld} from '../src/world-integrity.js';
+import {Engine} from '../src/engine.js';
+const map=maps.beerendorf;
+test('Beerendorf has exactly one optional ambient walker, story NPCs remain unchanged',()=>{assert.equal(npcs.beerendorf.length,1);assert.equal(npcs.beerendorf[0].id,'berry_walker');assert.equal(npcs.village.every(n=>!n.patrol),true)});
+test('ambient route is a valid closed loop of walkable tiles',()=>{let x=7,y=9;for(const dir of npcs.beerendorf[0].patrol){const [dx,dy]={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}[dir];assert.equal(canMove(map,x,y,x+dx,y+dy),true,`${x},${y} ${dir}`);x+=dx;y+=dy;}assert.deepEqual([x,y],[7,9])});
+test('ambient walker traverses loop and returns to origin',()=>{let a=npcs.beerendorf;for(let turn=0;turn<4;turn++)a=advanceNpcPatrol(map,a,{x:1,y:1},turn);assert.deepEqual([a[0].x,a[0].y],[7,9]);assert.deepEqual([npcs.beerendorf[0].x,npcs.beerendorf[0].y],[7,9])});
+test('walker waits when player occupies the next step',()=>{const a=advanceNpcPatrol(map,npcs.beerendorf,{x:8,y:9},0);assert.equal(a[0].x,7)});
+test('walker cannot enter an interactable object tile',()=>{const m={id:'ground',w:11,h:8,walls:new Set(),heights:{},stairs:[],portals:[],landscapeArrivalCells:new Set()};const a=advanceNpcPatrol(m,[{id:'test',x:7,y:2,patrol:['right']}],{x:0,y:0},0);assert.equal(a[0].x,7)});
+test('world audit accepts ambient patrol',()=>assert.deepEqual(auditWorld(),[]));
+test('engine preserves NPC movement state separately from map definitions',()=>{const e=new Engine();e.state.mapId='beerendorf';e.state.x=1;e.state.y=1;e.advanceNpcs();assert.equal(e.characters[0].x,8);assert.equal(npcs.beerendorf[0].x,7)});

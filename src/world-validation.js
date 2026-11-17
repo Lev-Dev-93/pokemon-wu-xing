@@ -12,7 +12,7 @@ export function validatePortalDestinations(world){
  for(const [id,map] of Object.entries(world||{}))for(const [i,p] of (Array.isArray(map?.portals)?map.portals:[]).entries()){
   const dest=world[p?.target];
   if(!dest){issues.push(`${id}: Portal ${i} ohne Zielkarte`);continue;}
-  if(!Number.isInteger(p.tx)||!Number.isInteger(p.ty)||p.tx<0||p.ty<0||p.tx>=dest.w||p.ty>=dest.h)issues.push(`${id}: Portal ${i} landet außerhalb von ${p.target}`);
+  if(!Number.isInteger(p.tx)||!Number.isInteger(p.ty)||!Number.isInteger(dest.w)||!Number.isInteger(dest.h)||p.tx<0||p.ty<0||p.tx>=dest.w||p.ty>=dest.h)issues.push(`${id}: Portal ${i} landet außerhalb von ${p.target}`);
   else if(dest.walls?.has?.(`${p.tx},${p.ty}`))issues.push(`${id}: Portal ${i} landet in einer Wand`);
  }return issues;
 }
@@ -29,8 +29,10 @@ export function validateActors(world,actors){
  const issues=[];
  for(const [id,entries] of Object.entries(actors||{})){
   const map=world?.[id];if(!map){if(entries?.length)issues.push(`${id}: NPC-Karte fehlt`);continue;}
+  const occupied=new Set();
   for(const [i,n] of (Array.isArray(entries)?entries:[]).entries()){
-   if(!n||!Number.isInteger(n.x)||!Number.isInteger(n.y)||n.x<0||n.y<0||n.x>=map.w||n.y>=map.h||map.walls?.has?.(`${n.x},${n.y}`))issues.push(`${id}: NPC ${i} blockiert oder außerhalb`);
+   if(!n||!Number.isInteger(n.x)||!Number.isInteger(n.y)||n.x<0||n.y<0||n.x>=map.w||n.y>=map.h||map.walls?.has?.(`${n.x},${n.y}`)){issues.push(`${id}: NPC ${i} blockiert oder außerhalb`);continue;}
+   const cell=`${n.x},${n.y}`;if(occupied.has(cell))issues.push(`${id}: NPC ${i} überlappt anderen NPC`);occupied.add(cell);
   }
  }return issues;
 }
@@ -43,4 +45,22 @@ export function validateObjects(world,objects){
    if(!o||!Number.isInteger(o.x)||!Number.isInteger(o.y)||o.x<0||o.y<0||o.x>=map.w||o.y>=map.h)issues.push(`${id}: Objekt ${i} außerhalb`);
   }
  }return issues;
+}
+
+/** Checks arrival safety against static NPCs and duplicate portal declarations. */
+export function validatePortalSafety(world,actors={}){
+ const issues=[];
+ for(const [id,map] of Object.entries(world||{})){
+  if(!Array.isArray(map?.portals))continue;
+  const sources=new Set();
+  for(const [i,p] of map.portals.entries()){
+   if(!p||!Number.isInteger(p.x)||!Number.isInteger(p.y))continue;
+   const source=`${p.x},${p.y}`;
+   if(sources.has(source))issues.push(`${id}: mehrere Portale auf ${source}`);
+   sources.add(source);
+   const target=world[p.target];if(!target||!Number.isInteger(p.tx)||!Number.isInteger(p.ty))continue;
+   if((actors[p.target]||[]).some(n=>n?.x===p.tx&&n?.y===p.ty))issues.push(`${id}: Portal ${i} landet auf NPC`);
+  }
+ }
+ return issues;
 }

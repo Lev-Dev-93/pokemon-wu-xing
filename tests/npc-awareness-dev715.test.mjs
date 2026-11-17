@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {orientNearbyNpcs} from '../src/npc-awareness.js';
+import {Engine} from '../src/engine.js';
+import {npcs} from '../src/maps.js';
+test('opt-in NPC looks toward nearby player',()=>{const a=[{x:4,y:4,noticePlayer:true,facing:'up'}];assert.equal(orientNearbyNpcs(a,{x:5,y:4})[0].facing,'right');assert.equal(a[0].facing,'up')});
+test('distant player does not alter facing',()=>{const a=[{x:4,y:4,noticePlayer:true,facing:'up'}];assert.strictEqual(orientNearbyNpcs(a,{x:8,y:4})[0],a[0])});
+test('story NPCs do not react without opt-in',()=>{const a=[{x:4,y:4,facing:'up'}];assert.strictEqual(orientNearbyNpcs(a,{x:5,y:4})[0],a[0])});
+test('invalid radius is ignored',()=>{const a=[{x:4,y:4,noticePlayer:true,noticeRadius:100}];assert.strictEqual(orientNearbyNpcs(a,{x:5,y:4})[0],a[0])});
+test('reaction changes neither coordinates nor NPC source data',()=>{const a=[{x:4,y:4,noticePlayer:true}];const b=orientNearbyNpcs(a,{x:4,y:5});assert.deepEqual([b[0].x,b[0].y],[4,4]);assert.equal(a[0].facing,undefined)});
+test('ambient walker opts in but story figures remain stationary',()=>{assert.equal(npcs.beerendorf[0].noticePlayer,true);assert.equal(npcs.village.some(n=>n.noticePlayer),false);const e=new Engine();e.state.mapId='beerendorf';e.state.x=7;e.state.y=8;e.advanceNpcs();assert.equal(e.characters.length,1);assert.equal(npcs.beerendorf[0].x,7)});
