@@ -1,4 +1,4 @@
-import {validateNpcSchedule} from './npc-patrol.js';
+import {validateNpcSchedule,npcMovementPhase} from './npc-patrol.js';
 import {auditInteractionTargets} from './interaction-targets.js';
 import {maps,npcs,objects,inside,tileHeight,canMove} from './maps.js';
 export function auditWorld(){
@@ -21,6 +21,7 @@ export function auditWorld(){
   const npcIds=new Set();
   for(const npc of npcs[id]||[]){if(npcIds.has(npc.id))errors.push(`${id}: doppelte NPC-ID ${npc.id}`);npcIds.add(npc.id);}
   for(const npc of npcs[id]||[]){
+   if((npc.patrol!==undefined||npc.schedule!==undefined)&&npcMovementPhase(npc,0)===null)errors.push(`${id}: ungültige NPC-Bewegungsparameter ${npc.id}`);
    if(npc.schedule!==undefined&&!validateNpcSchedule(npc))errors.push(`${id}: ungültiger NPC-Tagesablauf ${npc.id}`);
    if(npc.patrol!==undefined&&(!Array.isArray(npc.patrol)||!npc.patrol.length||npc.patrol.some(direction=>!['up','down','left','right'].includes(direction))))errors.push(`${id}: ungültige NPC-Patrouille ${npc.id}`);
   }

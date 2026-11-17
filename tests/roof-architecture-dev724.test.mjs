@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {roofArchitecture} from '../src/roof-architecture.js';
+const examples=[{x:1,y:2,w:5,h:3,label:'Labor'},{x:5,y:4,w:4,h:2,label:'Haus'},{x:0,y:0,w:1,h:1},{x:7,y:8,w:3,h:3}];
+test('invalid building footprints draw nothing',()=>{for(const b of [null,{}, {x:0,y:0,w:0,h:2},{x:0,y:0,w:2,h:-1}])assert.deepEqual(roofArchitecture(b),[])});
+test('all roof and facade pixels stay inside building footprint',()=>{for(const b of examples)for(const p of roofArchitecture(b)){assert.ok(p.x>=b.x*32&&p.y>=b.y*32);assert.ok(p.x+p.w<=(b.x+b.w)*32&&p.y+p.h<=(b.y+b.h)*32);assert.ok(p.w>0&&p.h>0)}});
+test('research laboratory gets recognizable skylight',()=>{const b=examples[0];assert.ok(roofArchitecture(b).some(p=>p.color==='#a6d4d4'))});
+test('roof families have distinct colors',()=>{const b={x:2,y:2,w:4,h:3};const a=roofArchitecture({...b,label:'Labor'});const c=roofArchitecture({...b,label:'Haus'});assert.notDeepEqual(a,c)});
+test('roof architecture is deterministic',()=>{for(const b of examples)assert.deepEqual(roofArchitecture(b),roofArchitecture(b))});
+test('one-tile houses do not receive lower-floor decorations',()=>{const parts=roofArchitecture({x:0,y:0,w:1,h:1});assert.ok(parts.every(p=>p.y+p.h<=32))});

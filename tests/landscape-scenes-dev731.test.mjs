@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {landscapeScenePixels} from '../src/landscape-scenes-art.js';
+import {maps,isVillagePath,isBerryVillagePath,isProfessorClearingPath} from '../src/maps.js';
+const path=(id,x,y)=>id==='village'?isVillagePath(x,y):id==='beerendorf'?isBerryVillagePath(x,y):isProfessorClearingPath(x,y);
+const ids=['village','beerendorf','professor_clearing','yard'];
+const yardPath=(x,y)=>x===7&&y>=2||y===10&&x>=4&&x<=10;
+test('all four inhabited outdoor areas get coherent regional scenes',()=>{for(const id of ids){const pixels=landscapeScenePixels(maps[id],path);assert.ok(pixels.length>40,id);assert.equal(new Set(pixels.map(p=>p.kind)).size,1);}});
+test('regional scenes are deterministic and do not mutate maps',()=>{for(const id of ids){const m=maps[id],before=[...m.walls];const a=landscapeScenePixels(m,path);assert.deepEqual(a,landscapeScenePixels(m,path));assert.deepEqual([...m.walls],before);}});
+test('scene pixels remain inside their own tile',()=>{for(const id of ids)for(const p of landscapeScenePixels(maps[id],path)){assert.ok(p.x>=p.cellX*32&&p.x+p.w<=(p.cellX+1)*32);assert.ok(p.y>=p.cellY*32&&p.y+p.h<=(p.cellY+1)*32);}});
+test('scene tiles never occupy portals walls or paths',()=>{for(const id of ids){const m=maps[id],portals=new Set(m.portals.map(p=>`${p.x},${p.y}`));for(const p of landscapeScenePixels(m,path)){const cell=`${p.cellX},${p.cellY}`;assert.ok(!m.walls.has(cell),`${id} wall ${cell}`);assert.ok(!portals.has(cell),`${id} portal ${cell}`);assert.ok(!(id==='yard'?yardPath(p.cellX,p.cellY):path(id,p.cellX,p.cellY)),`${id} path ${cell}`);}}});
+test('scene motifs are distinct between four regions',()=>{const kinds=ids.map(id=>landscapeScenePixels(maps[id],path)[0].kind);assert.equal(new Set(kinds).size,4);});
+test('interiors, malformed maps and fully blocked maps render no scenes',()=>{assert.deepEqual(landscapeScenePixels(maps.bedroom,path),[]);assert.deepEqual(landscapeScenePixels(null,path),[]);assert.deepEqual(landscapeScenePixels({...maps.yard,walls:null},path),[]);const m={...maps.yard,walls:new Set(Array.from({length:256},(_,i)=>`${i%16},${Math.floor(i/16)}`))};assert.deepEqual(landscapeScenePixels(m,path),[]);});
+test('renderer integrates landscape scenes after existing ground details',async()=>{const {readFileSync}=await import('node:fs');const src=readFileSync(new URL('../src/art.js',import.meta.url),'utf8');assert.match(src,/import \{composedLandscapePixels\}/);assert.match(src,/for\(const part of composedLandscapePixels\(/);});

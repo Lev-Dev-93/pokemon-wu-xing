@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {vegetationClusterPixels} from '../src/vegetation-clusters-art.js';
+const make=(id='beerendorf')=>({id,w:18,h:18,walls:new Set(['4,4','6,6']),portals:[{x:5,y:5}]});
+const path=(_,x,y)=>x===9||y===9;
+test('cluster vegetation is deterministic and visibly populated',()=>{const m=make();const p=vegetationClusterPixels(m,path);assert.ok(p.length>40);assert.deepEqual(p,vegetationClusterPixels(m,path));});
+test('all cluster pixels remain within their grass tiles',()=>{for(const p of vegetationClusterPixels(make(),path)){assert.ok(p.x>=p.cellX*32&&p.x+p.w<=(p.cellX+1)*32);assert.ok(p.y>=p.cellY*32&&p.y+p.h<=(p.cellY+1)*32);}});
+test('portals, walls and paths remain clear',()=>{for(const p of vegetationClusterPixels(make(),path)){assert.ok(!path('',p.cellX,p.cellY));assert.ok(!['4,4','6,6','5,5'].includes(`${p.cellX},${p.cellY}`));}});
+test('non-outdoor maps do not receive vegetation',()=>{assert.deepEqual(vegetationClusterPixels(make('bedroom'),path),[]);assert.deepEqual(vegetationClusterPixels(null,path),[]);});
+test('regional plant palettes and forms differ',()=>{const a=vegetationClusterPixels(make('beerendorf'),path);const b=vegetationClusterPixels(make('professor_clearing'),path);assert.notDeepEqual(new Set(a.map(p=>p.color)),new Set(b.map(p=>p.color)));});
+test('rendering does not mutate world state',()=>{const m=make();const before=JSON.stringify({walls:[...m.walls],portals:m.portals});vegetationClusterPixels(m,path);assert.equal(JSON.stringify({walls:[...m.walls],portals:m.portals}),before);});
+test('yard path protection does not depend on callback',()=>{const m=make('yard');const p=vegetationClusterPixels(m,()=>false);assert.ok(p.every(p=>!(p.cellX===7&&p.cellY>=2||p.cellY===10&&p.cellX>=4&&p.cellX<=10)));});

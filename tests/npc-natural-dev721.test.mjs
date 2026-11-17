@@ -1,0 +1,16 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {npcMovementPhase,advanceNpcPatrol} from '../src/npc-patrol.js';
+import {maps,npcs} from '../src/maps.js';
+import {Engine} from '../src/engine.js';
+import {auditWorld} from '../src/world-integrity.js';
+const actor={patrol:['right','down','left','up'],patrolEvery:2,pauseEvery:12,pauseTicks:4};
+test('rest period pauses last four slots of each twelve',()=>{for(let t=8;t<12;t++)assert.equal(npcMovementPhase(actor,t).moving,false)});
+test('rest does not advance patrol route index',()=>{assert.equal(npcMovementPhase(actor,7).index,3);assert.equal(npcMovementPhase(actor,12).index,4)});
+test('different cadence moves every other active slot',()=>{assert.equal(npcMovementPhase(actor,0).moving,true);assert.equal(npcMovementPhase(actor,1).moving,false);assert.equal(npcMovementPhase(actor,2).moving,true)});
+test('movement pattern repeats consistently across cycles',()=>{assert.equal(npcMovementPhase(actor,0).index,0);assert.equal(npcMovementPhase(actor,12).index,4)});
+test('invalid rest configurations fail safely',()=>{for(const x of [{pauseEvery:3,pauseTicks:3},{pauseEvery:0,pauseTicks:1},{pauseEvery:-1},{patrolEvery:0}])assert.equal(npcMovementPhase(x,0),null)});
+test('ambient walker pauses when player remains still',()=>{let actors=npcs.beerendorf;const seen=[];for(let t=0;t<24;t++){actors=advanceNpcPatrol(maps.beerendorf,actors,{x:1,y:1},t);seen.push(`${actors[0].x},${actors[0].y}`)}assert.ok(new Set(seen).size>1);assert.equal(seen[8],seen[11]);});
+test('movement stays deterministic across save and load',()=>{const e=new Engine();e.state.mapId='beerendorf';e.state.x=1;e.state.y=1;for(let i=0;i<19;i++)e.advanceNpcs();e.state.mapId='bedroom';e.state.x=5;e.state.y=5;const copy=new Engine();copy.load(e.save());e.state.mapId='beerendorf';copy.state.mapId='beerendorf';for(let i=0;i<15;i++){e.advanceNpcs();copy.advanceNpcs();assert.deepEqual(copy.characters,e.characters)} });
+test('unconfigured story NPCs remain stationary',()=>{const e=new Engine();e.state.mapId='village';const before=structuredClone(e.characters);for(let i=0;i<30;i++)e.advanceNpcs();assert.deepEqual(e.characters,before)});
+test('world integrity accepts configured ambient rest cycles',()=>assert.deepEqual(auditWorld(),[]));

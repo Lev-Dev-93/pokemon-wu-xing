@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {outdoorGroundAccents} from '../src/outdoor-ground-art.js';
+const map={id:'beerendorf',w:16,h:16,walls:new Set(['3,3']),portals:[{x:4,y:5}]};
+const none=()=>false;
+test('ground decoration is deterministic',()=>assert.deepEqual(outdoorGroundAccents(map,none),outdoorGroundAccents(map,none)));
+test('decorative pixels stay inside their own tiles',()=>{for(const p of outdoorGroundAccents(map,none)){assert.ok(p.x>=p.tileX*32&&p.y>=p.tileY*32);assert.ok(p.x+p.w<=(p.tileX+1)*32&&p.y+p.h<=(p.tileY+1)*32)}});
+test('walls and portal tiles are untouched',()=>assert.ok(outdoorGroundAccents(map,none).every(p=>!['3,3','4,5'].includes(`${p.tileX},${p.tileY}`))));
+test('path tiles are untouched',()=>assert.equal(outdoorGroundAccents(map,()=>true).length,0));
+test('other maps receive no new ground art',()=>assert.deepEqual(outdoorGroundAccents({...map,id:'bedroom'},none),[]));
+test('different settlements get different accents',()=>assert.notDeepEqual(outdoorGroundAccents(map,none),outdoorGroundAccents({...map,id:'yard'},none)));
+test('missing and malformed maps are safe',()=>{for(const m of [null,{}, {id:'yard',w:-1,h:12}])assert.deepEqual(outdoorGroundAccents(m,none),[])});

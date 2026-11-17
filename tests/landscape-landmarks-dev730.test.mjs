@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {landscapeLandmarkPixels} from '../src/landscape-landmarks-art.js';
+const make=(id='beerendorf')=>({id,w:24,h:24,walls:new Set(['4,4','6,6']),portals:[{x:5,y:5}]});
+const path=(_,x,y)=>x===12||y===12;
+test('regional landmarks render visible 2x2 groups deterministically',()=>{const m=make();const a=landscapeLandmarkPixels(m,path);assert.ok(a.length>100);assert.deepEqual(a,landscapeLandmarkPixels(m,path));});
+test('landmark pixels are strictly inside their tiles',()=>{for(const p of landscapeLandmarkPixels(make(),path)){assert.ok(p.x>=p.cellX*32&&p.x+p.w<=(p.cellX+1)*32);assert.ok(p.y>=p.cellY*32&&p.y+p.h<=(p.cellY+1)*32);}});
+test('landmarks never cover portals walls or paths',()=>{for(const p of landscapeLandmarkPixels(make(),path)){assert.ok(!path('',p.cellX,p.cellY));assert.ok(!['4,4','6,6','5,5'].includes(`${p.cellX},${p.cellY}`));}});
+test('different regions have distinctive motifs',()=>{const motifs=['village','beerendorf','professor_clearing','yard'].map(id=>new Set(landscapeLandmarkPixels(make(id),path).map(p=>p.kind)));assert.equal(new Set(motifs.map(m=>[...m][0])).size,4);});
+test('indoor and invalid maps have no landscape landmarks',()=>{assert.deepEqual(landscapeLandmarkPixels(make('bedroom'),path),[]);assert.deepEqual(landscapeLandmarkPixels(null,path),[]);assert.deepEqual(landscapeLandmarkPixels({...make(),walls:null},path),[]);});
+test('landmark rendering does not change map data',()=>{const m=make();const before=JSON.stringify({...m,walls:[...m.walls]});landscapeLandmarkPixels(m,path);assert.equal(JSON.stringify({...m,walls:[...m.walls]}),before);});
+test('yard walkway remains clear even with false path callback',()=>{const p=landscapeLandmarkPixels(make('yard'),()=>false);assert.ok(p.every(v=>!(v.cellX===7&&v.cellY>=2||v.cellY===10&&v.cellX>=4&&v.cellX<=10)));});
+test('blocked anchor cells suppress complete motif',()=>{const m=make();m.walls=new Set(Array.from({length:24*24},(_,i)=>`${i%24},${Math.floor(i/24)}`));assert.deepEqual(landscapeLandmarkPixels(m,path),[]);});

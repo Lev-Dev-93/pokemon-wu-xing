@@ -1,3 +1,11 @@
+import {settlementGardenPixels} from './settlement-gardens-art.js';
+import {settlementLandmarkPixels} from './settlement-landmarks-art.js';
+import {composedLandscapePixels} from './landscape-composition.js';
+import {facadeOrnaments} from './facade-ornaments.js';
+import {roofArchitecture} from './roof-architecture.js';
+import {outdoorGroundAccents} from './outdoor-ground-art.js';
+import {settlementBuildingDetails,yardBarnDetails} from './settlement-identity-art.js';
+import {settlementPlazaPixels} from './settlement-plaza-art.js';
 import {drawFurnitureSprite} from './furniture-art.js';
 import {currentLayout} from './layout-runtime.js';
 import {drawMuAtmosphere} from './mu-atmosphere.js';
@@ -85,6 +93,7 @@ function drawYard(c,map){const W=map.w*T;
  for(let x=1;x<=6;x++)roof(c,x*T,0);
  for(let x=1;x<=6;x++){wallBlock(c,x*T,T);if(x===3||x===5)window(c,x*T,T)}
  R(c,7*T+4,T+4,24,25,'#6a4b39');R(c,7*T+7,T+6,18,22,'#3f5961');
+ for(const part of yardBarnDetails())R(c,part.x,part.y,part.w,part.h,part.color);
  for(let y=2;y<11;y++)if(!map.walls.has(`7,${y}`))path(c,7*T,y*T,y);
  for(let x=4;x<11;x++)if(!map.walls.has(`${x},10`))path(c,x*T,10*T,x);
  // Umzäunte Weide mit offenem Tor im Süden; Zaun-Kollisionen liegen in maps.js.
@@ -98,12 +107,16 @@ function drawYard(c,map){const W=map.w*T;
  for(let y=3;y<11;y++){fence(c,0,y*T);fence(c,W-T,y*T)}
 }
 function drawBuildingFacades(c,buildings){
+ const mapId=Object.entries(outdoorBuildings).find(([,value])=>value===buildings)?.[0];
  for(const {x,y,w,h,color='#9e7153',label=''} of buildings){
   for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++){
    wallBlock(c,xx*T,yy*T);
    if(yy===y)roof(c,xx*T,yy*T);
   }
   facadeDetail(c,x,y,w,h,x+y);
+  for(const part of roofArchitecture({x,y,w,h,label}))R(c,part.x,part.y,part.w,part.h,part.color);
+  for(const part of facadeOrnaments({x,y,w,h,label}))R(c,part.x,part.y,part.w,part.h,part.color);
+  for(const part of settlementBuildingDetails(mapId,{x,y,w,h,label}))R(c,part.x,part.y,part.w,part.h,part.color);
   R(c,x*T+5,(y+h-1)*T+6,w*T-10,16,color);
   if(label&&typeof c.fillText==='function'){
    c.save();c.fillStyle='#fff2d1';c.font='bold 9px sans-serif';
@@ -228,8 +241,18 @@ function drawLandscapeDetails(c,map){
 function drawLayoutFurniture(c,id){for(const o of currentLayout()[id]||[])if(o.kind==='furniture')drawFurnitureSprite(c,o,T)}
 
 export function drawScene(c,map,state,animationFrame=0,actors=npcs[map.id]||[],heroVisual=null){c.imageSmoothingEnabled=false;for(let y=0;y<map.h;y++)for(let x=0;x<map.w;x++){const px=x*T,py=y*T,n=x+y*map.w;if(map.id==='yard'){if(x===7&&y>=2||y===10&&x>=4&&x<=10)path(c,px,py,n);else grass(c,px,py,n)}else if((((map.id==='route1'||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))){if(isTravelPath(map.id,x,y)&&!map.walls.has(`${x},${y}`))path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='brook'){if(y>=7&&y<=9){R(c,px,py,32,32,x>=6&&x<=9?'#aa8356':'#4d9eaf')}else if(isTravelPath(map.id,x,y)&&!map.walls.has(`${x},${y}`))path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='village'){if(isVillagePath(x,y)&&!map.walls.has(`${x},${y}`))path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='professor_clearing'){if(isProfessorClearingPath(x,y)&&!map.walls.has(`${x},${y}`))path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='beerendorf'){if(isBerryVillagePath(x,y)&&!map.walls.has(`${x},${y}`))path(c,px,py,n);else grass(c,px,py,n)}else if(map.id==='ground')stone(c,px,py,n);else wood(c,px,py,n);if(!['yard','village','professor_clearing','route1','route2','waldrand','beerendorf','brook'].includes(map.id)&&y===0)wallpaper(c,px,py,n)}
+// Subtle original ground vegetation for the inhabited outdoor areas.
+// Never cover paths, portals, buildings or blocked cells.
+for(const part of outdoorGroundAccents(map,(id,x,y)=>id==='yard'?(x===7&&y>=2||y===10&&x>=4&&x<=10):id==='beerendorf'?isBerryVillagePath(x,y):isVillagePath(x,y)))R(c,part.x,part.y,part.w,part.h,part.color);
 if(map.id==='bedroom'){drawBedroom(c)}if(map.id==='ground'){drawGround(c)}if(map.id==='yard'){drawYard(c,map);for(const [fx,fy] of [[1,6],[4,7],[12,8],[14,6]]){R(c,fx*T+6,fy*T+11,20,15,'#6b8e50');R(c,fx*T+10,fy*T+6,12,12,'#96b36c')}}if(map.id==='village')drawVillage(c,map);if(map.id==='professor_clearing')drawProfessorClearing(c,map);if(map.id==='beerendorf')drawBeerendorf(c,map);if(map.id==='route2'){for(let y=11;y<=12;y++)for(let x=9;x<=10;x++){wallBlock(c,x*T,y*T);if(y===11)roof(c,x*T,y*T)}door(c,10*T,13*T);}if(map.id==='beerendorf_haus2'){drawInterior(c,'village_home');for(const [x,y] of [[2,2],[8,2],[2,5]]){R(c,x*T+10,y*T+12,13,13,'#608b51');R(c,x*T+13,y*T+15,5,5,'#c95667')}}if(map.id==='beerendorf_haus'){drawInterior(c,'village_home')}if(map.id==='beerendorf_wohnhaus'){drawInterior(c,'village_home')}if(map.id==='forest_elder_house'){drawInterior(c,'village_home')}if(map.id==='beerendorf_werkstatt'){drawInterior(c,'study')}if(((map.id==='route1'||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))||['route2','waldrand'].includes(map.id))drawRoute1(c,map);if(map.id==='brook'){for(let x=0;x<map.w;x++)for(let y=7;y<=9;y++)if(x<6||x>9){const X=x*T,Y=y*T;R(c,X+4,Y+9,18,2,'#82c6ce');R(c,X+12,Y+23,12,2,'#75b8c5');waterGlint(c,X,Y,state.steps||0)}for(const [x,y] of [[2,3],[13,3],[2,12],[13,12]])if(!map.walls.has(`${x},${y}`)&&terrainKind(map.id,x,y)==='grass'){pot(c,x*T,y*T)}for(let x=0;x<map.w;x++){if(x<6||x>9){for(let y of [6,10]){R(c,x*T,y*T+18,32,14,'#739c66');R(c,x*T+8,y*T+12,3,15,'#4c7e57');R(c,x*T+21,y*T+10,3,18,'#527d51')}}}for(let y=7;y<=9;y++)for(let x=6;x<=9;x++){const X=x*T,Y=y*T;R(c,X,Y,32,32,'#a47848');R(c,X+2,Y+3,28,5,'#d4a36b');R(c,X+2,Y+19,28,4,'#744e32');R(c,X+14,Y,3,32,'#5f402b');if(x===6||x===9){R(c,X+(x===6?2:26),Y+3,4,26,'#66462f');R(c,X+(x===6?2:26),Y+3,4,3,'#e7b77e')}}}if(map.id==='village_home'||map.id==='village_house_east'||map.id==='professor_house'||map.id==='chapel'||map.id==='rival_house'||map.id==='study'){drawInterior(c,map.id==='study'?'study':'village_home');if(map.id==='chapel'){carpet(c,4*T,T,3*T,5*T,'#927b9c')}}
 drawPathEdges(c,map);
+for(const part of settlementPlazaPixels(map,(id,x,y)=>id==='village'?isVillagePath(x,y):id==='beerendorf'?isBerryVillagePath(x,y):isProfessorClearingPath(x,y)))R(c,part.x,part.y,part.w,part.h,part.color);
+// dev.733: large, regional path emblems distinguish settlements at normal zoom.
+for(const part of settlementLandmarkPixels(map,(id,x,y)=>id==='village'?isVillagePath(x,y):id==='beerendorf'?isBerryVillagePath(x,y):isProfessorClearingPath(x,y)))R(c,part.x,part.y,part.w,part.h,part.color);
+// dev.734: distinct ornamental gardens use only safe, unoccupied grass tiles.
+for(const part of settlementGardenPixels(map,(id,x,y)=>id==='village'?isVillagePath(x,y):id==='beerendorf'?isBerryVillagePath(x,y):isProfessorClearingPath(x,y)))R(c,part.x,part.y,part.w,part.h,part.color);
+// dev.732: priority-based vegetation composition prevents stacked motifs.
+for(const part of composedLandscapePixels(map,(id,x,y)=>id==='village'?isVillagePath(x,y):id==='beerendorf'?isBerryVillagePath(x,y):isProfessorClearingPath(x,y)))R(c,part.x,part.y,part.w,part.h,part.color);
 drawLandscapeDetails(c,map);
 drawVillageDecor(c,map);
 drawBrookBanks(c,map);

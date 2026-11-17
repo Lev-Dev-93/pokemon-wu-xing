@@ -1,3 +1,63 @@
+## 1.0.0-dev.734 – Regionale Gartenanlagen
+
+- Originale regionale Blumenbeete mit sicherer Platzierung und kompaktem Fallback auf dicht bebauten Karten.
+- Sieben neue automatisierte Tests; insgesamt 1258 bestanden.
+
+## dev.733 – Regionale Dorfplatzmotive
+- Große ortsspezifische Bodenmotive in Startdorf, Beerendorf und Professorenlichtung sowie Wegakzent am Züchterhof.
+- Rein grafische Ergänzung; neue Tests für sichere Platzierung.
+- 1251/1251 automatisierte Tests bestanden.
+
+# dev.732 – Einheitliche Landschaftskomposition
+- Neue priorisierte Landschafts-Zeichenpipeline verhindert Überlagerungen zwischen Szenen, Motiven und kleineren Pflanzen.
+- 13 neue Tests; 1.245 Tests bestanden.
+- Keine Gameplay- oder Storyänderungen.
+
+## dev.731 – Zusammenhängende Landschaftsszenen
+- Vier neue regionale 3×2-Kachel-Szenen (Gärten, Beerengärten, Farngruppen, Weidewiesen), maximal zwei je Außenkarte.
+- Vollständige Sicherheitsprüfung der Flächen gegen Wege, Wände und Portale; deterministische, rein visuelle Platzierung.
+- Integration in den bestehenden Welt-Renderer und sieben neue Regressionstests.
+- Story, Kollisionen, Spielstände, Fundgegenstände und NPCs unverändert.
+
+## dev.730 – Regionale Landschaftsmotive
+- Neues Modul `src/landscape-landmarks-art.js` mit zusammenhängenden 2×2-Kachel-Motiven für Blumenbeete, Beerenhecken, Farngruppen und Weidegras.
+- Sichere rein grafische Integration ohne Änderung an Karten, Kollisionen, Portalen oder Story.
+- Acht neue automatisierte Regressionstests.
+
+## dev.728 – Phase 14: Vegetation und Landschaftsübergänge
+
+- Neues Modul `src/landscape-transition-art.js`: ortsabhängige Grashalme und Blüten an Wegen in Startdorf, Beerendorf, Professorenlichtung und Züchterhof.
+- Alle Akzente liegen auf freien Graskacheln direkt neben Wegen; keine Zeichnung auf Portalen, Mauern oder Wegkacheln.
+- Acht neue Regressionstests; Karten, Story, Kollisionen und Fundgegenstände unverändert.
+
+## dev.727 – Phase 14: Dorfplätze und Wegegestaltung
+- Ortsabhängige Wegkanten und Kreuzungspflaster als reine Pixelgrafik.
+- Portale und Kollisionen bleiben unverändert.
+- 1.202 automatisierte Tests bestanden.
+
+## dev.724 – Phase 14: Individuelle Dacharchitektur
+- Vier neue pixelbasierte Dachvarianten mit Dachfenster, Ziegeln und Fassadenstreben; rein visuell.
+- Sechs zusätzliche Geometrie- und Determinismus-Tests; 1174/1174 bestanden.
+
+## dev.723 – Fassadenornamente
+- Originale Dach- und Fensterdetails für bestehende Häuser, ohne Gameplay-Eingriffe.
+- Vier neue automatisierte Tests.
+
+## dev.722 – Phase 14: Ambient-Blickbewegungen
+- Opt-in-Blickrichtungswechsel in NPC-Ruhephasen, deterministisch und ohne Positionsänderungen.
+- Spaziergänger in Beerendorf verwendet die Funktion.
+- Sechs neue Regressionstests.
+
+## dev.721 – Phase 14: Natürlichere NPC-Bewegungen (dev.719–721)
+- Einstellbare Schrittintervalle und regelmäßige NPC-Ruhepausen; Beerendorfer Spaziergänger nutzt beide.
+- Deterministische Fortsetzung und Validierung; 1.158 Tests bestanden.
+
+## dev.718 – Eigenständiger NPC-Zeittakt
+- NPCs bewegen sich zeitbasiert (700 ms) statt bei Spielerschritten.
+- Während Dialogen, Menüs, Kämpfen, Cutscenes und in inaktiven Tabs pausiert der Takt; keine Nachholbewegungen.
+- Bewegungsanimationen bleiben erhalten, Kollisions- und Storylogik unverändert.
+- Automatisierte Tests für Takt, Pausen und Entkopplung.
+
 ## dev.717 – Phase 14: Sichere NPC-Kollisionen und Kartenübergänge
 - NPC-Patrouillen laufen beim Portalwechsel nicht versehentlich auf der Quellkarte weiter.
 - NPC-Speicherstände mit Positionen auf interaktiven Objekten werden abgelehnt.
@@ -1541,3 +1601,16 @@ Gemeinsame Gebäudefassaden; Entfernung statischer Möbel- und Figurenduplikate;
 - Spaziergänger in Beerendorf reagiert innerhalb von zwei Kacheln.
 - Keine Story-, Karten- oder Kollisionsänderungen.
 - Sechs neue Tests; 1133/1133 bestanden. Browsertest ausstehend.
+
+## dev.725 – Siedlungs-Bodendetails
+- Neue kachelgebundene Pixelvegetation und Kiesel für Hof, Beerendorf und Startdorf; keine Karten-/Storyänderungen.
+
+## dev.726 – Siedlungsarchitektur und markante Gebäude
+- Individuelle Architektur für Werkstatt, Laden, Kapelle, Forschungsgebäude, Wohnhäuser und Züchterhof-Scheune.
+- Ortsabhängige Dachpaletten, Giebel, Fensterläden und Fassadendetails.
+- Neue Grafik bleibt innerhalb der bestehenden Gebäudegrundrisse; 15 neue Tests.
+
+## dev.729 – Zusammenhängende Vegetationsgruppen
+- Neue regionale Pflanzencluster mit Beerensträuchern, Farnen und Wiesenpflanzen.
+- Render-only, ohne Änderungen an Story, Portalen, Karten oder Fundgegenständen.
+- Sieben neue Tests, insgesamt 1217 bestanden.

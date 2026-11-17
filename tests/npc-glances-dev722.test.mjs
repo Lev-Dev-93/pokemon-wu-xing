@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {npcIdleFacing,advanceNpcPatrol} from '../src/npc-patrol.js';
+import {maps,npcs} from '../src/maps.js';
+import {Engine} from '../src/engine.js';
+const walker=npcs.beerendorf[0];
+test('glances are opt-in and deterministic',()=>{assert.equal(npcIdleFacing(walker,0),'down');assert.equal(npcIdleFacing(walker,3),'left');assert.equal(npcIdleFacing(walker,6),'up');assert.equal(npcIdleFacing(walker,12),'down')});
+test('glances only happen at configured intervals',()=>{assert.equal(npcIdleFacing(walker,1),null);assert.equal(npcIdleFacing(walker,2),null)});
+test('invalid glance configuration fails closed',()=>{for(const actor of [{glanceEvery:0,glanceDirections:['up']},{glanceEvery:1,glanceDirections:['teleport']},{glanceEvery:2,glanceDirections:[]},{glanceDirections:['up']},{}])assert.equal(npcIdleFacing(actor,0),null)});
+test('glances do not consume route movement or change coordinates',()=>{const stationary={...walker,x:7,y:9};const out=advanceNpcPatrol(maps.beerendorf,[stationary],{x:1,y:1},9)[0];assert.equal(out.x,7);assert.equal(out.y,9);assert.equal(out.facing,'right')});
+test('story NPCs never gain ambient glances',()=>{const e=new Engine();e.state.mapId='ground';const before=structuredClone(e.characters);for(let i=0;i<20;i++)e.advanceNpcs();assert.deepEqual(e.characters,before)});
+test('glance configuration is not written into canonical map data by runtime',()=>{const before=structuredClone(walker);const e=new Engine();e.state.mapId='beerendorf';e.state.x=1;e.state.y=1;for(let i=0;i<20;i++)e.advanceNpcs();assert.deepEqual(walker,before)});
