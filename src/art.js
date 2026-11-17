@@ -1,4 +1,10 @@
-import {drawYardSpriteBuildings,drawYardTerrainTile,drawYardProp,drawYardFenceSprite,drawYardTree,drawYardPond,drawYardPathEdge,yardAsset} from './yard-sprite-assets.js';
+import {drawGroundFloorDetails} from './ground-floor-detail-assets.js';
+import {drawBedroomDetails} from './bedroom-detail-assets.js';
+import {drawBedroomPcSprite} from './bedroom-pc-art.js';
+import {drawLargeInteriorFurnishings} from './interior-large-assets.js';
+import {drawStartHomeSurfaces} from './interior-surface-assets.js';
+import {drawStartHomeFurnishings} from './interior-sprite-assets.js';
+import {drawYardSpriteBuildings,drawYardTerrainTile,drawYardProp,drawYardFenceSprite,drawYardTree,drawYardPond,drawYardPathEdge,drawYardFarmProps,yardAsset} from './yard-sprite-assets.js';
 import {yardFinishingPixels} from './yard-finishing-art.js';
 import {yardArchitecturePixels} from './yard-architecture-art.js';
 import {yardGround,yardWater,yardBabies,yardHabitatPixels} from './yard-biome-art.js';
@@ -88,19 +94,20 @@ function interiorDetail(c,id){
 }
 function wallBlock(c,x,y){R(c,x,y,32,32,'#79644f');R(c,x+2,y+2,28,26,'#a18a6a');R(c,x+3,y+4,26,2,'#d4b795');R(c,x+2,y+27,28,4,'#624e41')}
 function hero(c,x,y,facing,steps){const walk=steps%2===0?0:2;R(c,x+10,y+26,6,4-walk,'#3b3b48');R(c,x+19,y+26-walk,6,4+walk,'#3b3b48');R(c,x+9,y+16,18,12,'#426e85');R(c,x+10,y+18,3,9,'#e0a77e');R(c,x+24,y+18,3,9,'#e0a77e');R(c,x+10,y+7,16,12,'#eebf96');R(c,x+8,y+4,20,8,'#513a33');R(c,x+11,y+2,14,4,'#715043');R(c,x+13,y+17,10,3,'#d5a980');if(facing==='down'){R(c,x+13,y+13,2,2,'#322d30');R(c,x+21,y+13,2,2,'#322d30')}if(facing==='left')R(c,x+10,y+13,2,2,'#322d30');if(facing==='right')R(c,x+24,y+13,2,2,'#322d30');if(facing==='up'){R(c,x+12,y+9,13,8,'#614b3f');R(c,x+14,y+18,9,8,'#a97c5e')}}
-function drawBedroom(c){interiorDetail(c,'bedroom');carpet(c,96,128,64,64);window(c,5*32,0);door(c,5*32,7*32)}
-function drawUpper(c){interiorDetail(c,'upper');carpet(c,4*32,3*32,4*32,3*32,'#8b7769');sofa(c,32,32);dresser(c,9*32,32);window(c,5*32,0);pot(c,10*32,3*32);shelf(c,32,5*32);door(c,5*32,32);stairs(c,10*32,7*32)}
+function drawBedroom(c){drawStartHomeSurfaces(c,'bedroom');interiorDetail(c,'bedroom');carpet(c,96,128,64,64);window(c,5*32,0);door(c,5*32,7*32);drawBedroomDetails(c);drawStartHomeFurnishings(c,'bedroom');drawLargeInteriorFurnishings(c,'bedroom')}
+function drawUpper(c){drawStartHomeSurfaces(c,'upper');interiorDetail(c,'upper');carpet(c,4*32,3*32,4*32,3*32,'#8b7769');sofa(c,32,32);dresser(c,9*32,32);window(c,5*32,0);pot(c,10*32,3*32);shelf(c,32,5*32);door(c,5*32,32);stairs(c,10*32,7*32);drawLargeInteriorFurnishings(c,'upper')}
 function drawGround(c){
+ drawStartHomeSurfaces(c,'ground');
  interiorDetail(c,'ground');
  // Küche links: Herd, Spüle, Schränke und Esstisch. Wohnzimmer rechts: Sofa, Teppich und Bücher.
- R(c,0,0,6*T,7*T,'#b79b78');R(c,6*T,0,6*T,7*T,'#c3ad8c');
+ // Separate kitchen and living-room flooring is supplied by the surface atlas.
  for(let x=0;x<6;x++)R(c,x*T,0,T,6,'#896748');
  
  
  
  carpet(c,7*T,3*T,4*T,3*T,'#8d665c');
  window(c,5*T,0);window(c,9*T,0);
- stairs(c,10*T,T);door(c,5*T,8*T);
+ stairs(c,10*T,T);door(c,5*T,8*T);drawStartHomeFurnishings(c,'ground');drawLargeInteriorFurnishings(c,'ground');drawGroundFloorDetails(c);
 }
 function yardAssetReadyTerrain(){return Boolean(yardAsset('terrain'));}
 function drawYard(c,map,{buildings=true}={}){
@@ -119,24 +126,17 @@ function drawYard(c,map,{buildings=true}={}){
  }
  R(c,2*T+2,26,7*T-4,4,'#633f38');R(c,2*T+5,27,7*T-10,2,'#e1ad7d');
  for(const xx of [3,5]){R(c,xx*T+3,T+2,26,26,'#684a3b');R(c,xx*T+6,T+4,20,20,'#d3e7db');R(c,xx*T+8,T+6,16,16,'#83bdca');R(c,xx*T+15,T+5,2,19,'#f4dfb7');R(c,xx*T+8,T+14,16,2,'#f4dfb7');R(c,xx*T+5,T+25,22,3,'#d3a474');}
- // Standalone barn directly to the right of the house.
+ // Rustic barn fallback with wide dark entrance and two outward-open timber leaves.
  for(let x=10;x<=14;x++){roof(c,x*T,0);wallBlock(c,x*T,T)}
- for(let yy=6;yy<28;yy+=7)for(let xx=10*T+5+(Math.floor(yy/7)%2)*6;xx<15*T-8;xx+=12){
-  R(c,xx,yy,9,2,'#c18462');R(c,xx+1,yy+2,7,1,'#7b493b');
- }
- R(c,10*T+2,26,5*T-4,4,'#61423b');R(c,10*T+5,27,5*T-10,2,'#e1b184');
- // Barn ventilation window, framed in timber.
- R(c,13*T+9,T+5,16,13,'#543c32');R(c,13*T+11,T+7,12,9,'#2c3835');
- for(let i=0;i<3;i++)R(c,13*T+12+i*4,T+8,2,7,'#c59b68');
- R(c,10*T+3,T+4,5*T-6,23,'#a76f49');
- for(let x=10;x<=14;x++){
-  R(c,x*T+3,T+4,5,24,'#6c4637');R(c,x*T+25,T+4,4,24,'#765039');
-  R(c,x*T+10,T+9,12,2,'#c99467');
- }
- R(c,11*T+9,T+5,3*T-18,24,'#5c3e32');
- R(c,11*T+12,T+8,3*T-24,21,'#80563b');
- R(c,12*T+15,T+8,3,21,'#e5bb83');
- R(c,11*T+12,T+27,3*T-24,3,'#382f2d');
+ R(c,10*T+4,28,5*T-8,6,'#583a2c');
+ R(c,11*T+10,T+3,3*T-20,28,'#352c27');
+ R(c,11*T+14,T+7,3*T-28,23,'#242a25');
+ for(let x=11*T+18;x<14*T-12;x+=10)R(c,x,T+23,7,2,'#c6a15e');
+ R(c,11*T+7,T+1,5,30,'#c69b67');R(c,14*T-12,T+1,5,30,'#c69b67');
+ R(c,10*T+22,T+7,18,22,'#855b3c');R(c,14*T-7,T+7,18,22,'#855b3c');
+ R(c,10*T+25,T+9,2,18,'#c49a66');R(c,14*T+3,T+9,2,18,'#c49a66');
+ R(c,12*T+9,14,14,13,'#302c28');
+ for(let i=0;i<3;i++)R(c,12*T+11+i*4,16,2,9,'#b78c59');
  }
  // Garden beds occupy the former barn site (left of central path).
  for(let y=3;y<=4;y++)for(let x=1;x<=4;x++){
@@ -364,9 +364,10 @@ if(map.id==='route2'){
 drawMuAtmosphere(c,map);
 drawForestAtmosphere(c,map);
 if(currentLayout()[map.id])drawLayoutFurniture(c,map.id);
-for(const item of objects[map.id]||[]){if(item.id==='pokemon_pc'){R(c,item.x*T+4,item.y*T+3,24,23,'#343c55');R(c,item.x*T+7,item.y*T+6,18,13,'#69c9d2');R(c,item.x*T+11,item.y*T+22,10,5,'#c6cbd2');R(c,item.x*T+7,item.y*T+27,18,3,'#555c6d');objectHighlight(c,item.x*T,item.y*T,'pc');drawTag(c,item.x,item.y,'PC')}else if(item.id==='supply_box'){R(c,item.x*T+3,item.y*T+9,26,20,'#8d6135');R(c,item.x*T+3,item.y*T+9,26,5,'#e0b967');R(c,item.x*T+13,item.y*T+10,6,17,'#e8d19a');objectHighlight(c,item.x*T,item.y*T,'box');drawTag(c,item.x,item.y,'TRÄNKE')}else if(item.id==='village_sign'||item.id==='professor_sign'){R(c,item.x*T+7,item.y*T+6,18,20,'#a77a4c');R(c,item.x*T+5,item.y*T+3,22,13,'#e6c990')}}
+for(const item of objects[map.id]||[]){if(item.id==='pokemon_pc'){if(drawBedroomPcSprite(c,item.x,item.y)){drawTag(c,item.x,item.y,'PC');continue;}R(c,item.x*T+4,item.y*T+3,24,23,'#343c55');R(c,item.x*T+7,item.y*T+6,18,13,'#69c9d2');R(c,item.x*T+11,item.y*T+22,10,5,'#c6cbd2');R(c,item.x*T+7,item.y*T+27,18,3,'#555c6d');objectHighlight(c,item.x*T,item.y*T,'pc');drawTag(c,item.x,item.y,'PC')}else if(item.id==='supply_box'){R(c,item.x*T+3,item.y*T+9,26,20,'#8d6135');R(c,item.x*T+3,item.y*T+9,26,5,'#e0b967');R(c,item.x*T+13,item.y*T+10,6,17,'#e8d19a');objectHighlight(c,item.x*T,item.y*T,'box');drawTag(c,item.x,item.y,'TRÄNKE')}else if(item.id==='village_sign'||item.id==='professor_sign'){R(c,item.x*T+7,item.y*T+6,18,20,'#a77a4c');R(c,item.x*T+5,item.y*T+3,22,13,'#e6c990')}}
 if(map.id==='yard'){
  // Final sprite pass keeps pond and tree silhouettes above legacy decoration layers.
+ drawYardFarmProps(c,map);
  drawYardPond(c);
  for(const [x,y,variant] of [[0,2,0],[14,9,1],[0,9,1]])drawYardTree(c,x,y,variant);
  yardBabies(c,animationFrame);

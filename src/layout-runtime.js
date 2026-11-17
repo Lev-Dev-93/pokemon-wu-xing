@@ -51,7 +51,7 @@ export function applyLayout(next,player=null,{record=false}={}){const validation
  }
 
  // Keep original interactions, relocate them along with their furniture.
- if(id==='bedroom'||id==='ground'){objects[id]=original[id].objects.map(o=>({...o}));for(const o of objects[id]){const item=(next[id]||[]).find(i=>i.id===(o.id==='bed'?'player-bed':o.id==='pokemon_pc'?'pokemon-pc':''));if(item){o.x=item.x;o.y=item.y+(o.id==='pokemon_pc'?1:0)}}}
+ if(id==='bedroom'||id==='ground'){objects[id]=original[id].objects.map(o=>({...o}));for(const o of objects[id]){const item=(next[id]||[]).find(i=>i.id===(o.id==='bed'?'player-bed':o.id==='pokemon_pc'?'pokemon-pc':''));if(item){o.x=item.x;o.y=item.y}}}
  }
  for(const id of ['village','professor_clearing','beerendorf'])for(const item of next[id]||[]){if(!item.door)continue;const interior=maps[item.door.target];if(!interior)continue;for(const exit of interior.portals)if(exit.target===id){exit.tx=item.door.x;exit.ty=item.door.y+1}}
  if(record)remember(current);current=layoutCopy(next);return {ok:true,migration}}
@@ -86,7 +86,10 @@ export function inspectImportedLayout(text){
    merged[id]=items;
 
   }
-  const validation=check(merged);
+  // Migrate pre-dev.780 layouts: the story PC belongs in the player's bedroom.
+   merged.ground=(merged.ground||[]).filter(o=>o.id!=='pokemon-pc');
+   if(!(merged.bedroom||[]).some(o=>o.id==='pokemon-pc'))merged.bedroom.push({...defaults.bedroom.find(o=>o.id==='pokemon-pc')});
+   const validation=check(merged);
   if(!validation.ok)return validation;
   const changed=supported.filter(id=>JSON.stringify(merged[id])!==JSON.stringify(current[id]));
   return {ok:true,layout:merged,changedMaps:changed,objectCount:supported.reduce((n,id)=>n+merged[id].length,0)};

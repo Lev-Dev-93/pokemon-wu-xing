@@ -27,11 +27,12 @@ test('Heilungs-NPC im Dorfhaus entfernt, Adoptivmutter heilt im eigenen Haus',()
  assert.equal(e.interact(),true);assert.equal(e.lastEvent,'stationHealed');
  assert.equal(e.state.team[0].currentHp,e.state.team[0].stats.hp);
 });
-test('PC befindet sich im Erdgeschoss der Zuchtfarm, nicht im Dorfhaus',()=>{
- assert.ok(objects.ground.some(o=>o.id==='pokemon_pc'));
+test('PC befindet sich im Schlafzimmer, nicht im Erdgeschoss oder Dorfhaus',()=>{
+ assert.ok(objects.bedroom.some(o=>o.id==='pokemon_pc'));
+ assert.ok(!objects.ground.some(o=>o.id==='pokemon_pc'));
  assert.ok(!objects.village_home.some(o=>o.id==='pokemon_pc'));
- const e=new Engine();e.state.mapId='ground';e.state.flags.route1_hatched=true;
- e.state.x=8;e.state.y=3;e.state.facing='up';
+ const e=new Engine();e.state.mapId='bedroom';e.state.flags.route1_hatched=true;
+ e.state.x=6;e.state.y=2;e.state.facing='right';
  assert.equal(e.interact(),true);assert.equal(e.lastEvent,'storageOpened');
  assert.equal(e.canAccessStorage(),true);
 });

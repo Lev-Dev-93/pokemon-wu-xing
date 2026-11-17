@@ -98,7 +98,7 @@ export class Engine{
  get storage(){return structuredClone(this.state.storage||[])}
  addPokemon(p){this.state.team??=[];return addToTeam(this.state.team,p)}
  movePokemon(from,to){if(this.mode!=='exploration')return false;const changed=reorderTeam(this.state.team,from,to);if(changed){this.message='Die Teamreihenfolge wurde geändert.';this.lastEvent='teamReordered';}return changed}
- canAccessStorage(){return this.mode==='exploration'&&this.state.mapId==='ground'&&this.state.flags.route1_hatched}
+ canAccessStorage(){return this.mode==='exploration'&&this.state.mapId==='bedroom'&&this.state.flags.route1_hatched}
  depositPokemon(index){if(!this.canAccessStorage()||!validateTeam(this.state.team)||!Number.isInteger(index)||index<0||index>=this.state.team.length||this.state.team.length<=1||this.state.storage.length>=500)return false;this.state.storage.push(this.state.team.splice(index,1)[0]);this.message='Pokémon im Lager abgelegt.';this.lastEvent='pokemonDeposited';return true}
  withdrawPokemon(index){if(!this.canAccessStorage()||!Number.isInteger(index)||index<0||index>=this.state.storage.length||this.state.team.length>=6)return false;const pokemon=this.state.storage[index];if(!addToTeam(this.state.team,pokemon))return false;this.state.storage.splice(index,1);this.message='Pokémon ins Team aufgenommen.';this.lastEvent='pokemonWithdrawn';return true}
  recoverFromBlackout(){

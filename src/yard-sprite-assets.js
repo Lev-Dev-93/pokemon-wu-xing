@@ -8,7 +8,8 @@ export const YARD_ASSETS=Object.freeze({
  pathEdges:'./assets/tilesets/yard_path_edges_32.png',
  home:'./assets/buildings/zuechterhaus_224x64.png',
  barn:'./assets/buildings/scheune_160x64.png',
- buildingShadows:'./assets/tilesets/yard_building_shadows.png'
+ buildingShadows:'./assets/tilesets/yard_building_shadows.png',
+ farmProps:'./assets/tilesets/yard_farm_props_32.png'
 });
 const cache=new Map();
 export function yardAsset(key){
@@ -70,4 +71,17 @@ export function drawYardPathEdge(ctx,x,y,mask){
  if(typeof ctx.drawImage!=='function')return false;
  const atlas=yardAsset('pathEdges');if(!atlas)return false;
  ctx.drawImage(atlas,(mask%4)*32,Math.floor(mask/4)*32,32,32,x*32,y*32,32,32);return true;
+}
+
+// Decorative farm equipment is non-blocking; no gameplay collision changes.
+export const YARD_FARM_PROPS=Object.freeze([[11,2,0],[13,2,1],[11,3,2],[13,3,3],[2,6,4],[4,6,5],[5,3,6],[12,3,7]]);
+export function drawYardFarmProps(ctx,map){
+ if(typeof ctx.drawImage!=='function'||map?.id!=='yard')return 0;
+ const atlas=yardAsset('farmProps');if(!atlas)return 0;
+ let count=0;
+ for(const [x,y,index] of YARD_FARM_PROPS){
+  if(map.walls.has(`${x},${y}`))continue;
+  ctx.drawImage(atlas,(index%4)*32,Math.floor(index/4)*32,32,32,x*32,y*32,32,32);count++;
+ }
+ return count;
 }

@@ -1,3 +1,8 @@
+## 1.0.0-dev.780 – Phase 16
+- Pokémon-PC ins Schlafzimmer versetzt, samt Lagerzugriff und Layout-Migration.
+- Eigenes PC-PNG, Schlafzimmer-Konzeptgrafik und Regressionstests.
+- Scheune bleibt nicht betretbare Dekoration.
+
 ## 1.0.0-dev.774 – Phase 16
 - Gebäudesprites mit zusätzlichen Dach-, Sockel- und Holzdetails.
 - Neuer transparenter Gebäudeschatten-Atlas und Renderer-Anbindung.
@@ -1685,3 +1690,32 @@ Gemeinsame Gebäudefassaden; Entfernung statischer Möbel- und Figurenduplikate;
 
 ## dev.773 – Gebäude-Pixelart
 - Detaillierte Wohnhaus- und Scheunen-PNGs, bei identischen Abmessungen und unveränderter Spiellogik.
+
+## 1.0.0-dev.775
+- Scheune mit offenem Doppeltor und eigenständigem landwirtschaftlichen Erscheinungsbild; Canvas-Fallback angepasst.
+
+## 1.0.0-dev.776
+- Züchterhof: eigener PNG-Atlas mit acht landwirtschaftlichen Dekorationsmotiven; Einbindung als zusätzliche Sprite-Ebene.
+
+## 1.0.0-dev.777 – Phase 16: Innenausstattung
+- Originales Möbel-PNG-Atlas für Schlafzimmer und Erdgeschoss.
+- PNG-Möbel-Renderer mit Lade-Fallback und unveränderter Kartenlogik.
+- Drei neue Tests, vollständige Suite: 1.340 bestanden.
+
+## 1.0.0-dev.778 – Innenraumflächen
+- PNG-Holzböden und Wandverkleidungen für das Starthaus integriert.
+- Neue künstlerische Pixelart-Stilvorlage für künftige Möbelgrafiken.
+- 1.343 automatisierte Tests bestanden.
+
+## 1.0.0-dev.779
+- Großformatige 64px-Möbelsprites und Innenraum-Integration (Phase 16).
+
+## 1.0.0-dev.781
+- Schlafzimmer: eigener PNG-Dekorationsatlas und zusätzliche Sprite-Ebene.
+- Innenraum-Bodenatlas: Zeichnung auf tatsächliche Kartengrenzen begrenzt.
+- PC im Schlafzimmer und Scheune als reine Dekoration unverändert.
+
+## 1.0.0-dev.782 – Erdgeschossgrafik
+- PNG-Atlas für Küchen-, Ess- und Wohnbereich mit 16 Motiven.
+- Separate, kollisionsfreie Dekorationsebene im Erdgeschoss.
+- Vier Tests ergänzt, 1350/1350 bestanden.
